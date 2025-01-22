@@ -1,3 +1,9 @@
+## v0.6.5
+
+#### New functions:
+- Updated available variables and sources
+
+
 ## v0.6.4
 
 #### Bug fixes:
@@ -5,7 +11,7 @@
  
 ## v0.6.3
 
-#### New functions
+#### New functions:
 - Added possibility to merge duplicate variables in geoenrich.exports.collate_npy
 - Added population density and distance to port
 

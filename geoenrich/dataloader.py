@@ -207,7 +207,7 @@ def import_occurrences_csv(path, id_col, date_col, lat_col, lon_col, depth_col =
     
     Args:
         path (str): Path to the csv file to open.
-        id_col (int or str): Name or index of the column containing individual occurrence ids.
+        id_col (int or str): Name or index of the column containing unique occurrence ids (must be numeric).
         date_col (int or str): Name or index of the column containing occurrence dates.
         lat_col (int or str): Name or index of the column containing occurrence latitudes (decimal degrees).
         lon_col (int or str): Name or index of the column containing occurrence longitudes (decimal degrees).
@@ -259,6 +259,7 @@ def load_areas_file(path, date_format = None, crs = "EPSG:4326", *args, **kwargs
 
     """
     Load data to download a variable for specific areas.
+    An "id" column must be present and contain a unique numeric identifier.
     Bound columns must be named *{dim}_min* and *{dim}_max*, with {dim} in latitude, longitude, date.
     Additional arguments are passed down to *pandas.read_csv*.
 
