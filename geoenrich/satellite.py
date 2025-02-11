@@ -162,8 +162,7 @@ def get_metadata_copernicus(ds, varname):
 
             item = {'name': name,
                     'standard_name': 'latitude',
-                    'vals': ds.variables[name].data,
-                    'unit': ds.variables[name].attrs['units']}
+                    'vals': ds.variables[name].data}
             dimdict[name] = item
             dimdict['latitude'] = item
 
@@ -171,8 +170,7 @@ def get_metadata_copernicus(ds, varname):
 
             item = {'name': name,
                     'standard_name': 'longitude',
-                    'vals': ds.variables[name].data,
-                    'unit': ds.variables[name].attrs['units']}
+                    'vals': ds.variables[name].data}
             dimdict[name] = item
             dimdict['longitude'] = item
 
