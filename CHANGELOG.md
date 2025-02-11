@@ -1,3 +1,10 @@
+## v0.6.6
+
+#### Bug fixes:
+- Updated dataset id for pH
+- Removed "unit" field from latitude and longitude
+
+
 ## v0.6.5
 
 #### New functions:
@@ -7,7 +14,7 @@
 ## v0.6.4
 
 #### Bug fixes:
- - Fixed bug that occurred when requesting data for surface points in 'nearest_lower' mode.
+ - Fixed bug that occurred when requesting data for surface points in 'nearest_lower' mode
  
 ## v0.6.3
 
