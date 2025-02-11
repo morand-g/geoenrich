@@ -18,7 +18,7 @@ nanophytoplankton,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_
 nitrate,Copernicus,0.25°,1d,1993-01-01 – 2022-12-31,75 levels,cmems_mod_glo_bgc_my_0.25deg_P1D-m,no3
 oxygen,Copernicus,0.25°,1d,1993-01-01 – 2022-12-31,75 levels,cmems_mod_glo_bgc_my_0.25deg_P1D-m,o2
 oxygen-nrt,Copernicus,0.25°,1d,2023-01-01 – ongoing,75 levels,cmems_mod_glo_bgc_myint_0.25deg_P1D-m,o2
-ph,Copernicus,0.25°,1m,1985-01-01 – 2023-12-01,surface,cmems_obs-mob_glo_bgc-car_nrt_irr-i,ph
+ph,Copernicus,0.25°,1m,1985-01-01 – 2023-12-01,surface,cmems_obs-mob_glo_bgc-car_my_irr-i,ph
 pop-density-log,GPW v3v4,0.0083°,5y,1995 – 2020,surface,http://tds.marbec-tools.ird.fr/thredds/dodsC/testAll/geoenrich/pop_density3.nc,Band1
 primary-production,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-pp_my_l4-multi-4km_P1M,PP
 prochlorophytes,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,PROCHLO
