@@ -1,5 +1,8 @@
 ## v0.6.6
 
+#### New functions:
+- Updated documentation
+
 #### Bug fixes:
 - Updated dataset id for pH
 - Removed "unit" field from latitude and longitude
