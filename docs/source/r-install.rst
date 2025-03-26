@@ -39,12 +39,13 @@ Finally, you can check that geoenrich submodules can be imported properly::
 3.1.1. Root folder for geoenrich
 """"""""""""""""""""""""""""""""
 
-The first time you import the dataloader or enrichment module, it will display the location of the *credentials_example.py* configuration file. You will need to edit it and then remove *_example* from the file name so its name is just *credentials.py*. You can also get the location by typing ``dataloader$'__file__'``
+The first time you import the dataloader or enrichment module, it will display the location of the *credentials_example.py* configuration file. You will need to edit it and then remove *_example* from the file name so its name is just *credentials.py*. You can also get the location by typing ``dataloader$'__file__'`` in R.
 
 In this file, you need to specify the *root_path* where all persistent data will be stored. You should pick a stable location with plenty of free space available (depending on your data download needs).
 
 3.1.2. Credentials
 """"""""""""""""""
+
 If you want to use services that require authentification, you need to specify your credentials in the same file.
 You will see 3 variables that need to be filled with GBIF credentials if you want to download occurrence data from GBIF. If you don't already have an account you can register on the `GBIF website <https://www.gbif.org/user/profile/>`_.
 
@@ -65,7 +66,7 @@ There is also a dictionary named *dap_creds* that is intended to store credentia
 3.2. Adding other data sources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-At the same location, there is a *catalog.csv* file that already contains a list of available variables.
+At the same location (``print(dataloader$'__file__')``), there is a *catalog.csv* file that already contains a list of available variables.
 
 If you need additional variables, you can add a *personal_catalog.csv* file to the same folder (template on `GitHub <https://github.com/morand-g/geoenrich/blob/main/geoenrich/data/personal_catalog.csv>`_). Three columns are compulsory:
 
