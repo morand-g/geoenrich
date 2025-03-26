@@ -55,7 +55,6 @@ There is also a dictionary named *dap_creds* that is intended to store credentia
 
 
 
-
 4.2. Adding other data sources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
