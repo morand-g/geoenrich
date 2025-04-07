@@ -7,6 +7,8 @@ Installation instructions for R
 
 You must have installed R on your computer, as well as Python3 and pip. This is automatic in all recent Linux distributions. Otherwise instructions are available here: `Python <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and `pip <https://pip.pypa.io/en/stable/installation/>`_.
 
+If you want to use Copernicus data, you need to install Copernicus Marine API (`instructions <https://help.marine.copernicus.eu/en/articles/7970514-copernicus-marine-toolbox-installation>`_) and set it up with your Copernicus account (`instructions <https://help.marine.copernicus.eu/en/articles/8185007-copernicus-marine-toolbox-credentials-configuration>`_).
+
 
 .. note::
   If you use Mac OS, you'll need to install the Xcode Command Line Tools: run ``xcode-select --install`` in a terminal.
