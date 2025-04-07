@@ -6,6 +6,7 @@
 #### Bug fixes:
 - Updated dataset id for pH
 - Removed "unit" field from latitude and longitude
+- Marked the downsample argument of enrichment.enrich as Broken.
 
 
 ## v0.6.5

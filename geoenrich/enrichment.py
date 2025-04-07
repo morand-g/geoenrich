@@ -64,7 +64,7 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
         geo_buff (int): Geographic buffer for which to download data around occurrence point (kilometers).
         time_buff (float list): Time bounds for which to download data around occurrence day (days). For instance, time_buff = [-7, 0] will download data from 7 days before the occurrence to the occurrence date.
         depth_request (str): For 4D data: 'all' -> data for all depths. 'nearest' -> closest available depth. 'nearest_lower' -> closest lower available depth. Anything else downloads surface data.
-        downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
+        downsample (dict): BROKEN, DO NOT USE. Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
         slice (int tuple): Slice of the enrichment file to use for enrichment.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
