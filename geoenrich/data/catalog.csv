@@ -4,6 +4,7 @@ bottom-temp,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,surface,cmems_mod_gl
 chlorophyll,Copernicus,4km,1d,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-gapfree-multi-4km_P1D,CHL
 current3d-u,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,50 levels,cmems_mod_glo_phy_my_0.083deg_P1D-m,uo
 current3d-v,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,50 levels,cmems_mod_glo_phy_my_0.083deg_P1D-m,vo
+dhw,NOAA,5km,1d,1987-01-01 – 2024-12-31,surface,http://tds.marbec-tools.ird.fr/thredds/dodsC/testAll/geoenrich/DHW_1987-2024.nc,degree_heating_week
 diatoms,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,DIATO
 dinophytes,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,DINO
 distance-to-coast,PacIOOS,0.01°,,,surface,https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/dist2coast_1deg,dist
