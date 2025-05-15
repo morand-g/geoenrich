@@ -1,11 +1,34 @@
+## v0.6.7
+
+#### New functions:
+- Added Degree heating week variable
+- Updated R tutorial
+
+## v0.6.6
+
+#### New functions:
+- Updated documentation
+
+#### Bug fixes:
+- Updated dataset id for pH
+- Removed "unit" field from latitude and longitude
+- Marked the downsample argument of enrichment.enrich as Broken.
+
+
+## v0.6.5
+
+#### New functions:
+- Updated available variables and sources
+
+
 ## v0.6.4
 
 #### Bug fixes:
- - Fixed bug that occurred when requesting data for surface points in 'nearest_lower' mode.
+ - Fixed bug that occurred when requesting data for surface points in 'nearest_lower' mode
  
 ## v0.6.3
 
-#### New functions
+#### New functions:
 - Added possibility to merge duplicate variables in geoenrich.exports.collate_npy
 - Added population density and distance to port
 

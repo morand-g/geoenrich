@@ -1,4 +1,4 @@
-# **geoenrich 0.6.4**
+# **geoenrich 0.6.7**
 
 [![Read the Docs](https://img.shields.io/readthedocs/geoenrich)](https://geoenrich.readthedocs.io/en/latest/)
 [![License](https://img.shields.io/github/license/morand-g/geoenrich?color=green)](https://github.com/morand-g/geoenrich/blob/main/LICENSE)
@@ -51,4 +51,3 @@ Please feel free to raise issues or suggest improvements in the [Issues tab](htt
 ### Planned improvements
 
 - Enrich an area defined by a shapefile.
-- Add bathymetry from GEBCO.

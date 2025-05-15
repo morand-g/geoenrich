@@ -5,10 +5,13 @@ Installation instructions for R
 1. Prerequisites
 ----------------
 
-Assuming you have a version of R installed on your computer, as well as Python3 and pip. This is automatic in all recent Linux distributions. Otherwise instructions are available here: `Python <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and `pip <https://pip.pypa.io/en/stable/installation/>`_.
+You must have installed R on your computer, as well as Python3 and pip. This is automatic in all recent Linux distributions. Otherwise instructions are available here: `Python <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and `pip <https://pip.pypa.io/en/stable/installation/>`_.
 
 If you want to use Copernicus data, you need to install Copernicus Marine API (`instructions <https://help.marine.copernicus.eu/en/articles/7970514-copernicus-marine-toolbox-installation>`_) and set it up with your Copernicus account (`instructions <https://help.marine.copernicus.eu/en/articles/8185007-copernicus-marine-toolbox-credentials-configuration>`_).
 
+
+.. note::
+  If you use Mac OS, you'll need to install the Xcode Command Line Tools: run ``xcode-select --install`` in a terminal.
 
 
 2. Installation
@@ -24,13 +27,6 @@ Then the package needs to be installed. This can be done directly in R. If you d
 
 	py_install("geoenrich", pip = TRUE)
 
-
-If you already have conda installed, R should find it automatically. If it does not, you can try installing the packages this way::
-
-	conda_create("r-reticulate-geoenrich")
-	conda_install("r-reticulate-geoenrich", "geoenrich", pip = TRUE)
-
-
 Finally, you can check that geoenrich submodules can be imported properly::
 
 	dataloader <- import("geoenrich.dataloader")
@@ -42,11 +38,17 @@ Finally, you can check that geoenrich submodules can be imported properly::
 3.1. First configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-The first time you import the dataloader or enrichment module, it will display the location of the *credentials_example.py* configuration file. You will need to edit it and then remove *_example* from the file name so its name is just *credentials.py*.
+3.1.1. Root folder for geoenrich
+""""""""""""""""""""""""""""""""
+
+The first time you import the dataloader or enrichment module, it will display the location of the *credentials_example.py* configuration file. You will need to edit it and then remove *_example* from the file name so its name is just *credentials.py*. You can also get the location by typing ``dataloader$'__file__'`` in R.
 
 In this file, you need to specify the *root_path* where all persistent data will be stored. You should pick a stable location with plenty of free space available (depending on your data download needs).
 
-If you want to use services that require authentification, you need to specify your credentials there.
+3.1.2. Credentials
+""""""""""""""""""
+
+If you want to use services that require authentification, you need to specify your credentials in the same file.
 You will see 3 variables that need to be filled with GBIF credentials if you want to download occurrence data from GBIF. If you don't already have an account you can register on the `GBIF website <https://www.gbif.org/user/profile/>`_.
 
 There is also a dictionary named *dap_creds* that is intended to store credentials to OpenDAP servers. The server domains are the keys, like the example provided for Copernicus. You can add as many credentials as you need into that dictionary.
@@ -66,7 +68,7 @@ There is also a dictionary named *dap_creds* that is intended to store credentia
 3.2. Adding other data sources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-At the same location, there is a *catalog.csv* file that already contains a list of available variables.
+At the same location (``print(dataloader$'__file__')``), there is a *catalog.csv* file that already contains a list of available variables.
 
 If you need additional variables, you can add a *personal_catalog.csv* file to the same folder (template on `GitHub <https://github.com/morand-g/geoenrich/blob/main/geoenrich/data/personal_catalog.csv>`_). Three columns are compulsory:
 
