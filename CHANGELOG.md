@@ -1,8 +1,8 @@
 ## v0.6.7
 
 #### New functions:
--  Added Degree heating week variable
-
+- Added Degree heating week variable
+- Updated R tutorial
 
 ## v0.6.6
 
