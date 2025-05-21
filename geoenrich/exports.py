@@ -198,7 +198,7 @@ def fetch_data(row, var_id, var_indices, ds, dimdict, var, downsample, indices =
 
 
 def produce_stats(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request = None,
-                    downsample = None, out_path = Path('./')):
+                    downsample = None, out_path = Path('./'), filename = None):
 
     """
     Produce a document named *dataset\_ref*\_stats.csv with summary stats of all enriched data.
@@ -212,6 +212,7 @@ def produce_stats(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_
         depth_request (str): (Optional) Depth request that was used for enrichment.
         downsample (dict): (Optional) Downsample that was used for enrichment.
         out_path (str or pathlib.Path): Path where you want to save the output stats file.
+        filename (str): (Optional) Name of the output file. If None, the default name is used.
 
     Returns:
         None
@@ -258,8 +259,9 @@ def produce_stats(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_
                                      result_type = 'expand')
         ds.close()
 
-
-        filepath = Path(out_path, dataset_ref + '_' + str(en['id']) + '_stats.csv')
+        if filename is None:
+            filename = dataset_ref + '_' + str(en['id']) + '_stats.csv'
+        filepath = Path(out_path, filename)
         res.to_csv(str(filepath))
         print(f'File saved at {filepath}')
 
