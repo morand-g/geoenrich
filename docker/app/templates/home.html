@@ -67,7 +67,12 @@
                         </div>
                     </div>
                     <div class="field padding-bottom--24">
-                        <input id="fileselect" type="file" name="file" accept=".csv,.zip"></p>
+                          <label class="upload-box" for="fileselect" id="uploadBox">
+                            <span class="upload-placeholder" id="uploadText" aria-live="polite">
+                              Choose file or drag here
+                            </span>
+                            <input id="fileselect" type="file" name="file" accept=".csv,.zip">
+                          </label>
                     </div>
                     <div class="grid--50-50">
                         <label for="var_id">Choose a variable:</label>
@@ -187,4 +192,5 @@
 
       <!-- External JS -->
       <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     </body>

@@ -296,9 +296,41 @@ a.ssolink {
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
+.upload-label { font-weight: 600; display: block; margin-bottom: 4px; }
+.upload-instructions { font-size: 0.9em; color: #666; margin-bottom: 8px; }
+
+.upload-box {
+    border: 2px dashed #cfcfcf;
+    border-radius: 8px;
+    padding: 22px;
+    text-align: center;
+    color: #666;
+    cursor: pointer;
+    transition: border-color .25s ease, color .25s ease, background-color .25s ease;
+    user-select: none;
+}
+.upload-box:hover { border-color: #9a9a9a; }
+.upload-box.has-file {
+    border-color: #cfcfcf;
+    color: #2b2b2b;
+    background: #a6b7ec;
+}
+
+  /* Hide the actual input */
+.upload-box input { display: none; }
+
+  /* Make filename look nice & truncate if long */
+.upload-placeholder {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
