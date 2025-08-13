@@ -40,25 +40,25 @@
               </div>
             </div>
           </div>
-          <div class="box-root padding-top--24 flex-flex flex-direction--column center-center" style="z-index: 9;">
-            <div class="header-logos grid--50-50 padding-top--24" >
-              <div class="flex-flex" style="justify-content: left;">
-                <a href="/">
-                  <img alt="G2OI" src="{{ url_for('static',filename='assets/logo_g2oi.png') }}">
-                </a>
-              </div>
-              <div class="flex-flex" style="justify-content: right;">
-                <a href="https://www.ird.fr/" target="_blank">
-                  <img alt="IRD" height="58" src="{{ url_for('static',filename='assets/logo_ird.png') }}">
-                </a>  
-              </div>
-            </div>  
-            <div class="box-root padding-top--24 padding-bottom--24 flex-flex flex-justifyContent--center">
-              <h1>GeoEnrich online</h1>
-            </div>
+          <div class="box-root padding-top--24 flex-flex flex-direction--column center-center" style="z-index: 9;">    
             <div class="formbg-outer">
               <div class="formbg">
                 <div class="formbg-inner padding-horizontal--48 center-center" style="justify-content:center;">
+                  <div class="header-logos grid--50-50" style="margin-top: -15px;">
+                    <div class="flex-flex" style="justify-content: left;">
+                      <a href="/">
+                        <img alt="G2OI" src="{{ url_for('static',filename='assets/logo_g2oi.png') }}">
+                      </a>
+                    </div>
+                    <div class="flex-flex" style="justify-content: right;">
+                      <a href="https://www.ird.fr/" target="_blank">
+                        <img alt="IRD" height="58" src="{{ url_for('static',filename='assets/logo_ird.png') }}">
+                      </a>  
+                    </div>
+                  </div>  
+                  <div class="box-root padding-top--24 padding-bottom--24 flex-flex flex-justifyContent--center extra-bottom-space">
+                    <h1>GeoEnrich online</h1>
+                  </div>
                   <form method = "POST" action="" enctype="multipart/form-data">
                     <div class="grid--50-50">
                         <label for="fileselect">Select your occurrences file:</label>
@@ -74,7 +74,7 @@
                             <input id="fileselect" type="file" name="file" accept=".csv,.zip">
                           </label>
                     </div>
-                    <div class="grid--50-50">
+                    <div class="grid--50-50" style="margin-top: -13px;">
                         <label for="var_id">Choose a variable:</label>
                         <div class="reset-pass">
                           <a href="https://geoenrich.readthedocs.io/en/latest/variables.html" target="_blank">Catalog</a>
@@ -164,7 +164,7 @@
                   </div>
                 </div>
               </div>
-              <div class="header-logos padding-top--48">  
+              <div class="header-logos padding-top--40">  
               <div class="footer-link">
                 <div class="listing padding-bottom--24 flex-flex center-center">
                     <a href="https://european-union.europa.eu/index_fr" rel="nofollow" target="_blank">
