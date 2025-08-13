@@ -5,7 +5,6 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static',filename='assets/favicon.ico') }}" />
     </head>
-
     <body>
       <div class="login-root">
         <div class="box-root flex-flex flex-direction--column" style="min-height: 100vh;flex-grow: 1;">
@@ -85,8 +84,8 @@
                             <option value="current3d-v">Current (v)</option>
                             <option value="diatoms">Diatoms</option>
                             <option value="dinophytes">Dinophytes</option>
-                            <option value="fsle">FSLE (strength)</option>
-                            <option value="fsle-orientation">FSLE (orientation)</option>
+                            <!-- <option value="fsle">FSLE (strength)</option>   not working key error -->
+                            <!-- <option value="fsle-orientation">FSLE (orientation)</option> -->
                             <option value="geos-current-u">Geostrophic current (u)</option>
                             <option value="geos-current-v">Geostrophic current (v)</option>
                             <option value="green-algae">Green algae</option>
@@ -97,15 +96,15 @@
                             <option value="organic-carbon3d">Organic Carbon (3D)</option>
                             <option value="oxygen">Oxygen</option>
                             <option value="ph">PH</option>
-                            <option value="picophytoplankton">Picophytoplankton</option>
+                            <!-- <option value="picophytoplankton">Picophytoplankton</option> -->
                             <option value="primary-production">Primary production</option>
                             <option value="prochlorophytes">Prochlorophytes</option>
                             <option value="prokaryotes">Prokaryotes</option>
-                            <option value="salinity3d">Salinity (3D)</option>
+                            <!-- <option value="salinity3d">Salinity (3D)</option> -->
                             <option value="ssh">Sea surface height</option>
                             <option value="sst">Sea surface temperature (Copernicus)</option>
-                            <option value="surface-current-u">Surface current (u)</option>
-                            <option value="surface-current-v">Surface current (v)</option>
+                            <!-- <option value="surface-current-u">Surface current (u)</option> -->
+                            <!-- <option value="surface-current-v">Surface current (v)</option> -->
                             <option value="surface-wind-u">Surface wind (u)</option>
                             <option value="surface-wind-v">Surface wind (v)</option>
                             <option value="temperature3d">Temperature (3D)</option>
@@ -181,4 +180,11 @@
           </div>
         </div>
       </div>
+      <!-- Loading overlay -->
+      <div id="loading-overlay">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- External JS -->
+      <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
     </body>
