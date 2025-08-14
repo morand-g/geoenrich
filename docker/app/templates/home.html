@@ -4,6 +4,8 @@
         <title>GeoEnrich online</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static',filename='assets/favicon.ico') }}" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+
     </head>
     <body>
       <div class="login-root">
@@ -61,7 +63,7 @@
                   </div>
                   <form method = "POST" action="" enctype="multipart/form-data">
                     <div class="grid--50-50">
-                        <label for="fileselect">Select your occurrences file:</label>
+                        <label for="fileselect">Select your occurrences file*:</label>
                         <div class="reset-pass">
                           <a href="https://geoenrich.readthedocs.io/en/latest/online.html" target="_blank">Formatting examples</a>
                         </div>
@@ -71,50 +73,44 @@
                             <span class="upload-placeholder" id="uploadText" aria-live="polite">
                               Choose file or drag here
                             </span>
-                            <input id="fileselect" type="file" name="file" accept=".csv,.zip">
+                            <input id="fileselect" type="file" name="file" accept=".csv">
                           </label>
                     </div>
                     <div class="grid--50-50" style="margin-top: -13px;">
-                        <label for="var_id">Choose a variable:</label>
+                        <label for="var_id">Choose a variable*:</label>
                         <div class="reset-pass">
                           <a href="https://geoenrich.readthedocs.io/en/latest/variables.html" target="_blank">Catalog</a>
                         </div>
                     </div>
                     <div class="field padding-bottom--24">
-                        <input list="var_id" name = "var_id" placeholder="Start typing to see available variables">
-                        <datalist id="var_id">
-                            <option value="bathymetry">Bathymetry (ETOPO1)</option>
-                            <option value="chlorophyll">Chlorophyll (Copernicus)</option>
-                            <option value="current3d-u">Current (u)</option>
-                            <option value="current3d-v">Current (v)</option>
-                            <option value="diatoms">Diatoms</option>
-                            <option value="dinophytes">Dinophytes</option>
-                            <!-- <option value="fsle">FSLE (strength)</option>   not working key error -->
-                            <!-- <option value="fsle-orientation">FSLE (orientation)</option> -->
-                            <option value="geos-current-u">Geostrophic current (u)</option>
-                            <option value="geos-current-v">Geostrophic current (v)</option>
-                            <option value="green-algae">Green algae</option>
-                            <option value="haptophytes">Haptophytes</option>
-                            <option value="microphytoplankton">Microphytoplankton</option>
-                            <option value="mixed-layer-thickness">Mixed Layer Thickness</option>
-                            <option value="nanophytoplankton">Nanophytoplankton</option>
-                            <option value="organic-carbon3d">Organic Carbon (3D)</option>
-                            <option value="oxygen">Oxygen</option>
-                            <option value="ph">PH</option>
-                            <!-- <option value="picophytoplankton">Picophytoplankton</option> -->
-                            <option value="primary-production">Primary production</option>
-                            <option value="prochlorophytes">Prochlorophytes</option>
-                            <option value="prokaryotes">Prokaryotes</option>
-                            <!-- <option value="salinity3d">Salinity (3D)</option> -->
-                            <option value="ssh">Sea surface height</option>
-                            <option value="sst">Sea surface temperature (Copernicus)</option>
-                            <!-- <option value="surface-current-u">Surface current (u)</option> -->
-                            <!-- <option value="surface-current-v">Surface current (v)</option> -->
-                            <option value="surface-wind-u">Surface wind (u)</option>
-                            <option value="surface-wind-v">Surface wind (v)</option>
-                            <option value="temperature3d">Temperature (3D)</option>
-                            <option value="wave-height">Wave height</option>
-                        </datalist> </p>
+                      <select id="var_id" name="var_id">
+                        <option value="">choose a variable...</option>
+                        <option value="bathymetry">Bathymetry (ETOPO1)</option>
+                        <option value="chlorophyll">Chlorophyll (Copernicus)</option>
+                        <option value="current3d-u">Current (u)</option>
+                        <option value="current3d-v">Current (v)</option>
+                        <option value="diatoms">Diatoms</option>
+                        <option value="dinophytes">Dinophytes</option>
+                        <option value="geos-current-u">Geostrophic current (u)</option>
+                        <option value="geos-current-v">Geostrophic current (v)</option>
+                        <option value="green-algae">Green algae</option>
+                        <option value="haptophytes">Haptophytes</option>
+                        <option value="microphytoplankton">Microphytoplankton</option>
+                        <option value="mixed-layer-thickness">Mixed Layer Thickness</option>
+                        <option value="nanophytoplankton">Nanophytoplankton</option>
+                        <option value="organic-carbon3d">Organic Carbon (3D)</option>
+                        <option value="oxygen">Oxygen</option>
+                        <option value="ph">PH</option>
+                        <option value="primary-production">Primary production</option>
+                        <option value="prochlorophytes">Prochlorophytes</option>
+                        <option value="prokaryotes">Prokaryotes</option>
+                        <option value="ssh">Sea surface height</option>
+                        <option value="sst">Sea surface temperature (Copernicus)</option>
+                        <option value="surface-wind-u">Surface wind (u)</option>
+                        <option value="surface-wind-v">Surface wind (v)</option>
+                        <option value="temperature3d">Temperature (3D)</option>
+                        <option value="wave-height">Wave height</option>
+                      </select>
                     </div>
                     <div class="padding-bottom--24">
                         <label for="params">Choose your buffer boundaries:</label>
@@ -124,12 +120,12 @@
                                 <input type="number" id="geo_buff" name="geo_buff" value=10>
                             </div>
                             <div class="field grid--50-50">
-                                <label for="time_buff1">Time period start (days):</label>
-                                <label for="time_buff2">Time period end (days):</label>
+                              <label for="time_buff1">Time period start (days):</label>
+                              <label for="time_buff2" style="margin-left: 10px;">Time period end (days):</label>
                             </div>
                             <div class="field padding-bottom--24 grid--50-50">
-                                <input type="number" id="time_buff1" value=-1 name="tbuff1">
-                                <input type="number" id="time_buff2" value=0 name="tbuff2">
+                              <input type="number" id="time_buff1" value="-1" name="tbuff1" style="width:245px;">
+                              <input type="number" id="time_buff2" value="0" name="tbuff2" style="width:245px;margin-left: 10px;">
                             </div>
                             <div class="field field-checkbox padding-bottom--24 flex-flex align-center">
                                 <label for="checkbox">
@@ -137,6 +133,8 @@
                                 </label>
                             </div>
                         </fieldset>
+                    </div>
+                    <div id="error-message" style="color:red; text-align:center; display:none; margin-bottom:10px;">
                     </div>
                     <div class="field flex-flex center-center">
                         <input type="submit" name="submit" value="Continue">
@@ -193,4 +191,6 @@
       <!-- External JS -->
       <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
       <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+      <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     </body>

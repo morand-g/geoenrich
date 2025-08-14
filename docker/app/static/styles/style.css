@@ -160,22 +160,30 @@ label {
 }
 
 .field input {
-    font-size: 16px;
-    line-height: 28px;
-    padding: 8px 16px;
-    width: 100%;
-    min-height: 44px;
-    border: unset;
-    border-radius: 4px;
-    outline-color: rgb(84 105 212 / 0.5);
-    background-color: rgb(255, 255, 255);
-    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-                rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-                rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-                rgba(60, 66, 87, 0.16) 0px 0px 0px 1px,
-                rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-                rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-                rgba(0, 0, 0, 0) 0px 0px 0px 0px;
+  --ring: 0 0 0 1px rgb(84 105 212 / 0.5);
+
+  font-size: 16px;
+  line-height: 28px;
+  padding: 8px 16px;
+  width: 100%;
+  min-height: 44px;
+
+  border: 1px solid transparent;        /* keep layout stable */
+  border-radius: 8px;
+  background: #fff;
+
+  /* base subtle border */
+  box-shadow: rgba(60, 66, 87, 0.16) 0 0 0 1px;
+
+  outline: none;                         /* remove UA ring */
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+
+.field input:is(:hover, :focus, :focus-visible) {
+  /* same ring for hover + focus */
+  box-shadow:
+    rgba(60, 66, 87, 0.16) 0 0 0 1px,   /* keep the 1px border */
+    var(--ring);                        /* the colored ring */
 }
 
 input[type="submit"] {
@@ -200,7 +208,7 @@ input[type="submit"] {
     width: 100%;
     min-height: 44px;
     border: unset;
-    border-radius: 4px;
+    border-radius: 8px;
     outline-color: rgb(84 105 212 / 0.5);
     background-color: rgb(84, 105, 212);
     box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
@@ -224,7 +232,7 @@ input[type="submit"] {
     width: 100%;
     min-height: 44px;
     border: unset;
-    border-radius: 4px;
+    border-radius: 8px;
     outline-color: rgb(84 105 212 / 0.5);
     box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
                 rgba(0, 0, 0, 0) 0px 0px 0px 0px,
@@ -302,6 +310,7 @@ a.ssolink {
 }
 
 .upload-label { font-weight: 600; display: block; margin-bottom: 4px; }
+
 .upload-instructions { font-size: 0.9em; color: #666; margin-bottom: 8px; }
 
 .upload-box {
@@ -315,16 +324,16 @@ a.ssolink {
     user-select: none;
 }
 .upload-box:hover { border-color: #9a9a9a; }
+
 .upload-box.has-file {
-    border-color: #cfcfcf;
+    /* border: 2px solid #5469d4; */
+    border: none;
     color: #2b2b2b;
     background: #a6b7ec;
 }
 
-  /* Hide the actual input */
 .upload-box input { display: none; }
 
-  /* Make filename look nice & truncate if long */
 .upload-placeholder {
     display: inline-block;
     max-width: 100%;
@@ -334,5 +343,33 @@ a.ssolink {
 }
 
 .extra-bottom-space {
-  margin-bottom: 50px; /* adjust value as needed */
+  margin-bottom: 50px; 
+}
+
+.choices__inner {
+  background-color: #ffffff !important; 
+  border-radius: 8px !important;
+  border: 1px solid #ccc !important;
+  padding: 6px 10px;
+}
+
+.choices__input {
+  background-color: #ffffff !important;
+  color: #000; 
+}
+
+.choices__list--dropdown {
+  background-color: #ffffff !important; 
+  border-radius: 12px !important;
+  border: 1px solid #ccc !important;
+}
+
+.choices__list--dropdown .choices__item {
+  padding: 8px 10px;
+  background-color: #ffffff; 
+  color: #000;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+  background-color: #f0f0f0 !important; 
 }

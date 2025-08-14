@@ -24,3 +24,40 @@
     }
   });
 })();
+
+ document.addEventListener('DOMContentLoaded', function () {
+    const element = document.getElementById('var_id');
+    const choices = new Choices(element, {
+      searchEnabled: true,
+      placeholder: true,
+      // placeholderValue: 'Click to choose',
+      searchPlaceholderValue: 'Search...',
+      shouldSort: false,
+      
+    });
+  });
+
+document.querySelector("form").addEventListener("submit", function(e) {
+    let fileInput = document.getElementById('fileselect');
+    let varSelect = document.getElementById('var_id');
+    let errorDiv = document.getElementById('error-message');
+
+    let errors = [];
+    if (!fileInput.value) {
+        errors.push("Please upload your occurrences file");
+    }
+    if (!varSelect.value) {
+        errors.push("Please choose a variable");
+    }
+
+    if (errors.length > 0) {
+        e.preventDefault(); // Stop form submission
+        errorDiv.innerHTML = errors.join("<br>");
+        errorDiv.style.display = "block";
+        document.getElementById("loading-overlay").style.display = "none"; // ensure spinner stays hidden
+    } else {
+        errorDiv.style.display = "none";
+        document.getElementById("loading-overlay").style.display = "flex"; // start spinner only when valid
+    }
+});
+  
