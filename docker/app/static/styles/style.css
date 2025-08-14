@@ -323,7 +323,7 @@ a.ssolink {
     transition: border-color .25s ease, color .25s ease, background-color .25s ease;
     user-select: none;
 }
-.upload-box:hover { border-color: #9a9a9a; }
+.upload-box:hover { border-color: rgb(84 105 212 / 0.5); }
 
 .upload-box.has-file {
     /* border: 2px solid #5469d4; */
@@ -349,10 +349,17 @@ a.ssolink {
 .choices__inner {
   background-color: #ffffff !important; 
   border-radius: 8px !important;
-  border: 1px solid #ccc !important;
+  border: 1px solid rgba(60, 66, 87, 0.16) !important;
   padding: 6px 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.choices__inner:is(:hover, :focus, :focus-within) {
+  border-color: rgb(84 105 212 / 0.5) !important;
+  box-shadow: 0 0 0 1px rgb(84 105 212 / 0.2); /* subtle glow */
+}
+
+/* Keep your original dropdown styling */
 .choices__input {
   background-color: #ffffff !important;
   color: #000; 
@@ -372,4 +379,27 @@ a.ssolink {
 
 .choices__list--dropdown .choices__item--selectable.is-highlighted {
   background-color: #f0f0f0 !important; 
+}
+
+.field input[type="checkbox"] {
+  appearance: none;          /* remove default look */
+  -webkit-appearance: none;  /* Safari fix */
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(60, 66, 87, 0.16);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.field input[type="checkbox"]:is(:hover, :focus) {
+  border-color: rgb(84 105 212 / 0.5);
+  box-shadow: 0 0 0 0px rgb(84 105 212 / 0.25); /* same ring effect */
+}
+
+.field input[type="checkbox"]:checked {
+  background-color: rgb(84 105 212 / 0.8);
+  border-color: rgb(84 105 212 / 0.8);
 }
