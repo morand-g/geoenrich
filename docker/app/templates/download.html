@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-        <title>GeoEnrich online</title>
+        <title data-i18n="title">GeoEnrich online</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static',filename='assets/favicon.ico') }}" />
     </head>
@@ -30,7 +30,7 @@
               <div class="box-root flex-flex" style="grid-area: 2 / 15 / auto / end;">
                 <div class="box-root box-background--cyan200" style="flex-grow: 1;"></div>
               </div>
-              <div class="box-root flex-flex" style="grid-area: 3 / 14 / auto / end;">
+              <div class="box-root flex-flex" style="grid-area: 3 / 16 / auto / end;">
                 <div class="box-root box-background--blue" style="flex-grow: 1;"></div>
               </div>
               <div class="box-root flex-flex" style="grid-area: 4 / 17 / auto / 20;">
@@ -42,26 +42,31 @@
             </div>
           </div>
           <div class="box-root padding-top--24 flex-flex flex-direction--column center-center" style="z-index: 9;">
-            <div class="header-logos grid--50-50 padding-top--24" >
-              <div class="flex-flex" style="justify-content: left;">
-                <a href="/">
-                  <img alt="G2OI" src="{{ url_for('static',filename='assets/logo_g2oi.png') }}">
-                </a>
-              </div>
-              <div class="flex-flex" style="justify-content: right;">
-                <a href="https://www.ird.fr/" >
-                  <img alt="IRD" height="58" src="{{ url_for('static',filename='assets/logo_ird.png') }}">
-                </a>  
-              </div>
+            
+
+
+
+            <div class="formbg-outer" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px;">
+              <div class="formbg" >
+                <div class="formbg-inner padding-horizontal--48">
+                <div class="header-logos grid--50-50">
+                  <div class="flex-flex" style="justify-content: left;">
+                    <a href="/">
+                      <img alt="G2OI" src="{{ url_for('static',filename='assets/logo_g2oi.png') }}">
+                    </a>
+                  </div>
+                  <div class="flex-flex" style="justify-content: right;">
+                    <a href="https://www.ird.fr/" >
+                      <img alt="IRD" height="58" src="{{ url_for('static',filename='assets/logo_ird.png') }}">
+                    </a>  
+                  </div>
             </div>  
             <div class="box-root padding-top--24 padding-bottom--24 flex-flex flex-justifyContent--center">
-              <h1>GeoEnrich online</h1>
+              <h1 data-i18n="title">GeoEnrich online</h1>
             </div>
-            <div class="formbg-outer">
-              <div class="formbg">
-                <div class="formbg-inner padding-horizontal--48">
+                
                   <div class="field flex-flex center-center">
-                    <a class="important-link" href="/getStats">Download</a>
+                    <a class="important-link" href="/getStats" data-i18n="download">Download</a>
                   </div>
                   <div class="flex-flex center-center grid--50-50 padding-top--24">
                     <div class="flex-flex">
@@ -69,7 +74,7 @@
                         <div class="flex-flex center-center">
                           <img height="20px" style="margin-right:10px"
                              src="{{ url_for('static',filename='assets/logo_rtd.png') }}">  
-                           <span>Documentation</span>
+                           <span data-i18n="documentation">Documentation</span>
                         </div> 
                       </a>
                     </div>
@@ -78,7 +83,7 @@
                         <div class="flex-flex center-center">
                           <img height="25px" style="margin-right:10px"
                              src="{{ url_for('static',filename='assets/logo_github.png') }}">  
-                           <span>Code & Support</span>
+                           <span data-i18n="codeSupport">Code & Support</span>
                         </div> 
                       </a>
                     </div>
@@ -99,7 +104,7 @@
                       </a>
                   </div>
                   <div class="padding-leftright--48 padding-bottom--24">
-                      <span>This website is being developed as part of the G2OI project, cofinanced by the European union, the Reunion region, and the French Republic.</span>
+                      <span data-i18n="g2oiProject">This website is being developed as part of the G2OI project, cofinanced by the European union, the Reunion region, and the French Republic.</span>
                   </div>
                 </div>
               </div>
@@ -107,4 +112,7 @@
           </div>
         </div>
       </div>
+
+      <script src="{{ url_for('static', filename='js/translation.js') }}"></script>
+
     </body>

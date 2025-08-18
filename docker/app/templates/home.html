@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-        <title>GeoEnrich online</title>
+        <title data-i18n="title">GeoEnrich online</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static',filename='assets/favicon.ico') }}" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
@@ -9,6 +9,7 @@
     </head>
     <body>
       <div class="login-root">
+        
         <div class="box-root flex-flex flex-direction--column" style="min-height: 100vh;flex-grow: 1;">
           <div class="loginbackground box-background--white padding-top--64">
             <div class="loginbackground-gridContainer">
@@ -45,6 +46,13 @@
           <div class="box-root padding-top--24 flex-flex flex-direction--column center-center" style="z-index: 9;">    
             <div class="formbg-outer">
               <div class="formbg">
+                <div class="language-container">
+                  <select class="language-select" onchange="setLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                  </select>
+              </div>
                 <div class="formbg-inner padding-horizontal--48 center-center" style="justify-content:center;">
                   <div class="header-logos grid--50-50" style="margin-top: -15px;">
                     <div class="flex-flex" style="justify-content: left;">
@@ -52,6 +60,7 @@
                         <img alt="G2OI" src="{{ url_for('static',filename='assets/logo_g2oi.png') }}">
                       </a>
                     </div>
+                    
                     <div class="flex-flex" style="justify-content: right;">
                       <a href="https://www.ird.fr/" target="_blank">
                         <img alt="IRD" height="58" src="{{ url_for('static',filename='assets/logo_ird.png') }}">
@@ -59,77 +68,80 @@
                     </div>
                   </div>  
                   <div class="box-root padding-top--24 padding-bottom--24 flex-flex flex-justifyContent--center extra-bottom-space">
-                    <h1>GeoEnrich online</h1>
+                    <h1 data-i18n="title">GeoEnrich online</h1>
                   </div>
                   <form method = "POST" action="" enctype="multipart/form-data">
                     <div class="grid--50-50">
-                        <label for="fileselect">Select your occurrences file*:</label>
+                        <label for="fileselect" data-i18n="selectFile">Select your occurrences file*:</label>
                         <div class="reset-pass">
                           <a href="https://geoenrich.readthedocs.io/en/latest/online.html" target="_blank">Formatting examples</a>
                         </div>
                     </div>
                     <div class="field padding-bottom--24">
                           <label class="upload-box" for="fileselect" id="uploadBox">
-                            <span class="upload-placeholder" id="uploadText" aria-live="polite">
+                            <span class="upload-placeholder" id="uploadText" aria-live="polite" data-i18n="chooseFile">
                               Choose file or drag here
                             </span>
                             <input id="fileselect" type="file" name="file" accept=".csv">
                           </label>
                     </div>
                     <div class="grid--50-50" style="margin-top: -13px;">
-                        <label for="var_id">Choose a variable*:</label>
+                        <label for="var_id" data-i18n="chooseVariable">Choose a variable*:</label>
                         <div class="reset-pass">
-                          <a href="https://geoenrich.readthedocs.io/en/latest/variables.html" target="_blank">Catalog</a>
+                          <a href="https://geoenrich.readthedocs.io/en/latest/variables.html" target="_blank" data-i18n="catalog">Catalog</a>
                         </div>
                     </div>
                     <div class="field padding-bottom--24">
                       <select id="var_id" name="var_id">
-                        <option value="">choose a variable...</option>
-                        <option value="bathymetry">Bathymetry (ETOPO1)</option>
-                        <option value="chlorophyll">Chlorophyll (Copernicus)</option>
-                        <option value="current3d-u">Current (u)</option>
-                        <option value="current3d-v">Current (v)</option>
-                        <option value="diatoms">Diatoms</option>
-                        <option value="dinophytes">Dinophytes</option>
-                        <option value="geos-current-u">Geostrophic current (u)</option>
-                        <option value="geos-current-v">Geostrophic current (v)</option>
-                        <option value="green-algae">Green algae</option>
-                        <option value="haptophytes">Haptophytes</option>
-                        <option value="microphytoplankton">Microphytoplankton</option>
-                        <option value="mixed-layer-thickness">Mixed Layer Thickness</option>
-                        <option value="nanophytoplankton">Nanophytoplankton</option>
-                        <option value="organic-carbon3d">Organic Carbon (3D)</option>
-                        <option value="oxygen">Oxygen</option>
-                        <option value="ph">PH</option>
-                        <option value="primary-production">Primary production</option>
-                        <option value="prochlorophytes">Prochlorophytes</option>
-                        <option value="prokaryotes">Prokaryotes</option>
-                        <option value="ssh">Sea surface height</option>
-                        <option value="sst">Sea surface temperature (Copernicus)</option>
-                        <option value="surface-wind-u">Surface wind (u)</option>
-                        <option value="surface-wind-v">Surface wind (v)</option>
-                        <option value="temperature3d">Temperature (3D)</option>
-                        <option value="wave-height">Wave height</option>
-                      </select>
+                        <option value="" data-i18n="chooseVariablePlaceholder">choose a variable...</option>
+                        <option value="bathymetry" data-i18n="bathymetry">Bathymetry (ETOPO1)</option>
+                        <option value="chlorophyll" data-i18n="chlorophyll">Chlorophyll (Copernicus)</option>
+                        <option value="current3d-u" data-i18n="current3d_u">Current (u)</option>
+                        <option value="current3d-v" data-i18n="current3d_v">Current (v)</option>
+                        <option value="diatoms" data-i18n="diatoms">Diatoms</option>
+                        <option value="dinophytes" data-i18n="dinophytes">Dinophytes</option>
+                        <option value="geos-current-u" data-i18n="geos_current_u">Geostrophic current (u)</option>
+                        <option value="geos-current-v" data-i18n="geos_current_v">Geostrophic current (v)</option>
+                        <option value="green-algae" data-i18n="green_algae">Green algae</option>
+                        <option value="haptophytes" data-i18n="haptophytes">Haptophytes</option>
+                        <option value="microphytoplankton" data-i18n="microphytoplankton">Microphytoplankton</option>
+                        <option value="mixed-layer-thickness" data-i18n="mixed_layer_thickness">Mixed Layer Thickness</option>
+                        <option value="nanophytoplankton" data-i18n="nanophytoplankton">Nanophytoplankton</option>
+                        <option value="organic-carbon3d" data-i18n="organic_carbon3d">Organic Carbon (3D)</option>
+                        <option value="oxygen" data-i18n="oxygen">Oxygen</option>
+                        <option value="ph" data-i18n="ph">PH</option>
+                        <option value="primary-production" data-i18n="primary_production">Primary production</option>
+                        <option value="prochlorophytes" data-i18n="prochlorophytes">Prochlorophytes</option>
+                        <option value="prokaryotes" data-i18n="prokaryotes">Prokaryotes</option>
+                        <option value="ssh" data-i18n="ssh">Sea surface height</option>
+                        <option value="sst" data-i18n="sst">Sea surface temperature (Copernicus)</option>
+                        <option value="surface-wind-u" data-i18n="surface_wind_u">Surface wind (u)</option>
+                        <option value="surface-wind-v" data-i18n="surface_wind_v">Surface wind (v)</option>
+                        <option value="temperature3d" data-i18n="temperature3d">Temperature (3D)</option>
+                        <option value="wave-height" data-i18n="wave_height">Wave height</option>
+                        </select>
                     </div>
                     <div class="padding-bottom--24">
-                        <label for="params">Choose your buffer boundaries:</label>
+                        <label for="params" data-i18n="bufferBoundaries">Choose your buffer boundaries:</label>
                         <fieldset id ="params">
                             <div class="field padding-bottom--24">
-                                <label for="geo_buff">Geographical buffer (km):</label>
+                                <label for="geo_buff" data-i18n="geoBuffer">Geographical buffer (km):</label>
                                 <input type="number" id="geo_buff" name="geo_buff" value=10>
                             </div>
                             <div class="field grid--50-50">
-                              <label for="time_buff1">Time period start (days):</label>
-                              <label for="time_buff2" style="margin-left: 10px;">Time period end (days):</label>
+                              <label for="time_buff1" data-i18n="timeStart">Time period start (days):</label>
+                              <label for="time_buff2" style="margin-left: 10px;" data-i18n="timeEnd">Time period end (days):</label>
                             </div>
                             <div class="field padding-bottom--24 grid--50-50">
                               <input type="number" id="time_buff1" value="-1" name="tbuff1" style="width:245px;">
                               <input type="number" id="time_buff2" value="0" name="tbuff2" style="width:245px;margin-left: 10px;">
                             </div>
                             <div class="field field-checkbox padding-bottom--24 flex-flex align-center">
-                                <label for="checkbox">
-                                    <input type="checkbox" name="checkbox"> Use all depths level instead of surface only (not recommended)
+                                <label for="checkbox" >
+                                    <input type="checkbox" name="checkbox" >
+                                </label>
+                                <label for="checkbox" data-i18n="allDepths">
+                                   Use all depths level instead of surface only (not recommended)
                                 </label>
                             </div>
                         </fieldset>
@@ -137,7 +149,7 @@
                     <div id="error-message" style="color:red; text-align:center; display:none; margin-bottom:10px;">
                     </div>
                     <div class="field flex-flex center-center">
-                        <input type="submit" name="submit" value="Continue">
+                        <input type="submit" name="submit" value="Continue" data-i18n="continue">
                     </div>
                   </form>
                   <div class="flex-flex center-center grid--50-50 padding-top--24">
@@ -146,7 +158,7 @@
                         <div class="flex-flex center-center">
                           <img height="20px" style="margin-right:10px"
                              src="{{ url_for('static',filename='assets/logo_rtd.png') }}">  
-                           <span>Documentation</span>
+                           <span data-i18n="documentation">Documentation</span>
                         </div> 
                       </a>
                     </div>
@@ -155,7 +167,7 @@
                         <div class="flex-flex center-center">
                           <img height="25px" style="margin-right:10px"
                              src="{{ url_for('static',filename='assets/logo_github.png') }}">  
-                           <span>Code & Support</span>
+                           <span data-i18n="codeSupport">Code & Support</span>
                         </div> 
                       </a>
                     </div>
@@ -176,7 +188,7 @@
                     </a>
                 </div>
                 <div class="padding-leftright--48 padding-bottom--24">
-                    <span>This website is being developed as part of the G2OI project, cofinanced by the European union, the Reunion region, and the French Republic.</span>
+                    <span data-i18n="g2oiProject">This website is being developed as part of the G2OI project, cofinanced by the European union, the Reunion region, and the French Republic.</span>
                 </div>
               </div>
             </div>
@@ -185,12 +197,16 @@
       </div>
       <!-- Loading overlay -->
       <div id="loading-overlay">
-        <div class="spinner"></div>
+        <div class="loading-content">
+          <div class="spinner"></div>
+          <h2 data-i18n="processingFile">Processing your file... please wait ⏳</h2>
+        </div>
       </div>
 
       <!-- External JS -->
       <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
       <script src="{{ url_for('static', filename='js/main.js') }}"></script>
       <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+      <script src="{{ url_for('static', filename='js/translation.js') }}"></script>
 
     </body>

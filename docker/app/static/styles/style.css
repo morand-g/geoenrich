@@ -294,6 +294,14 @@ a.ssolink {
   z-index: 9999;
 }
 
+.loading-content {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  gap: 15px;
+  text-align: center;
+}
+
 .spinner {
   border: 8px solid rgba(0, 0, 0, 0.1);
   border-left-color: #5469d4;
@@ -301,6 +309,11 @@ a.ssolink {
   height: 60px;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+.loading-content h2 {
+  color: rgb(84, 105, 212, 0.5);
+  font-family: Arial, sans-serif;
+  /* font-weight: 500; */
 }
 
 @keyframes spin {
@@ -402,4 +415,31 @@ a.ssolink {
 .field input[type="checkbox"]:checked {
   background-color: rgb(84 105 212 / 0.8);
   border-color: rgb(84 105 212 / 0.8);
+}
+
+.language-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px; 
+}
+
+.language-select {
+  padding: 4px 12px; 
+  border-radius: 4px; 
+  background: rgb(84, 105, 212);
+  font-size: 0.875rem;
+  border-color: rgb(84 105 212 / 0.8);
+  outline: none;
+  transition: border-color 0.2s;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.language-select option {
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500
+
 }
