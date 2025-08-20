@@ -443,3 +443,96 @@ a.ssolink {
   font-weight: 500
 
 }
+
+/* Main container (the white card in center) */
+#results {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  max-width: 1000px;
+  margin: 2rem auto;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  text-align: center;
+}
+
+/* Titles */
+#results h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.3rem;
+  color: rgb(84 105 212 / 0.5);
+  border-bottom: 2px solid #eaeaea;
+  padding-bottom: 0.4rem;
+}
+
+/* Preview table */
+#previewTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+#previewTable th,
+#previewTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+#previewTable th {
+  background-color: #f4f6fb;
+  font-weight: 600;
+  color: #333;
+}
+
+#previewTable tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Summary stats */
+#summaryStats {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+#summaryStats li {
+  background: #f9f9f9;
+  margin: 0.3rem 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #444;
+  border-left: 4px solid rgb(84 105 212 / 0.5);
+}
+
+/* Buttons */
+button, a button {
+  background-color: rgb(84 105 212 / 0.5);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s ease;
+  margin: 0.5rem;
+}
+
+/* button:hover, a button:hover {
+  background-color: #2a56b3;
+} */
+
+/* Special secondary buttons (like Documentation / Code & Support) */
+.secondary-btn {
+  background: #f4f6fb;
+  color: rgb(84 105 212 / 0.5);
+  border: 1px solid #ccd6f6;
+}
+
+.secondary-btn:hover {
+  background: #e8ecfa;
+}

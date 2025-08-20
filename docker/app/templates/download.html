@@ -65,9 +65,23 @@
               <h1 data-i18n="title">GeoEnrich online</h1>
             </div>
                 
-                  <div class="field flex-flex center-center">
+                  
+            <div class="field flex-flex center-center">  
+              <button id="previewBtn" class="important-link" onclick="previewCSV()">Preview File</button>
+            </div>
+
+            <div class="field flex-flex center-center">
+                    <div id="results" style="display:none;">
+                      <h3>Preview (first 10 rows)</h3>
+                      <table id="previewTable"></table>
+                      <h3>Summary Stats</h3>
+                      <ul id="summaryStats"></ul>
+                    </div>
+            </div>
+            
+            <div class="field flex-flex center-center">
                     <a class="important-link" href="/getStats" data-i18n="download">Download</a>
-                  </div>
+            </div>
                   <div class="flex-flex center-center grid--50-50 padding-top--24">
                     <div class="flex-flex">
                       <a class="secondary-link" href="https://geoenrich.readthedocs.io" target="_blank">
@@ -114,5 +128,7 @@
       </div>
 
       <script src="{{ url_for('static', filename='js/translation.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/download.js') }}"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     </body>
