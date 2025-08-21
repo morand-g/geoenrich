@@ -16,7 +16,11 @@ const translations = {
     codeSupport: "Code & Support",
     processingFile: "Processing your file... please wait ⏳",
     g2oiProject: "This website is being developed as part of the G2OI project, cofinanced by the European union, the Reunion region, and the French Republic.",
-    download: "Download"
+    download: "Download",
+    previewFile: "Preview File",
+    hidePreview: "Hide Preview",
+    preview: "Preview",
+    summaryStats: "Summary Stats"
   },
   fr: {
     title: "GeoEnrich en ligne",
@@ -35,7 +39,11 @@ const translations = {
     codeSupport: "Code & Support",
     processingFile: "Traitement de votre fichier... veuillez patienter ⏳",
     g2oiProject: "Ce site web est développé dans le cadre du projet G2OI, cofinancé par l'Union européenne, la région Réunion et la République française.",
-    download: "Télécharger"
+    download: "Télécharger",
+    previewFile: "Aperçu du fichier",
+    hidePreview: "Masquer l'aperçu",
+    summaryStats: "Statistiques résumées",
+    preview: "Aperçu"
   },
   es: {
     title: "GeoEnrich en línea",
@@ -54,14 +62,19 @@ const translations = {
     codeSupport: "Código y Soporte",
     processingFile: "Procesando su archivo... por favor espere ⏳",
     g2oiProject: "Este sitio web se desarrolla como parte del proyecto G2OI, cofinanciado por la Unión Europea, la región de Reunión y la República Francesa.",
-    download: "Descargar"
+    download: "Descargar",
+    previewFile: "Vista previa del archivo",
+    hidePreview: "Ocultar vista previa",
+    summaryStats: "Estadísticas resumidas",
+    preview:"avance"
+
   }
 };
 
 // Function to apply translations
 function setLanguage(lang) {
   localStorage.setItem('selectedLang', lang); // save selection
-
+  document.getElementById("language-select").value = lang;
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if(translations[lang] && translations[lang][key]){

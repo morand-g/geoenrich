@@ -5,12 +5,20 @@ let cachedData = null;
 async function previewCSV() {
   const resultsDiv = document.getElementById("results");
   const btn = document.getElementById("previewBtn"); // reference button
-
+  let userLang = localStorage.getItem('selectedLang');
   // Toggle: if visible -> hide
   if (previewVisible) {
     resultsDiv.style.display = "none";
     previewVisible = false;
-    btn.textContent = "Preview File"; // update button text
+if(userLang === "fr") {
+      btn.textContent = "Aperçu du fichier"; // update button text
+    }
+    else if(userLang === "es") {
+      btn.textContent = "Vista previa del archivo"; // update button text
+    }
+    else if(userLang === "en") {
+      btn.textContent = "Preview File"; // update button text
+    }    
     return;
   }
 
@@ -18,7 +26,15 @@ async function previewCSV() {
   if (previewLoaded) {
     resultsDiv.style.display = "block";
     previewVisible = true;
-    btn.textContent = "Hide Preview"; // update button text
+    if(userLang === "fr") {
+      btn.textContent = "Masquer l'aperçu"; // update button text
+    }
+    else if(userLang === "es") {
+      btn.textContent = "Ocultar vista previa"; // update button text
+    }
+    else if(userLang === "en") {
+      btn.textContent = "Hide Preview"; // update button text
+    }
     return;
   }
 
@@ -42,7 +58,15 @@ async function previewCSV() {
 
     previewLoaded = true;
     previewVisible = true;
-    btn.textContent = "Hide Preview"; // update button text
+    if(userLang === "fr") {
+      btn.textContent = "Masquer l'aperçu"; // update button text
+    }
+    else if(userLang === "es") {
+      btn.textContent = "Ocultar vista previa"; // update button text
+    }
+    else if(userLang === "en") {
+      btn.textContent = "Hide Preview"; // update button text
+    }
   }
 });
 
