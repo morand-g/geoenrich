@@ -20,7 +20,10 @@ const translations = {
     previewFile: "Preview File",
     hidePreview: "Hide Preview",
     preview: "Preview",
-    summaryStats: "Summary Stats"
+    summaryStats: "Summary Stats",
+    fileTooLarge: "The file is too large! Maximum allowed size is 20 MB.",
+    uploadFileError: "Please upload your occurrences file",
+    chooseVariableError: "Please choose a variable."
   },
   fr: {
     title: "GeoEnrich en ligne",
@@ -43,7 +46,11 @@ const translations = {
     previewFile: "Aperçu du fichier",
     hidePreview: "Masquer l'aperçu",
     summaryStats: "Statistiques résumées",
-    preview: "Aperçu"
+    preview: "Aperçu",
+    fileTooLarge: "Le fichier est trop volumineux. La taille maximale autorisée est de 20 Mo.",
+    uploadFileError: "Veuillez télécharger votre fichier d'occurrences",
+    chooseVariableError: "Veuillez choisir une variable."
+
   },
   es: {
     title: "GeoEnrich en línea",
@@ -66,8 +73,10 @@ const translations = {
     previewFile: "Vista previa del archivo",
     hidePreview: "Ocultar vista previa",
     summaryStats: "Estadísticas resumidas",
-    preview:"avance"
-
+    preview:"avance",
+    fileTooLarge: "El archivo es demasiado grande. El tamaño máximo permitido es de 20 MB.",
+    uploadFileError: "Por favor, sube tu archivo de ocurrencias",
+    chooseVariableError: "Por favor, elige una variable."
   }
 };
 

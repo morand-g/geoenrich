@@ -84,6 +84,9 @@
                             </span>
                             <input id="fileselect" type="file" name="file" accept=".csv">
                           </label>
+                          <div id="fileError" class="file-error" data-i18n="fileTooLarge" style="color:red; margin-top:4px; display:none;">
+                            File is too large! Maximum allowed size is 20 MB.
+                          </div>
                     </div>
                     <div class="grid--50-50" style="margin-top: -13px;">
                         <label for="var_id" data-i18n="chooseVariable">Choose a variable*:</label>
@@ -147,7 +150,7 @@
                         </fieldset>
                     </div>
                     <div id="error-message" style="color:red; text-align:center; display:none; margin-bottom:10px;">
-                    </div>
+                      </div>
                     <div class="field flex-flex center-center">
                         <input type="submit" name="submit" value="Continue" data-i18n="continue">
                     </div>
