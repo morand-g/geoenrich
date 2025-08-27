@@ -8,35 +8,43 @@ async function previewCSV() {
   let userLang = localStorage.getItem('selectedLang');
   // Toggle: if visible -> hide
   if (previewVisible) {
-    resultsDiv.style.display = "none";
-    previewVisible = false;
-if(userLang === "fr") {
-      btn.textContent = "Aperçu du fichier"; // update button text
-    }
-    else if(userLang === "es") {
-      btn.textContent = "Vista previa del archivo"; // update button text
-    }
-    else if(userLang === "en") {
-      btn.textContent = "Preview File"; // update button text
-    }    
-    return;
+  resultsDiv.style.display = "none";
+  previewVisible = false;
+
+  if (userLang === "fr") {
+    btn.textContent = "Aperçu du fichier";
+  } else if (userLang === "es") {
+    btn.textContent = "Vista previa del archivo";
+  } else if (userLang === "en") {
+    btn.textContent = "Preview File";
+  } else if (userLang === "ar") {
+    btn.textContent = "معاينة الملف";
+  } else if (userLang === "zh") {
+    btn.textContent = "预览文件";
   }
 
-  // If already loaded -> just show cached
-  if (previewLoaded) {
-    resultsDiv.style.display = "block";
-    previewVisible = true;
-    if(userLang === "fr") {
-      btn.textContent = "Masquer l'aperçu"; // update button text
-    }
-    else if(userLang === "es") {
-      btn.textContent = "Ocultar vista previa"; // update button text
-    }
-    else if(userLang === "en") {
-      btn.textContent = "Hide Preview"; // update button text
-    }
-    return;
+  return;
+}
+
+// If already loaded -> just show cached
+if (previewLoaded) {
+  resultsDiv.style.display = "block";
+  previewVisible = true;
+
+  if (userLang === "fr") {
+    btn.textContent = "Masquer l'aperçu";
+  } else if (userLang === "es") {
+    btn.textContent = "Ocultar vista previa";
+  } else if (userLang === "en") {
+    btn.textContent = "Hide Preview";
+  } else if (userLang === "ar") {
+    btn.textContent = "إخفاء المعاينة";
+  } else if (userLang === "zh") {
+    btn.textContent = "隐藏预览";
   }
+
+  return;
+}
 
   // First load: fetch CSV
   const res = await fetch("/getStats");
@@ -58,15 +66,17 @@ if(userLang === "fr") {
 
     previewLoaded = true;
     previewVisible = true;
-    if(userLang === "fr") {
-      btn.textContent = "Masquer l'aperçu"; // update button text
-    }
-    else if(userLang === "es") {
-      btn.textContent = "Ocultar vista previa"; // update button text
-    }
-    else if(userLang === "en") {
-      btn.textContent = "Hide Preview"; // update button text
-    }
+    if (userLang === "fr") {
+      btn.textContent = "Masquer l'aperçu"; // français
+    } else if (userLang === "es") {
+      btn.textContent = "Ocultar vista previa"; // espagnol
+    } else if (userLang === "en") {
+      btn.textContent = "Hide Preview"; // anglais
+    } else if (userLang === "ar") {
+      btn.textContent = "إخفاء المعاينة"; // arabe
+    } else if (userLang === "zh") {
+      btn.textContent = "隐藏预览"; // chinois
+}
   }
 });
 

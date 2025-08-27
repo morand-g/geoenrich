@@ -49,7 +49,8 @@ const translations = {
     preview: "Aperçu",
     fileTooLarge: "Le fichier est trop volumineux. La taille maximale autorisée est de 20 Mo.",
     uploadFileError: "Veuillez télécharger votre fichier d'occurrences",
-    chooseVariableError: "Veuillez choisir une variable."
+    chooseVariableError: "Veuillez choisir une variable.",
+    bathymetry:"testing"
 
   },
   es: {
@@ -77,18 +78,72 @@ const translations = {
     fileTooLarge: "El archivo es demasiado grande. El tamaño máximo permitido es de 20 MB.",
     uploadFileError: "Por favor, sube tu archivo de ocurrencias",
     chooseVariableError: "Por favor, elige una variable."
-  }
+  },
+  ar: {
+  title: "GeoEnrich عبر الإنترنت",
+  selectFile: "اختر ملف الوقوعات الخاص بك*:",
+  formattingExamples: "أمثلة على التنسيق",
+  chooseFile: "اختر ملفاً أو اسحب هنا",
+  chooseVariable: "اختر متغيراً*:",
+  catalog: "الفهرس",
+  bufferBoundaries: "اختر حدود منطقة العزل:",
+  geoBuffer: "منطقة عزل جغرافية (كم):",
+  timeStart: "بداية الفترة الزمنية (أيام):",
+  timeEnd: "نهاية الفترة الزمنية (أيام):",
+  allDepths: "استخدام جميع مستويات العمق بدلاً من السطح فقط (غير مستحسن)",
+  continue: "متابعة",
+  documentation: "التوثيق",
+  codeSupport: "الكود والدعم",
+  processingFile: "جارٍ معالجة الملف... يرجى الانتظار ⏳",
+  g2oiProject: "يتم تطوير هذا الموقع كجزء من مشروع G2OI، بتمويل مشترك من الاتحاد الأوروبي، ومنطقة ريونيون، والجمهورية الفرنسية.",
+  download: "تنزيل",
+  previewFile: "معاينة الملف",
+  hidePreview: "إخفاء المعاينة",
+  preview: "معاينة",
+  summaryStats: "إحصائيات ملخصة",
+  fileTooLarge: "الملف كبير جداً! الحد الأقصى المسموح به هو 20 ميغابايت.",
+  uploadFileError: "يرجى رفع ملف الوقوعات الخاص بك",
+  chooseVariableError: "يرجى اختيار متغير."
+},
+zh: {
+  title: "GeoEnrich 在线",
+  selectFile: "选择您的发生文件*：",
+  formattingExamples: "格式示例",
+  chooseFile: "选择文件或拖拽到此处",
+  chooseVariable: "选择一个变量*：",
+  catalog: "目录",
+  bufferBoundaries: "选择您的缓冲区边界：",
+  geoBuffer: "地理缓冲区（公里）：",
+  timeStart: "时间段开始（天）：",
+  timeEnd: "时间段结束（天）：",
+  allDepths: "使用所有深度级别而不仅仅是表面（不推荐）",
+  continue: "继续",
+  documentation: "文档",
+  codeSupport: "代码与支持",
+  processingFile: "正在处理您的文件...请稍候 ⏳",
+  g2oiProject: "本网站作为 G2OI 项目的一部分开发，由欧盟、留尼汪地区和法兰西共和国共同资助。",
+  download: "下载",
+  previewFile: "预览文件",
+  hidePreview: "隐藏预览",
+  preview: "预览",
+  summaryStats: "摘要统计",
+  fileTooLarge: "文件太大！允许的最大大小为 20 MB。",
+  uploadFileError: "请上传您的发生文件",
+  chooseVariableError: "请选择一个变量。"
+}
 };
 
 // Function to apply translations
 function setLanguage(lang) {
   localStorage.setItem('selectedLang', lang); // save selection
-  document.getElementById("language-select").value = lang;
+  const select = document.getElementById("language-select");
+  if (select) select.value = lang;
+
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if(translations[lang] && translations[lang][key]){
-      if (el.tagName === "INPUT" && el.type === "submit") {
-        el.value = translations[lang][key]; // for submit buttons
+      if (el.tagName === "INPUT" && (el.type === "submit" || el.type === "button")) {
+        el.value = translations[lang][key]; // for buttons
       } else {
         el.textContent = translations[lang][key];
       }
@@ -96,16 +151,27 @@ function setLanguage(lang) {
   });
 }
 
-let userLang = localStorage.getItem('selectedLang'); // check saved language
+// Apply language after DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  let userLang = localStorage.getItem('selectedLang');
 
-if (!userLang) {
-  // fallback to browser language
-  userLang = navigator.language || navigator.userLanguage;
-  if(userLang.startsWith('en')) userLang = 'en';
-  else if(userLang.startsWith('es')) userLang = 'es';
-  else userLang = 'fr'; // default to French if not en/es
-}
+  if (!userLang) {
+    // fallback to browser language
+    userLang = navigator.language || navigator.userLanguage;
 
-// Apply language
-setLanguage(userLang);
+    if (userLang.startsWith('en')) userLang = 'en';
+    else if (userLang.startsWith('es')) userLang = 'es';
+    else if (userLang.startsWith('fr')) userLang = 'fr';
+    else if (userLang.startsWith('ar')) userLang = 'ar';
+    else if (userLang.startsWith('zh')) userLang = 'zh';
+    else userLang = 'fr'; // default to French
+  }
 
+  setLanguage(userLang);
+
+  // Listen for changes in the language select dropdown
+  const select = document.getElementById('language-select');
+  if(select){
+    select.addEventListener('change', (e) => setLanguage(e.target.value));
+  }
+});
