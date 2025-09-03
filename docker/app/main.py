@@ -1,17 +1,17 @@
+from email.mime.multipart import MIMEMultipart
 import os
-import time
 from datetime import datetime
 import pandas as pd
-
-from flask import Flask, render_template, request, redirect, url_for, Response
-
+import smtplib
+from email.mime.text import MIMEText
+from flask import Flask, render_template, request, Response, send_from_directory
 from geoenrich.dataloader import import_occurrences_csv, load_areas_file
 from geoenrich.enrichment import create_enrichment_file, enrich
 from geoenrich.exports import produce_stats
 
 
-latdict = {'latitude':'latitude', 'decimallatitude':'latitude', 'lat': 'latitude'}
-londict = {'longitude':'longitude', 'decimallongitude':'longitude', 'lon': 'longitude'}
+latdict = {'latitude': 'latitude', 'decimallatitude': 'latitude', 'lat': 'latitude'}
+londict = {'longitude': 'longitude', 'decimallongitude': 'longitude', 'lon': 'longitude'}
 
 app = Flask(__name__)
 
@@ -19,80 +19,109 @@ app = Flask(__name__)
 app.config["DEBUG"] = False
 
 # App variables
-app.config['UPLOAD_FOLDER'] =  'static/uploads/'
+app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 app.config['UPLOAD_EXTENSIONS'] = ['.csv']
-app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024 # Maximum filesize of 20MB
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # Maximum filesize of 20MB
 app.config['DS_REF'] = ''
 
+# Directory for enrichment outputs
+OUTPUT_DIR = "data/biodive"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+#Mail connection
+def send_email(to_email, message):
+    sender = "no-reply@umontpellier.fr"
+    msg = MIMEMultipart()
+    msg["Subject"] = "GeoEnrich - Notification"
+    msg["From"] = sender
+    msg["To"] = to_email
+    msg.attach(MIMEText(message, "plain"))
+
+    with smtplib.SMTP("smtp-int.umontpellier.fr", 25) as server:
+        server.sendmail(sender, [to_email], msg.as_string())
 
 # Root URL
 @app.route('/')
 def index():
     return render_template('home.html')
 
-
-
 # Process uploaded file
 @app.route("/", methods=['POST'])
 def uploadFiles():
-     # get the uploaded file
-     uploaded_file = request.files['file']
-     if uploaded_file.filename != '':
-          csv_filepath = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
-          uploaded_file.save(csv_filepath)
+    uploaded_file = request.files['file']
+    if uploaded_file.filename != '':
+        csv_filepath = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+        uploaded_file.save(csv_filepath)
+        var_id = request.form['var_id']
+        geo_buff = int(request.form['geo_buff'])
+        time_buff = [int(request.form['tbuff1']), int(request.form['tbuff2'])]
 
-          var_id = request.form['var_id']
-          geo_buff = int(request.form['geo_buff'])
-          time_buff = [int(request.form['tbuff1']), int(request.form['tbuff2'])]
+        if request.form.get('checkbox'):
+            depth_request = 'all'
+        else:
+            depth_request = 'surface'
 
-          if request.form.get('checkbox'):
-               depth_request = 'all'
-          else:
-               depth_request = 'surface'
+        # Guess column names
+        lat_col, lon_col, date_col = 'latitude', 'longitude', 'date'
+        colnames = pd.read_csv(csv_filepath, nrows=0).columns.tolist()
+        for col in colnames:
+            if col.lower() in ['latitude', 'y', 'lat', 'decimallatitude']:
+                lat_col = col
+            elif col.lower() in ['longitude', 'x', 'lon', 'decimallongitude']:
+                lon_col = col
+            elif col.lower() in ['date', 'eventdate']:
+                date_col = col
 
-          ########## TO DO #########
-          # Check csv file integrity
+        # Try loading uploaded file as occurrences, and if it doesn't work, as areas
+        try:
+            df = import_occurrences_csv(
+                path=csv_filepath,
+                id_col='id', date_col=date_col, lat_col=lat_col, lon_col=lon_col
+            )
+        except:
+            df = load_areas_file(csv_filepath)
 
-          # Guess column names
-          lat_col, lon_col, date_col = 'latitude', 'longitude', 'date'
-          colnames = pd.read_csv(csv_filepath, nrows=0).columns.tolist()
-          for col in colnames:
-               if col.lower() in ['latitude', 'y', 'lat', 'decimallatitude']:
-                    lat_col = col
-               elif col.lower() in ['longitude', 'x', 'lon', 'decimallongitude']:
-                    lon_col = col
-               elif col.lower() in ['date', 'eventDate']:
-                    date_col = col
+        # Unique dataset reference
+        ds_ref = datetime.now().__str__().replace(' ', '_').replace(':', '-')
 
-          # Try loading uploaded file as occurrences, and if it doesn't work, as areas
-          try:
-               df = import_occurrences_csv(path = csv_filepath,
-                         id_col = 'id', date_col = date_col, lat_col = lat_col, lon_col = lon_col)
-          except:
-               df = load_areas_file(csv_filepath)
+        # Run enrichment
+        app.config['DS_REF'] = ds_ref
+        create_enrichment_file(df, ds_ref)
+        enrich(ds_ref, var_id, geo_buff, time_buff, depth_request, maxpoints=2000000)
+        produce_stats(ds_ref, var_id, out_path=OUTPUT_DIR)
 
-          # Create a unique dataset reference and run the enrichment process.
-          ds_ref = datetime.now().__str__().replace(' ','_')
-          app.config['DS_REF'] = ds_ref
-          create_enrichment_file(df, ds_ref)
-          enrich(ds_ref, var_id, geo_buff, time_buff, depth_request, maxpoints = 2000000)
-          produce_stats(ds_ref, var_id, out_path = 'static/stats/')
+        # Remove uploaded file
+        os.remove(csv_filepath)
 
-          os.remove(csv_filepath)
-          return render_template('download.html')
+        # Build download link
+        download_link = f"http://localhost:8080/download/{ds_ref}"
 
+        # Retrieve email from form
+        user_email = request.form.get("user_email")
+        
+        # Send email notification if user_email is provided
+        if user_email:
+            send_email(user_email, f"✅ Your enrichment {ds_ref} is complete!\nDownload: {download_link}")
+
+        return render_template('download.html', link=download_link)
+
+# Dynamic download route
+@app.route("/download/<ds_ref>")
+def download(ds_ref):
+    stats_filename = f"{ds_ref}_1_stats.csv"
+    return send_from_directory(OUTPUT_DIR, stats_filename, as_attachment=True)
 
 # Provide stats file
 @app.route("/getStats")
 def getStats():
-     with open('static/stats/' + app.config['DS_REF'] + '_1_stats.csv') as fp:
-         csv = fp.read()
-         return Response(csv,
-                         mimetype="text/csv",
-                         headers={"Content-disposition":
-                                   f"attachment; filename={app.config['DS_REF']}_1_stats.csv"})
-
+    ds_ref = app.config['DS_REF']
+    stats_filename = f"{ds_ref}_1_stats.csv"
+    return send_from_directory(
+        OUTPUT_DIR, 
+        stats_filename, 
+        as_attachment=True
+    )
 
 # Run app
 if (__name__ == "__main__"):
-     app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)

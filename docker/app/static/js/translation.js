@@ -23,7 +23,8 @@ const translations = {
     summaryStats: "Summary Stats",
     fileTooLarge: "The file is too large! Maximum allowed size is 20 MB.",
     uploadFileError: "Please upload your occurrences file",
-    chooseVariableError: "Please choose a variable."
+    chooseVariableError: "Please choose a variable.",
+    user_email: "Enter your mail to get a  download link:"
   },
   fr: {
     title: "GeoEnrich en ligne",
@@ -50,8 +51,7 @@ const translations = {
     fileTooLarge: "Le fichier est trop volumineux. La taille maximale autorisée est de 20 Mo.",
     uploadFileError: "Veuillez télécharger votre fichier d'occurrences",
     chooseVariableError: "Veuillez choisir une variable.",
-    bathymetry:"testing"
-
+    user_email: "Entrez votre e-mail pour obtenir un lien de téléchargement :"
   },
   es: {
     title: "GeoEnrich en línea",
@@ -77,7 +77,8 @@ const translations = {
     preview:"avance",
     fileTooLarge: "El archivo es demasiado grande. El tamaño máximo permitido es de 20 MB.",
     uploadFileError: "Por favor, sube tu archivo de ocurrencias",
-    chooseVariableError: "Por favor, elige una variable."
+    chooseVariableError: "Por favor, elige una variable.",
+    user_email: "Introduce tu correo electrónico para recibir un enlace de descarga:"
   },
   ar: {
   title: "GeoEnrich عبر الإنترنت",
@@ -103,7 +104,8 @@ const translations = {
   summaryStats: "إحصائيات ملخصة",
   fileTooLarge: "الملف كبير جداً! الحد الأقصى المسموح به هو 20 ميغابايت.",
   uploadFileError: "يرجى رفع ملف الوقوعات الخاص بك",
-  chooseVariableError: "يرجى اختيار متغير."
+  chooseVariableError: "يرجى اختيار متغير.",
+  user_email: "أدخل بريدك الإلكتروني للحصول على رابط التنزيل:"
 },
 zh: {
   title: "GeoEnrich 在线",
@@ -129,7 +131,8 @@ zh: {
   summaryStats: "摘要统计",
   fileTooLarge: "文件太大！允许的最大大小为 20 MB。",
   uploadFileError: "请上传您的发生文件",
-  chooseVariableError: "请选择一个变量。"
+  chooseVariableError: "请选择一个变量。",
+  user_email: "请输入您的电子邮件以获取下载链接："
 }
 };
 
