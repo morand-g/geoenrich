@@ -122,8 +122,13 @@ function computeSummary(data) {
     if (values.length) {
       const min = Math.min(...values);
       const max = Math.max(...values);
-      const mean = values.reduce((a,b) => a+b,0) / values.length;
-      summary[col] = {min, max, mean};
+      const mean = values.reduce((a, b) => a + b, 0) / values.length;
+
+      summary[col] = {
+        min: Number(min.toFixed(3)),
+        max: Number(max.toFixed(3)),
+        mean: Number(mean.toFixed(3))
+      };
     }
   });
 
