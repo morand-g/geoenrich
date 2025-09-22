@@ -1,21 +1,18 @@
 version: '3'
 
 services:
-
   web:
     build: .
     container_name: geoenrich
     restart: always
-
     volumes:
       - ./app:/app
     ports:
       - "8080:8080"
     environment:
       - FLASK_APP=main.py
-      - 'RUN=flask run --host=0.0.0.0 --port=8080'
-    command: bash -c "python /home/initialize.py
-             && flask run --host=0.0.0.0 --port=8080"
-
-volumes:
-  app:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - COPERNICUS_TOKEN=${COPERNICUS_TOKEN}
+    working_dir: /app
+    command: bash -c "mkdir -p /root/.copernicusmarine && echo \"$COPERNICUS_TOKEN\" > /root/.copernicusmarine/.copernicusmarine-credentials && python /home/initialize.py && flask run --host=0.0.0.0 --port=8080 --reload"

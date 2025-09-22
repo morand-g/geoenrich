@@ -91,40 +91,20 @@
                           </div>
                     </div>
                     <div class="grid--50-50" style="margin-top: -13px;">
-                        <label for="var_id" data-i18n="chooseVariable">Choose a variable*:</label>
+                        <label data-i18n="chooseVariable">Choose a variable*:</label>
                         <div class="reset-pass">
                           <a href="https://geoenrich.readthedocs.io/en/latest/variables.html" target="_blank" data-i18n="catalog">Catalog</a>
                         </div>
                     </div>
                     <div class="field padding-bottom--24">
-                      <select id="var_id" name="var_id">
-                        <option value="" data-i18n="chooseVariablePlaceholder">choose a variable...</option>
-                        <option value="bathymetry" data-i18n="bathymetry">Bathymetry (ETOPO1)</option>
-                        <option value="chlorophyll" data-i18n="chlorophyll">Chlorophyll (Copernicus)</option>
-                        <option value="current3d-u" data-i18n="current3d_u">Current (u)</option>
-                        <option value="current3d-v" data-i18n="current3d_v">Current (v)</option>
-                        <option value="diatoms" data-i18n="diatoms">Diatoms</option>
-                        <option value="dinophytes" data-i18n="dinophytes">Dinophytes</option>
-                        <option value="geos-current-u" data-i18n="geos_current_u">Geostrophic current (u)</option>
-                        <option value="geos-current-v" data-i18n="geos_current_v">Geostrophic current (v)</option>
-                        <option value="green-algae" data-i18n="green_algae">Green algae</option>
-                        <option value="haptophytes" data-i18n="haptophytes">Haptophytes</option>
-                        <option value="microphytoplankton" data-i18n="microphytoplankton">Microphytoplankton</option>
-                        <option value="mixed-layer-thickness" data-i18n="mixed_layer_thickness">Mixed Layer Thickness</option>
-                        <option value="nanophytoplankton" data-i18n="nanophytoplankton">Nanophytoplankton</option>
-                        <option value="organic-carbon3d" data-i18n="organic_carbon3d">Organic Carbon (3D)</option>
-                        <option value="oxygen" data-i18n="oxygen">Oxygen</option>
-                        <option value="ph" data-i18n="ph">PH</option>
-                        <option value="primary-production" data-i18n="primary_production">Primary production</option>
-                        <option value="prochlorophytes" data-i18n="prochlorophytes">Prochlorophytes</option>
-                        <option value="prokaryotes" data-i18n="prokaryotes">Prokaryotes</option>
-                        <option value="ssh" data-i18n="ssh">Sea surface height</option>
-                        <option value="sst" data-i18n="sst">Sea surface temperature (Copernicus)</option>
-                        <option value="surface-wind-u" data-i18n="surface_wind_u">Surface wind (u)</option>
-                        <option value="surface-wind-v" data-i18n="surface_wind_v">Surface wind (v)</option>
-                        <option value="temperature3d" data-i18n="temperature3d">Temperature (3D)</option>
-                        <option value="wave-height" data-i18n="wave_height">Wave height</option>
-                        </select>
+
+                      <div class="dropdown">
+                        <div class="dropdown-toggle">Choose a variable...</div>
+                        <div class="dropdown-menu" id="dropdownMenu"></div>
+                      </div>
+                    </div>
+                    <div style="display:none;">
+                      <input type="hidden" id="var_id" name="var_id" value="">
                     </div>
                     <div class="padding-bottom--24">
                         <label for="params" data-i18n="bufferBoundaries">Choose your buffer boundaries:</label>
@@ -152,6 +132,7 @@
                         </fieldset>
                         
                     </div>
+
                     <div class="field padding-bottom--24" >
                       <label for="user_email" data-i18n="user_email" >Enter your mail to get a  download link:</label>
                       <input type="email" id="user_email" name="user_email">
@@ -184,6 +165,7 @@
                   </div>
                 </div>
               </div>
+              
               <div class="header-logos padding-top--40">  
               <div class="footer-link">
                 <div class="listing padding-bottom--24 flex-flex center-center">
@@ -205,6 +187,7 @@
           </div>
         </div>
       </div>
+
       <!-- Loading overlay -->
       <div id="loading-overlay">
         <div class="loading-content">
@@ -212,7 +195,7 @@
           <h2 data-i18n="processingFile">Processing your file... please wait ⏳</h2>
         </div>
       </div>
-
+      <!-- Hidden input to store selected variable -->
       <!-- External JS -->
       <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
       <script src="{{ url_for('static', filename='js/main.js') }}"></script>

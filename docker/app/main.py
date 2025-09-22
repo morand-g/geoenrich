@@ -8,6 +8,8 @@ from flask import Flask, render_template, request, Response, send_from_directory
 from geoenrich.dataloader import import_occurrences_csv, load_areas_file
 from geoenrich.enrichment import create_enrichment_file, enrich
 from geoenrich.exports import produce_stats
+from dotenv import load_dotenv
+from pathlib import Path
 
 
 latdict = {'latitude': 'latitude', 'decimallatitude': 'latitude', 'lat': 'latitude'}
@@ -25,9 +27,9 @@ app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # Maximum filesize of 20MB
 app.config['DS_REF'] = ''
 
 # Directory for enrichment outputs
-OUTPUT_DIR = "data/biodive"
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
+OUTPUT_DIR = "data/useroutputs/"  
+SMTP_HOST = os.getenv("SMTP_HOST")  # default fallback
+print(SMTP_HOST)
 #Mail connection
 def send_email(to_email, message):
     sender = "no-reply@umontpellier.fr"
@@ -36,8 +38,9 @@ def send_email(to_email, message):
     msg["From"] = sender
     msg["To"] = to_email
     msg.attach(MIMEText(message, "plain"))
-
-    with smtplib.SMTP("smtp-int.umontpellier.fr", 25) as server:
+    SMTP_HOST = os.getenv("SMTP_HOST")  # default fallback
+    SMTP_PORT = int(os.getenv("SMTP_PORT", 25))
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
         server.sendmail(sender, [to_email], msg.as_string())
 
 # Root URL
