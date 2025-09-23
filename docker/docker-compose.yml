@@ -15,4 +15,8 @@ services:
       - FLASK_DEBUG=1
       - COPERNICUS_TOKEN=${COPERNICUS_TOKEN}
     working_dir: /app
-    command: bash -c "mkdir -p /root/.copernicusmarine && echo \"$COPERNICUS_TOKEN\" > /root/.copernicusmarine/.copernicusmarine-credentials && python /home/initialize.py && flask run --host=0.0.0.0 --port=8080 --reload"
+    command: bash -c "mkdir -p /root/.copernicusmarine \
+      && echo \"$COPERNICUS_TOKEN\" > /root/.copernicusmarine/.copernicusmarine-credentials \
+      && cp /usr/local/lib/python3.10/site-packages/geoenrich/data/catalog.csv /app/static/js/ \
+      && python /home/initialize.py \
+      && flask run --host=0.0.0.0 --port=8080 --reload"

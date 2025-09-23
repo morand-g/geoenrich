@@ -80,3 +80,56 @@ document.querySelector("form").addEventListener("submit", function(e) {
         document.getElementById("loading-overlay").style.display = "flex"; // start spinner only when valid
     }
 });
+
+// Load catalog.csv and labels.json, then populate dropdown
+Promise.all([
+  fetch("/static/js/catalog.csv").then(r => r.text()),
+  fetch("/static/js/labels.json").then(r => r.json())
+])
+.then(([csvText, labelMap]) => {
+  const rows = csvText
+    .trim()
+    .split("\n")
+    .map(r => r.replace(/\r/g, "").split(",").map(v => v.trim()))
+    .filter(r => r.length > 1);
+
+  const headers = rows[0];
+  const variableIndex = headers.indexOf("variable");
+  const urlIndex = headers.indexOf("url");
+
+  const menu = document.getElementById("dropdownMenu");
+  const toggle = document.querySelector(".dropdown-toggle");
+  const hiddenInput = document.getElementById("var_id");
+
+  rows.slice(1).forEach(row => {
+    const variable = row[variableIndex];
+    const displayLabel = labelMap[variable] || variable;
+    const url = `https://data.marine.copernicus.eu/products?q=${row[urlIndex]}`;
+
+    const item = document.createElement("div");
+    item.classList.add("dropdown-item");
+    item.innerHTML = `
+      <span>${displayLabel}</span>
+      ${url ? `<a href="${url}" target="_blank">source</a>` : ""}
+    `;
+
+    item.addEventListener("click", (e) => {
+      if (e.target.tagName !== "A") {
+        toggle.textContent = displayLabel;
+        hiddenInput.value = variable;
+        menu.style.display = "none";
+      }
+    });
+
+    menu.appendChild(item);
+  });
+
+  toggle.addEventListener("click", () => {
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".dropdown")) menu.style.display = "none";
+  });
+})
+.catch(err => console.error("Error loading files:", err));
