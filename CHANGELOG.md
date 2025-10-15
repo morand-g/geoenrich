@@ -2,6 +2,11 @@
 
 #### New functions:
 - Added possibility to personnalize file name in exports.produce_stats
+- Added FSLE in the variable catalog
+
+
+#### Bug fixes:
+- Allow str path in exports.collate_npy
 
 
 ## v0.6.7

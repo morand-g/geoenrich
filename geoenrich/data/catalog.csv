@@ -10,6 +10,8 @@ dinophytes,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc
 distance-to-coast,PacIOOS,0.01°,,,surface,https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/dist2coast_1deg,dist
 distance-to-port,Global Fishing Watch,0.01°,,,surface,http://tds.marbec-tools.ird.fr/thredds/dodsC/testAll/geoenrich/dist_port.nc,Band1
 eke,,,,,surface,calculated,eke
+fsle,Aviso+,0.04°,1d,1994-01-04 – ongoing,surface,http://tds-odatis.aviso.altimetry.fr/thredds/dodsC/dataset-duacs-dt-global-allsat-madt-fsle-vDT2024,fsle_max
+fsle-orientation,Aviso+,0.04°,1d,1994-01-04 – ongoing,surface,http://tds-odatis.aviso.altimetry.fr/thredds/dodsC/dataset-duacs-dt-global-allsat-madt-fsle-vDT2024,theta_max
 geos-current-u,Copernicus,0.125°,1d,1993-01-01 – 2022-12-31,surface,cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1D,ugosa
 geos-current-v,Copernicus,0.125°,1d,1993-01-01 – 2022-12-31,surface,cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1D,vgosa
 green-algae,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,GREEN

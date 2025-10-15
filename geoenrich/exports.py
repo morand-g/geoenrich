@@ -686,6 +686,7 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
         None
     """
 
+    data_path = Path(data_path)
     folderpath = data_path / (ds_ref + '-npy')
     if not(folderpath.exists()):
         folderpath.mkdir()
