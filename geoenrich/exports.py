@@ -667,7 +667,7 @@ def export_raster(dataset_ref, occ_id, var_id, path = Path('./'), geo_buff = Non
             print('Abort. Array is smaller than 2x2 pixels.')
 
 
-def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {'example-var': 2}, duplicates = {'var_to_remove':'var_to_keep'}):
+def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {'example-var': 2}, duplicates = {}):
 
     """
     Export a 3D numpy array with all layers for each occurrence of a dataset.
@@ -679,7 +679,7 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
         output_res (int) : output data resolution along lat and lon axes.
         slice (list[int]): if not None, only process the given slice of the dataset.
         dimension3 (dict): provides the expected 3rd dimension length (time dimension * depth dimension) for each variable where it is larger than 1.
-        duplicates (dict): dictionnary of variables which should be merged. If var_to_keep is empty, data from var_to_remove are used instead.
+        duplicates (dict): dictionnary of variables which should be merged, e.g. {'var_to_remove':'var_to_keep'}. If var_to_keep is empty, data from var_to_remove are used instead.
 
 
     Returns:
