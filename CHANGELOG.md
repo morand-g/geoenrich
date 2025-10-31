@@ -1,8 +1,22 @@
+## v0.6.8
+
+#### New functions:
+- Added possibility to personnalize file name in exports.produce_stats
+- Added FSLE in the variable catalog
+
+
+#### Bug fixes:
+- Allow str path in exports.collate_npy
+- Replace time buffer tuple with list in tutorial.
+- Removed default dicitonnary in exports.collate_npy
+
+
 ## v0.6.7
 
 #### New functions:
 - Added Degree heating week variable
 - Updated R tutorial
+
 
 ## v0.6.6
 
@@ -26,6 +40,7 @@
 #### Bug fixes:
  - Fixed bug that occurred when requesting data for surface points in 'nearest_lower' mode
  
+
 ## v0.6.3
 
 #### New functions:

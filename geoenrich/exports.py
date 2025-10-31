@@ -198,7 +198,7 @@ def fetch_data(row, var_id, var_indices, ds, dimdict, var, downsample, indices =
 
 
 def produce_stats(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request = None,
-                    downsample = None, out_path = Path('./')):
+                    downsample = None, out_path = Path('./'), filename = None):
 
     """
     Produce a document named *dataset\_ref*\_stats.csv with summary stats of all enriched data.
@@ -212,6 +212,7 @@ def produce_stats(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_
         depth_request (str): (Optional) Depth request that was used for enrichment.
         downsample (dict): (Optional) Downsample that was used for enrichment.
         out_path (str or pathlib.Path): Path where you want to save the output stats file.
+        filename (str): (Optional) Name of the output file. If None, the default name is used.
 
     Returns:
         None
@@ -258,8 +259,9 @@ def produce_stats(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_
                                      result_type = 'expand')
         ds.close()
 
-
-        filepath = Path(out_path, dataset_ref + '_' + str(en['id']) + '_stats.csv')
+        if filename is None:
+            filename = dataset_ref + '_' + str(en['id']) + '_stats.csv'
+        filepath = Path(out_path, filename)
         res.to_csv(str(filepath))
         print(f'File saved at {filepath}')
 
@@ -665,7 +667,7 @@ def export_raster(dataset_ref, occ_id, var_id, path = Path('./'), geo_buff = Non
             print('Abort. Array is smaller than 2x2 pixels.')
 
 
-def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {'example-var': 2}, duplicates = {'var_to_remove':'var_to_keep'}):
+def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {'example-var': 2}, duplicates = {}):
 
     """
     Export a 3D numpy array with all layers for each occurrence of a dataset.
@@ -677,13 +679,14 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
         output_res (int) : output data resolution along lat and lon axes.
         slice (list[int]): if not None, only process the given slice of the dataset.
         dimension3 (dict): provides the expected 3rd dimension length (time dimension * depth dimension) for each variable where it is larger than 1.
-        duplicates (dict): dictionnary of variables which should be merged. If var_to_keep is empty, data from var_to_remove are used instead.
+        duplicates (dict): dictionnary of variables which should be merged, e.g. {'var_to_remove':'var_to_keep'}. If var_to_keep is empty, data from var_to_remove are used instead.
 
 
     Returns:
         None
     """
 
+    data_path = Path(data_path)
     folderpath = data_path / (ds_ref + '-npy')
     if not(folderpath.exists()):
         folderpath.mkdir()

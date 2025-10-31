@@ -21,11 +21,11 @@ sys.path.insert(0, os.path.abspath('../../geoenrich'))
 # -- Project information -----------------------------------------------------
 
 project = 'geoenrich'
-copyright = '2024, Gaétan Morand (UMR Marbec). Project under GNU GPL v3 license'
+copyright = '2025, Gaétan Morand (UMR Marbec). Project under GNU GPL v3 license'
 author = 'Gaétan Morand (UMR Marbec)'
 
 # The full version, including alpha/beta/rc tags
-release = '0.6.7'
+release = '0.6.8'
 
 
 # -- General configuration ---------------------------------------------------
@@ -55,4 +55,4 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+html_static_path = ['_static']
