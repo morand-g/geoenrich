@@ -13,8 +13,6 @@ It should work on other operating systems and with other versions of Python 3, b
 
 Assuming you have Python3 and pip installed. This is automatic in all recent Linux distributions. Otherwise instructions are available here: `Python <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and `pip <https://pip.pypa.io/en/stable/installation/>`_.
 
-If you want to use Copernicus data, you need to install Copernicus Marine API (`instructions <https://help.marine.copernicus.eu/en/articles/7970514-copernicus-marine-toolbox-installation>`_) and set it up with your Copernicus account (`instructions <https://help.marine.copernicus.eu/en/articles/8185007-copernicus-marine-toolbox-credentials-configuration>`_).
-
 3. Installation
 ---------------
 

@@ -8,7 +8,7 @@
 #### Bug fixes:
 - Allow str path in exports.collate_npy
 - Replace time buffer tuple with list in tutorial.
-- TODO : collate: virer le dict par défaut
+- Removed default dicitonnary in exports.collate_npy
 
 
 ## v0.6.7
