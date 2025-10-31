@@ -8,7 +8,7 @@ Please note that some of the variables marked as *ongoing* may be updated with a
 
 
 .. note::
-  If you want to use FSLE data, you need to save your Avso+ credentials in a .netrc file as explained (`here <https://opendap.github.io/documentation/tutorials/ClientAuthentication.html>`_).
+  If you want to use FSLE data, you need to save your Aviso+ credentials in a .netrc file as explained (`here <https://opendap.github.io/documentation/tutorials/ClientAuthentication.html>`_).
 
 
 
