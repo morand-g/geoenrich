@@ -23,7 +23,7 @@ app.config["DEBUG"] = False
 # App variables
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 app.config['UPLOAD_EXTENSIONS'] = ['.csv']
-app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # Maximum filesize of 20MB
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  
 app.config['DS_REF'] = ''
 
 # Directory for enrichment outputs
@@ -32,7 +32,7 @@ SMTP_HOST = os.getenv("SMTP_HOST")  # default fallback
 print(SMTP_HOST)
 #Mail connection
 def send_email(to_email, message):
-    sender = "no-reply@umontpellier.fr"
+    sender = "no-reply@ird.fr"
     msg = MIMEMultipart()
     msg["Subject"] = "GeoEnrich - Notification"
     msg["From"] = sender
@@ -90,7 +90,7 @@ def uploadFiles():
         # Run enrichment
         app.config['DS_REF'] = ds_ref
         create_enrichment_file(df, ds_ref)
-        enrich(ds_ref, var_id, geo_buff, time_buff, depth_request, maxpoints=2000000)
+        enrich(ds_ref, var_id, geo_buff, time_buff, depth_request, maxpoints=app.config['MAX_CONTENT_LENGTH'])
         produce_stats(ds_ref, var_id, out_path=OUTPUT_DIR)
 
         # Remove uploaded file

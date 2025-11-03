@@ -5,8 +5,8 @@
   const uploadBox   = document.getElementById('uploadBox');
   const fileError   = document.getElementById('fileError');
   const defaultText = uploadText.textContent.trim();
-  const placeholderColor = '#999'; // your placeholder color
-  const maxSize = 20 * 1024 * 1024; // 20 MB
+  const placeholderColor = '#999'; 
+  const maxSize = 100 * 1024 * 1024; // 100 MB
 
   // Set initial color
   uploadText.style.color = placeholderColor;

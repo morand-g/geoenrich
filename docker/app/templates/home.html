@@ -74,7 +74,7 @@
                   </div>
                   <form method = "POST" action="" enctype="multipart/form-data">
                     <div class="grid--50-50">
-                        <label for="fileselect" data-i18n="selectFile">Select your occurrences file*:</label>
+                        <label for="fileselect" data-i18n="selectFile">Select your occurrences file* (max 100 MB):</label>
                         <div class="reset-pass">
                           <a href="https://geoenrich.readthedocs.io/en/latest/online.html" target="_blank">Formatting examples</a>
                         </div>
@@ -87,7 +87,7 @@
                             <input id="fileselect" type="file" name="file" accept=".csv">
                           </label>
                           <div id="fileError" class="file-error" data-i18n="fileTooLarge" style="color:red; margin-top:4px; display:none;">
-                            File is too large! Maximum allowed size is 20 MB.
+                            File is too large! Maximum allowed size is 100 MB.
                           </div>
                     </div>
                     <div class="grid--50-50" style="margin-top: -13px;">
