@@ -137,3 +137,6 @@ run_enrichment.py
 
 # R
 .Rhistory
+
+# local data
+docker_online/app/data/

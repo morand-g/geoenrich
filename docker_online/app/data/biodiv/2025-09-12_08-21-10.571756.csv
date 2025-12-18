@@ -1,0 +1,4 @@
+id,mint,maxt,minx,maxx,miny,maxy,ind,1_latitude_min,1_latitude_max,1_longitude_min,1_longitude_max
+corsica,2015-06-01,2015-06-30,8.3,9.7,41.2,43.2,"{'latitude': {'min': np.int64(7872), 'max': np.int64(7992), 'step': 1}, 'longitude': {'min': np.int64(11298), 'max': np.int64(11382), 'step': 1}}",7872,7992,11298,11382
+galapagos,2022-03-18,2022-03-18,-91.9,-89.0,-1.5,0.79,"{'latitude': {'min': np.int64(5310), 'max': np.int64(5447), 'step': 1}, 'longitude': {'min': np.int64(5286), 'max': np.int64(5460), 'step': 1}}",5310,5447,5286,5460
+samoa,2018-11-21,2018-11-28,-172.9,-171.3,-14.1,-13.3,"{'latitude': {'min': np.int64(4554), 'max': np.int64(4602), 'step': 1}, 'longitude': {'min': np.int64(426), 'max': np.int64(522), 'step': 1}}",4554,4602,426,522
