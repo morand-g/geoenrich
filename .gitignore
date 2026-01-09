@@ -139,4 +139,5 @@ run_enrichment.py
 .Rhistory
 
 # local data
-docker_online/app/data/
+docker_online/app/data/sat
+docker_online/app/data/biodiv/
