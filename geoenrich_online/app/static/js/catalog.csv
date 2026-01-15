@@ -1,0 +1,41 @@
+variable,source,spatial_resolution,time_resolution,time_coverage,depth_levels,url,varname
+bathymetry,NOAA,0.017°,,,surface,https://www.ngdc.noaa.gov/thredds/dodsC/global/ETOPO1_Bed_g_gmt4.nc,z
+bottom-temp,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,surface,cmems_mod_glo_phy_my_0.083deg_P1D-m,bottomT
+chlorophyll,Copernicus,4km,1d,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-gapfree-multi-4km_P1D,CHL
+current3d-u,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,50 levels,cmems_mod_glo_phy_my_0.083deg_P1D-m,uo
+current3d-v,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,50 levels,cmems_mod_glo_phy_my_0.083deg_P1D-m,vo
+dhw,NOAA,5km,1d,1987-01-01 – 2024-12-31,surface,http://tds.marbec-tools.ird.fr/thredds/dodsC/testAll/geoenrich/DHW_1987-2024.nc,degree_heating_week
+diatoms,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,DIATO
+dinophytes,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,DINO
+distance-to-coast,PacIOOS,0.01°,,,surface,https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/dist2coast_1deg,dist
+distance-to-port,Global Fishing Watch,0.01°,,,surface,http://tds.marbec-tools.ird.fr/thredds/dodsC/testAll/geoenrich/dist_port.nc,Band1
+eke,,,,,surface,calculated,eke
+geos-current-u,Copernicus,0.125°,1d,1993-01-01 – 2022-12-31,surface,cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1D,ugosa
+geos-current-v,Copernicus,0.125°,1d,1993-01-01 – 2022-12-31,surface,cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1D,vgosa
+green-algae,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,GREEN
+haptophytes,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,HAPTO
+microphytoplankton,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,MICRO
+mixed-layer-thickness,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,surface,cmems_mod_glo_phy_my_0.083deg_P1D-m,mlotst
+nanophytoplankton,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,NANO
+nitrate,Copernicus,0.25°,1d,1993-01-01 – 2022-12-31,75 levels,cmems_mod_glo_bgc_my_0.25deg_P1D-m,no3
+oxygen,Copernicus,0.25°,1d,1993-01-01 – 2022-12-31,75 levels,cmems_mod_glo_bgc_my_0.25deg_P1D-m,o2
+oxygen-nrt,Copernicus,0.25°,1d,2023-01-01 – ongoing,75 levels,cmems_mod_glo_bgc_myint_0.25deg_P1D-m,o2
+ph,Copernicus,0.25°,1m,1985-01-01 – 2023-12-01,surface,cmems_obs-mob_glo_bgc-car_my_irr-i,ph
+pop-density-log,GPW v3v4,0.0083°,5y,1995 – 2020,surface,http://tds.marbec-tools.ird.fr/thredds/dodsC/testAll/geoenrich/pop_density3.nc,Band1
+primary-production,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-pp_my_l4-multi-4km_P1M,PP
+prochlorophytes,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,PROCHLO
+prokaryotes,Copernicus,4km,1m,1997-09-04 – ongoing,surface,cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M,PROKAR
+salinity,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,50 levels,cmems_mod_glo_phy_my_0.083deg_P1D-m,so
+salinity-nrt,Copernicus,0.083°,1d,2021-07-01 – ongoing,50 levels,cmems_mod_glo_phy_myint_0.083deg_P1D-m,so
+sla,Copernicus,0.125°,1d,1993-01-01 – 2022-12-31,surface,cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1D,sla
+ssh,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,surface,cmems_mod_glo_phy_my_0.083deg_P1D-m,zos
+sst,Copernicus,0.05°,1d,2007-01-01 – ongoing,surface,METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2,analysed_sst
+sst-old,Copernicus,0.05°,1d,1981-10-01 – 2022-05-31,surface,METOFFICE-GLO-SST-L4-REP-OBS-SST,analysed_sst
+surface-wind-u,CCMP,0.25°,6h,1987-07-02 – 2011-12-31,surface,http://apdrc.soest.hawaii.edu:80/dods/public_data/satellite_product/CCMP/6hourly_v2,uwnd
+surface-wind-v,CCMP,0.25°,6h,1987-07-02 – 2011-12-31,surface,http://apdrc.soest.hawaii.edu:80/dods/public_data/satellite_product/CCMP/6hourly_v2,vwnd
+temperature3d,Copernicus,0.083°,1d,1993-01-01 – 2021-06-30,50 levels,cmems_mod_glo_phy_my_0.083deg_P1D-m,thetao
+wave-height,Copernicus,0.2°,3h,1993-01-01 – 2023-04-30,surface,cmems_mod_glo_wav_my_0.2deg_PT3H-i,VHM0
+wind-u,Copernicus,0.125°,1h,2007-01-11 – ongoing,surface,cmems_obs-wind_glo_phy_my_l4_0.125deg_PT1H,eastward_wind
+wind-u-old,Copernicus,0.25°,1h,1994-06-01 – 2009-10-31,surface,cmems_obs-wind_glo_phy_my_l4_0.25deg_PT1H,eastward_wind
+wind-v,Copernicus,0.125°,1h,2007-01-11 – ongoing,surface,cmems_obs-wind_glo_phy_my_l4_0.125deg_PT1H,northward_wind
+wind-v-old,Copernicus,0.25°,1h,1994-06-01 – 2009-10-31,surface,cmems_obs-wind_glo_phy_my_l4_0.25deg_PT1H,northward_wind
