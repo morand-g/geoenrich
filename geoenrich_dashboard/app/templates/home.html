@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+    <head>
+        <title data-i18n="title">GeoEnrich online</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+        <link rel="shortcut icon" href="{{ url_for('static',filename='assets/favicon.ico') }}" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+
+    </head>
+    <body>
+      <div class="login-root">
+        
+        <div class="box-root flex-flex flex-direction--column" style="min-height: 100vh;flex-grow: 1;">
+          <div class="loginbackground box-background--white padding-top--64">
+            <div class="loginbackground-gridContainer">
+              <div class="box-root flex-flex" style="grid-area: top / start / 8 / end;">
+                <div class="box-root" style="background-image: linear-gradient(white 0%, rgb(247, 250, 252) 33%); flex-grow: 1;">
+                </div>
+              </div>
+              <div class="box-root flex-flex" style="grid-area: 4 / 2 / auto / 5;">
+                <div class="box-root box-divider--light-all-2" style="flex-grow: 1;"></div>
+              </div>
+              <div class="box-root flex-flex" style="grid-area: 6 / start / auto / 2;">
+                <div class="box-root box-background--blue800" style="flex-grow: 1;"></div>
+              </div>
+              <div class="box-root flex-flex" style="grid-area: 7 / start / auto / 4;">
+                <div class="box-root box-background--blue" style="flex-grow: 1;"></div>
+              </div>
+              <div class="box-root flex-flex" style="grid-area: 8 / 4 / auto / 6;">
+                <div class="box-root box-background--gray100" style="flex-grow: 1;"></div>
+              </div>
+              <div class="box-root flex-flex" style="grid-area: 2 / 15 / auto / end;">
+                <div class="box-root box-background--cyan200" style="flex-grow: 1;"></div>
+              </div>
+              <div class="box-root flex-flex" style="grid-area: 3 / 14 / auto / end;">
+                <div class="box-root box-background--blue" style="flex-grow: 1;"></div>
+              </div>
+              <div class="box-root flex-flex" style="grid-area: 4 / 17 / auto / 20;">
+                <div class="box-root box-background--gray100" style="flex-grow: 1;"></div>
+              </div>
+              <div class="box-root flex-flex" style="grid-area: 5 / 14 / auto / 17;">
+                <div class="box-root box-divider--light-all-2" style="flex-grow: 1;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="box-root padding-top--24 flex-flex flex-direction--column center-center" style="z-index: 9;">    
+            <div class="formbg-outer">
+              <div class="formbg">
+                <div class="language-container">
+                  <select id="language-select" class="language-select" onchange="setLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                    <option value="ar">العربية</option>
+                    <option value="zh">中文</option>
+                  </select>
+              </div>
+                <div class="formbg-inner padding-horizontal--48 center-center" style="justify-content:center;">
+                  <div class="header-logos grid--50-50" style="margin-top: -15px;">
+                    <div class="flex-flex" style="justify-content: left;">
+                      <a href="/">
+                        <img alt="G2OI" src="{{ url_for('static',filename='assets/logo_g2oi.png') }}">
+                      </a>
+                    </div>
+                    
+                    <div class="flex-flex" style="justify-content: right;">
+                      <a href="https://www.ird.fr/" target="_blank">
+                        <img alt="IRD" height="58" src="{{ url_for('static',filename='assets/logo_ird.png') }}">
+                      </a>  
+                    </div>
+                  </div>  
+                  <div class="box-root padding-top--24 padding-bottom--24 flex-flex flex-justifyContent--center extra-bottom-space">
+                    <h1 data-i18n="title">GeoEnrich online</h1>
+                  </div>
+                  <form method = "POST" action="" enctype="multipart/form-data">
+                    <div class="grid--50-50">
+                        <label for="fileselect" data-i18n="selectFile">Select your occurrences file* (max 100 MB):</label>
+                        <div class="reset-pass">
+                          <a href="https://geoenrich.readthedocs.io/en/latest/online.html" target="_blank">Formatting examples</a>
+                        </div>
+                    </div>
+                    <div class="field padding-bottom--24">
+                          <label class="upload-box" for="fileselect" id="uploadBox">
+                            <span class="upload-placeholder" id="uploadText" aria-live="polite" data-i18n="chooseFile">
+                              Choose file or drag here
+                            </span>
+                            <input id="fileselect" type="file" name="file" accept=".csv">
+                          </label>
+                          <div id="fileError" class="file-error" data-i18n="fileTooLarge" style="color:red; margin-top:4px; display:none;">
+                            File is too large! Maximum allowed size is 100 MB.
+                          </div>
+                    </div>
+                    <div class="grid--50-50" style="margin-top: -13px;">
+                        <label data-i18n="chooseVariable">Choose a variable*:</label>
+                        <div class="reset-pass">
+                          <a href="https://geoenrich.readthedocs.io/en/latest/variables.html" target="_blank" data-i18n="catalog">Catalog</a>
+                        </div>
+                    </div>
+                    <div class="field padding-bottom--24">
+
+                      <div class="dropdown">
+                        <div class="dropdown-toggle">Choose a variable...</div>
+                        <div class="dropdown-menu" id="dropdownMenu"></div>
+                      </div>
+                    </div>
+                    <div style="display:none;">
+                      <input type="hidden" id="var_id" name="var_id" value="">
+                    </div>
+                    <div class="padding-bottom--24">
+                        <label for="params" data-i18n="bufferBoundaries">Choose your buffer boundaries:</label>
+                        <fieldset id ="params">
+                            <div class="field padding-bottom--24">
+                                <label for="geo_buff" data-i18n="geoBuffer">Geographical buffer (km):</label>
+                                <input type="number" id="geo_buff" name="geo_buff" value=10>
+                            </div>
+                            <div class="field grid--50-50">
+                              <label for="time_buff1" data-i18n="timeStart">Time period start (days):</label>
+                              <label for="time_buff2" style="margin-left: 10px;" data-i18n="timeEnd">Time period end (days):</label>
+                            </div>
+                            <div class="field padding-bottom--24 grid--50-50">
+                              <input type="number" id="time_buff1" value="-1" name="tbuff1" style="width:245px;">
+                              <input type="number" id="time_buff2" value="0" name="tbuff2" style="width:245px;margin-left: 10px;">
+                            </div>
+                            <div class="field field-checkbox padding-bottom--24 flex-flex align-center">
+                                <label for="checkbox" >
+                                    <input type="checkbox" name="checkbox" >
+                                </label>
+                                <label for="checkbox" data-i18n="allDepths">
+                                   Use all depths level instead of surface only (not recommended)
+                                </label>
+                            </div>
+                        </fieldset>
+                        
+                    </div>
+
+                    <div class="field padding-bottom--24" >
+                      <label for="user_email" data-i18n="user_email" >Enter your mail to get a  download link:</label>
+                      <input type="email" id="user_email" name="user_email">
+                    </div>
+                    <div id="error-message" style="color:red; text-align:center; display:none; margin-bottom:10px;">
+                      </div>
+                    <div class="field flex-flex center-center">
+                        <input type="submit" name="submit" value="Continue" data-i18n="continue">
+                    </div>
+                  </form>
+                  <div class="flex-flex center-center grid--50-50 padding-top--24">
+                    <div class="flex-flex">
+                      <a class="secondary-link" href="https://geoenrich.readthedocs.io" target="_blank">
+                        <div class="flex-flex center-center">
+                          <img height="20px" style="margin-right:10px"
+                             src="{{ url_for('static',filename='assets/logo_rtd.png') }}">  
+                           <span data-i18n="documentation">Documentation</span>
+                        </div> 
+                      </a>
+                    </div>
+                    <div class="flex-flex">
+                      <a class="secondary-link" href="https://github.com/morand-g/geoenrich" target="_blank">
+                        <div class="flex-flex center-center">
+                          <img height="25px" style="margin-right:10px"
+                             src="{{ url_for('static',filename='assets/logo_github.png') }}">  
+                           <span data-i18n="codeSupport">Code & Support</span>
+                        </div> 
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="header-logos padding-top--40">  
+              <div class="footer-link">
+                <div class="listing padding-bottom--24 flex-flex center-center">
+                    <a href="https://european-union.europa.eu/index_fr" rel="nofollow" target="_blank">
+                        <img alt="Europe" height="40" src="{{ url_for('static',filename='assets/logo_ue.png') }}">
+                    </a>
+                    <a href="https://regionreunion.com/" target="_blank">
+                        <img alt="Reunion" height="40" src="{{ url_for('static',filename='assets/logo_reunion.png') }}">
+                    </a>
+                    <a href="https://www.gouvernement.fr/" target="_blank">
+                        <img alt="France" height="40" src="{{ url_for('static',filename='assets/logo_france.png') }}">
+                    </a>
+                </div>
+                <div class="padding-leftright--48 padding-bottom--24">
+                    <span data-i18n="g2oiProject">This website is being developed as part of the G2OI project, cofinanced by the European union, the Reunion region, and the French Republic.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading overlay -->
+      <div id="loading-overlay">
+        <div class="loading-content">
+          <div class="spinner"></div>
+          <h2 data-i18n="processingFile">Processing your file... please wait ⏳</h2>
+        </div>
+      </div>
+      <!-- Hidden input to store selected variable -->
+      <!-- External JS -->
+      <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+      <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+      <script src="{{ url_for('static', filename='js/translation.js') }}"></script>
+
+    </body>
