@@ -1,3 +1,13 @@
+## v1.0
+
+#### New functions:
+- Dashboard to help large enrichment jobs
+
+
+#### Bug fixes:
+- Fixed a NA handling bug in exports.compute_stats  
+
+
 ## v0.6.8
 
 #### New functions:
