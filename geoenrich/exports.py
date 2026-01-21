@@ -309,6 +309,7 @@ def compute_stats(row, en_params, input_type, var_indices, ds, dimdict, var):
         mask = ellipsoid_mask(data, coords, row['geometry'], geo_buff)
         data = np.ma.masked_where(mask, data)
 
+    data = np.ma.masked_invalid(data)
     av, std = np.ma.average(data), np.ma.std(data)
     minv, maxv, count = np.ma.min(data), np.ma.max(data), np.ma.count(data)
     names = [var_id + '_av', var_id + '_std', var_id + '_min', var_id + '_max', var_id + '_count']
