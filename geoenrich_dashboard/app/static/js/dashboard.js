@@ -1,231 +1,225 @@
-// ===============================
-// MULTI-VARIABLE SELECTION (FETCH)
-// ===============================
-document.addEventListener("DOMContentLoaded", function () {
+const uploadBox = document.getElementById("uploadBox");
+const uploadText = document.getElementById("uploadText");
+const fileInput = document.getElementById("fileInput");
+const startBtn = document.getElementById("startBtn");
+const statsDiv = document.getElementById("stats");
+const section2 = document.getElementById("section2");
+const enrichBtn = document.getElementById("enrichBtn");
+const progressContainer = document.getElementById("progressContainer");
 
-  console.log("DOM READY – FETCH VARIABLES INIT");
+const variableSelect = document.getElementById("variableSelect");
+const selectedVariablesDiv = document.getElementById("selectedVariables");
 
-  const availableEl = document.getElementById("availableVariables");
-  const selectedEl  = document.getElementById("selectedVariables");
-  const hiddenInput = document.getElementById("var_id");
+let csvFile = null;
+let selectedVariables = [];
+let availableVariables = [];
 
-  if (!availableEl || !selectedEl || !hiddenInput) {
-    console.error("Variable containers not found in DOM");
-    return;
+/* =========================
+   SECTION 1 – CSV UPLOAD
+========================= */
+
+uploadBox.addEventListener("click", () => fileInput.click());
+
+uploadBox.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  uploadBox.classList.add("dragover");
+});
+
+uploadBox.addEventListener("dragleave", () => {
+  uploadBox.classList.remove("dragover");
+});
+
+uploadBox.addEventListener("drop", (e) => {
+  e.preventDefault();
+  uploadBox.classList.remove("dragover");
+  handleFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener("change", () => {
+  handleFile(fileInput.files[0]);
+});
+
+function handleFile(file) {
+  if (!file || !file.name.endsWith(".csv")) return;
+  csvFile = file;
+  uploadText.textContent = file.name;
+  startBtn.disabled = false;
+}
+
+startBtn.addEventListener("click", () => {
+  const reader = new FileReader();
+  reader.onload = () => processCSV(reader.result);
+  reader.readAsText(csvFile);
+});
+
+function processCSV(text) {
+  const rows = text.trim().split("\n").map(r => r.split(","));
+  const headers = rows[0].map(h => h.trim().toLowerCase());
+  const data = rows.slice(1);
+
+  const dateColIndex = headers.findIndex(h => h.includes("date"));
+
+  let html = `<strong>Rows:</strong> ${data.length}<br>`;
+
+  if (dateColIndex !== -1) {
+    const dates = data.map(r => r[dateColIndex]).filter(Boolean).sort();
+    html += `<strong>Date range:</strong> ${dates[0]} → ${dates[dates.length - 1]}`;
+  } else {
+    html += "No date column found";
   }
 
-  let selectedVars = [];
-  let catalog = [];
+  statsDiv.style.display = "block";
+  statsDiv.innerHTML = html;
+  section2.classList.remove("locked");
+}
 
-  // ---------- LOAD CATALOG ----------
-  Promise.all([
-    fetch("/static/js/catalog.csv").then(r => r.text()),
-    fetch("/static/js/labels.json").then(r => r.json())
-  ])
-  .then(([csvText, labelMap]) => {
+/* =========================
+   SECTION 2 – VARIABLES
+========================= */
 
-    const rows = csvText
-      .trim()
-      .split("\n")
-      .map(r => r.replace(/\r/g, "").split(",").map(v => v.trim()));
+variableSelect.onchange = () => {
+  const value = variableSelect.value;
+  if (!value) return;
 
-    const headers = rows[0];
-    const variableIndex = headers.indexOf("variable");
-    const urlIndex = headers.indexOf("url");
+  selectedVariables.push(value);
+  availableVariables = availableVariables.filter(v => v !== value);
 
-    catalog = rows.slice(1).map(r => ({
-      id: r[variableIndex],
-      label: labelMap[r[variableIndex]] || r[variableIndex],
-      url: r[urlIndex]
-        ? `https://data.marine.copernicus.eu/products?q=${r[urlIndex]}`
-        : null
-    }));
+  renderVariableSelect();
+  renderVariables();
+};
 
-    renderAvailable();
+function renderVariableSelect() {
+  variableSelect.innerHTML = '<option value="">-- select variable --</option>';
+
+  availableVariables.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v;
+    opt.textContent = v;
+    variableSelect.appendChild(opt);
+  });
+}
+
+function renderVariables() {
+  selectedVariablesDiv.innerHTML = "";
+
+  selectedVariables.forEach((v, index) => {
+    const div = document.createElement("div");
+    div.className = "variable-item";
+    div.textContent = v;
+    div.draggable = true;
+
+    div.ondragstart = () => {
+      div.classList.add("dragging");
+      div.dataset.index = index;
+    };
+
+    div.ondragend = () => div.classList.remove("dragging");
+    div.ondragover = (e) => e.preventDefault();
+
+    div.ondrop = () => {
+      const from = Number(document.querySelector(".dragging").dataset.index);
+      const to = index;
+      const item = selectedVariables.splice(from, 1)[0];
+      selectedVariables.splice(to, 0, item);
+      renderVariables();
+    };
+
+    selectedVariablesDiv.appendChild(div);
+  });
+}
+
+/* =========================
+   FETCH VARIABLE CATALOG
+========================= */
+
+fetch("/get_var_catalog")
+  .then(res => res.json())
+  .then(data => {
+    availableVariables = data;
+    renderVariableSelect();
   })
-  .catch(err => console.error("Error loading catalog:", err));
-
-  // ---------- RENDER FUNCTIONS ----------
-  function renderAvailable() {
-    availableEl.innerHTML = "";
-
-    catalog.forEach(v => {
-      if (!selectedVars.find(s => s.id === v.id)) {
-        const div = document.createElement("div");
-        div.className = "dropdown-item";
-        div.innerHTML = `
-          <span>${v.label}</span>
-          ${v.url ? `<a href="${v.url}" target="_blank">source</a>` : ""}
-        `;
-
-        div.addEventListener("click", e => {
-          if (e.target.tagName !== "A") addVariable(v);
-        });
-
-        availableEl.appendChild(div);
-      }
-    });
-  }
-
-  function renderSelected() {
-    selectedEl.innerHTML = "";
-
-    selectedVars.forEach(v => {
-      const div = document.createElement("div");
-      div.className = "dropdown-item";
-      div.dataset.id = v.id;
-      div.textContent = v.label;
-      div.title = "Click to remove – Drag to reorder";
-
-      div.addEventListener("click", () => removeVariable(v.id));
-
-      selectedEl.appendChild(div);
-    });
-  }
-
-  // ---------- ACTIONS ----------
-  function addVariable(v) {
-    selectedVars.unshift(v); // climb to top
-    renderAvailable();
-    renderSelected();
-    syncHiddenInput();
-  }
-
-  function removeVariable(id) {
-    selectedVars = selectedVars.filter(v => v.id !== id);
-    renderAvailable();
-    renderSelected();
-    syncHiddenInput();
-  }
-
-  function syncHiddenInput() {
-    hiddenInput.value = selectedVars.map(v => v.id).join(",");
-  }
-
-  // ---------- DRAG & DROP ----------
-  new Sortable(selectedEl, {
-    animation: 150,
-    onEnd: () => {
-      const reordered = [];
-      selectedEl.querySelectorAll(".dropdown-item").forEach(el => {
-        const v = selectedVars.find(v => v.id === el.dataset.id);
-        reordered.push(v);
-      });
-      selectedVars = reordered;
-      syncHiddenInput();
-    }
+  .catch(() => {
+    variableSelect.innerHTML = '<option value="">Failed to load variables</option>';
   });
 
-});
+/* =========================
+   SECTION 3 
+========================= */
 
-// ===============================
-// DROPDOWN OPEN / CLOSE
-// ===============================
-// ===============================
-// DROPDOWN OPEN / CLOSE (CSS-COMPATIBLE)
-// ===============================
-document.addEventListener("click", function (e) {
+enrichBtn.addEventListener("click", () => {
+  if (!selectedVariables.length) return;
 
-  const toggle = e.target.closest(".dropdown-toggle");
-  const dropdowns = document.querySelectorAll(".dropdown");
+  // Unlock Section 3
+  document.getElementById("section3").classList.remove("locked");
 
-  // close all dropdowns
-  dropdowns.forEach(d => {
-    const menu = d.querySelector(".dropdown-menu");
-    if (menu) menu.style.display = "none";
-  });
+  // Clear previous progress
+  progressContainer.innerHTML = "";
 
-  if (toggle) {
-    const dropdown = toggle.closest(".dropdown");
-    const menu = dropdown.querySelector(".dropdown-menu");
-
-    // toggle current dropdown
-    menu.style.display = menu.style.display === "block" ? "none" : "block";
-    e.stopPropagation();
-  }
-});
-
-// prevent closing when clicking inside menu
-document.querySelectorAll(".dropdown-menu").forEach(menu => {
-  menu.addEventListener("click", e => e.stopPropagation());
-});
-
-
-function initProgressBars() {
-  const raw = document.getElementById("var_id").value;
-  if (!raw) return;
-
-  const variables = raw.split(",").map(v => v.trim());
-  const container = document.getElementById("progress-container");
-  const section = document.getElementById("processing-section");
-
-  container.innerHTML = "";
-  section.style.display = "block";
-
-  variables.forEach(v => {
+  // Create progress rows
+  progressState = selectedVariables.map(v => {
     const row = document.createElement("div");
     row.className = "progress-row";
-    row.dataset.var = v;
 
-    row.innerHTML = `
-      <div>${v}</div>
-      <div class="progress-bar-wrapper">
-        <div class="progress-bar"></div>
-      </div>
-      <div class="progress-status">Waiting</div>
-    `;
+    const label = document.createElement("div");
+    label.className = "progress-label";
+    label.innerHTML = `<span>${v}</span><span class="status">Pending</span>`;
 
-    container.appendChild(row);
+    const bar = document.createElement("div");
+    bar.className = "progress-bar";
+
+    const fill = document.createElement("div");
+    fill.className = "progress-fill";
+
+    bar.appendChild(fill);
+    row.appendChild(label);
+    row.appendChild(bar);
+    progressContainer.appendChild(row);
+
+    return { fill, status: label.querySelector(".status") };
   });
-}
 
+  let current = 0;
 
-// async function processVariablesSequentially(jobId) {
-//   const rows = document.querySelectorAll(".progress-row");
+  function runNext() {
+    if (current >= progressState.length) return;
 
-//   for (const row of rows) {
-//     const variable = row.dataset.var;
-//     const bar = row.querySelector(".progress-bar");
-//     const status = row.querySelector(".progress-status");
-
-//     status.textContent = "Processing";
-
-//     await processSingleVariable(jobId, variable, bar, status);
-
-//     status.textContent = "Done";
-//     bar.style.width = "100%";
-//   }
-// }
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function runFakeProcessing() {
-  const rows = document.querySelectorAll(".progress-row");
-
-  for (const row of rows) {
-    const bar = row.querySelector(".progress-bar");
-    const status = row.querySelector(".progress-status");
-
-    status.textContent = "Processing";
+    const item = progressState[current];
+    item.status.textContent = "Processing";
 
     let progress = 0;
 
-    while (progress < 100) {
-      progress += Math.random() * 12;   // natural-looking increments
-      progress = Math.min(progress, 100);
-      bar.style.width = progress + "%";
+    const interval = setInterval(() => {
+      progress += 5; 
+      if (progress > 100) progress = 100;
+      item.fill.style.width = progress + "%";
 
-      await sleep(300 + Math.random() * 300);
-    }
+      if (progress >= 100) {
+        clearInterval(interval);       
+        item.status.textContent = "Finished";
+        unlockSection4IfReady();       
 
-    status.textContent = "Done";
-    await sleep(400);
+        current++;                       
+        setTimeout(runNext, 200);         
+      }
+    }, 120); 
   }
-}
 
-document.getElementById("continueBtn").addEventListener("click", () => {
-  initProgressBars();
-  runFakeProcessing();
+  runNext(); 
 });
+
+/* =========================
+   SECTION 4
+========================= */
+function unlockSection4IfReady() {
+    if (!progressState.length) return;
+
+    const allFinished = progressState.every(
+        p => p.status.textContent === "Finished"
+    );
+
+    if (allFinished) {
+        document.getElementById("section4").classList.remove("locked");
+        document.getElementById("exportCsvBtn").disabled = false;
+        document.getElementById("exportJsonBtn").disabled = false;
+    }
+}
