@@ -4,12 +4,14 @@ from datetime import datetime
 import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
-from flask import Flask, render_template, request, Response, send_from_directory
+from flask import Flask, render_template, request, Response, send_from_directory, jsonify
 from geoenrich.dataloader import import_occurrences_csv, load_areas_file
 from geoenrich.enrichment import create_enrichment_file, enrich
 from geoenrich.exports import produce_stats
 from dotenv import load_dotenv
 from pathlib import Path
+
+from geoenrich.satellite import get_var_catalog
 
 
 latdict = {'latitude': 'latitude', 'decimallatitude': 'latitude', 'lat': 'latitude'}
@@ -124,6 +126,12 @@ def getStats():
         stats_filename, 
         as_attachment=True
     )
+
+#get var list
+@app.route("/get_var_catalog")
+def get_var_catalog_api():
+    catalog = get_var_catalog()
+    return jsonify(list(catalog.keys()))
 
 # Run app
 if (__name__ == "__main__"):
