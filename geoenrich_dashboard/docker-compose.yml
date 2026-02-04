@@ -1,12 +1,12 @@
-version: '3'
-
 services:
   web:
     build: .
-    container_name: geoenrich
+    container_name: geoenrich_dashboard
     restart: always
     volumes:
       - ./app:/app
+      - /data/venvs/copmarine/lib/python3.10/site-packages/geoenrich:/home/geoenrich_host
+      - /data/data/geoenrich_dashboard_data:/home/data
     ports:
       - "8081:8080"
     environment:
@@ -18,5 +18,6 @@ services:
     command: bash -c "mkdir -p /root/.copernicusmarine \
       && echo \"$COPERNICUS_TOKEN" > /root/.copernicusmarine/.copernicusmarine-credentials \
       && cp /usr/local/lib/python3.10/site-packages/geoenrich/data/catalog.csv /app/static/js/ \
-      && python /home/initialize.py \
+      && cp /home/geoenrich_host/data/personal_catalog.csv /usr/local/lib/python3.10/site-packages/geoenrich/data/personal_catalog.csv \
+      && cp /usr/local/lib/python3.10/site-packages/geoenrich/credentials_example.py /usr/local/lib/python3.10/site-packages/geoenrich/credentials.py \
       && flask run --host=0.0.0.0 --port=8080 --reload"
