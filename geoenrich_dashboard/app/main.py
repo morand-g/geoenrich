@@ -75,6 +75,25 @@ def uploadFiles():
 @app.route("/addVariables", methods=['POST'])
 def add_variables():
 
+    dataset_ref = app.config['DS_REF']
+
+    variables = request.form['selectedVariablesList'].split(',')[1:]
+    geo_buff = int(request.form['bufferInput'])
+    depth_request = request.form['depthMode']
+
+    for v in variables:
+
+        original, enrichment_metadata = load_enrichment_file(dataset_ref)
+        enrichments = enrichment_metadata['enrichments']
+        enrichment_id = get_enrichment_id(enrichments, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={})
+
+        if enrichment_id == -1:
+            if len(enrichments):
+                enrichment_id = max([en['id'] for en in enrichments]) + 1
+            else:
+                enrichment_id = 1
+            
+            save_enrichment_config(dataset_ref, enrichment_id, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={}, status = 'Waiting')
 
     return '', 204
 

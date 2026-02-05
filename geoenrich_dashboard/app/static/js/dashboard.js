@@ -9,6 +9,7 @@ const progressContainer = document.getElementById("progressContainer");
 
 const variableSelect = document.getElementById("variableSelect");
 const selectedVariablesDiv = document.getElementById("selectedVariables");
+const selectedVariablesList = document.getElementById("selectedVariablesList");
 
 let csvFile = null;
 let selectedVariables = [];
@@ -82,10 +83,12 @@ variableSelect.onchange = () => {
   if (!value) return;
 
   selectedVariables.push(value);
+  selectedVariablesList.value = selectedVariablesList.value + ',' + value;
   availableVariables = availableVariables.filter(v => v !== value);
 
   renderVariableSelect();
   renderVariables();
+  enrichBtn.disabled = false;
 };
 
 function renderVariableSelect() {
