@@ -72,6 +72,13 @@ def uploadFiles():
     return '', 204
 
 
+@app.route("/addVariables", methods=['POST'])
+def add_variables():
+
+
+    return '', 204
+
+
 def enrich_route():
         
         # var_id = request.form['var_id']

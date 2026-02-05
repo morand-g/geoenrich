@@ -62,7 +62,7 @@ border-color: #6b7280;
 }
 
 
-button {
+.inputbutton {
       margin-top: 12px;
       width: 100%;
       padding: 10px;
@@ -74,7 +74,7 @@ button {
       font-size: 14px;
     }
 
-button:disabled {
+.inputbutton:disabled {
       background: #6b7280;
       cursor: not-allowed;
     }

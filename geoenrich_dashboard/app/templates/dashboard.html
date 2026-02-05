@@ -29,7 +29,7 @@
 
 
 <!-- <button  disabled>Start</button> -->
-<input id="startBtn" type="submit" name="submit" value="Start" disabled />
+<input id="startBtn" type="submit" name="submit1" value="Start" class="inputbutton" disabled />
 
 </form>
 
@@ -41,7 +41,7 @@
 <div id="section2" class="section locked">
 <h2>2. Enrichment Settings</h2>
 
-
+<form method = "POST" action="/addVariables" enctype="multipart/form-data">
 <label>Variables</label>
 <select id="variableSelect">
 <option value="">Loading variables...</option>
@@ -58,15 +58,15 @@
 <label>Depth mode</label>
 <select id="depthMode">
   <option value="surface">Surface</option>
-  <option value="shallow">Shallow</option>
-  <option value="deep">Deep</option>
+  <option value="all">All depths</option>
+  <option value="at-depth">Survey depth</option>
 </select>
 
 
-<button id="enrichBtn">Start enrichment</button>
+<input id="enrichBtn" type="submit" name="submit2" value="Proceed" class="inputbutton" disabled />
 </div>
 
-
+</form>
 </div>
 
 
