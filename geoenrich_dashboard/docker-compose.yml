@@ -1,6 +1,6 @@
 services:
   web:
-    build: .
+    image: geoenrich_dashboard
     container_name: geoenrich_dashboard
     restart: always
     volumes:
