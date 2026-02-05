@@ -139,5 +139,7 @@ run_enrichment.py
 .Rhistory
 
 # local data
-docker_online/app/data/
-docker_dashboard/app/data/
+geoenrich_online/app/data/
+geoenrich_dashboard/app/data/
+geoenrich_online/app/static/uploads
+geoenrich_dashboard/app/static/uploads
