@@ -20,4 +20,5 @@ services:
       && cp /usr/local/lib/python3.10/site-packages/geoenrich/data/catalog.csv /app/static/js/ \
       && cp /home/geoenrich_host/data/personal_catalog.csv /usr/local/lib/python3.10/site-packages/geoenrich/data/personal_catalog.csv \
       && cp /usr/local/lib/python3.10/site-packages/geoenrich/credentials_example.py /usr/local/lib/python3.10/site-packages/geoenrich/credentials.py \
+      && redis-server --daemonize yes \
       && flask run --host=0.0.0.0 --port=8080 --reload"

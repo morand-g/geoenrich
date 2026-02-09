@@ -216,36 +216,40 @@ enrichBtn.addEventListener("click", () => {
   // runNext(); 
 });
 
+
 const socket = io();
+
 socket.on('task_status', (data) => {
 
-    if (data.status === 'PENDING') {
-        const row = document.createElement("div");
-        row.className = "progress-row";
+  console.log('message: ' + data.status + ' for task ' + data.task_id);
 
-        const label = document.createElement("div");
-        label.className = "progress-label";
-        label.innerHTML = `<span>${data.varname}</span><span class="status">Pending</span>`;
+  if (data.status === 'PENDING') {
+      const row = document.createElement("div");
+      row.className = "progress-row";
 
-        const bar = document.createElement("div");
-        bar.className = "progress-bar";
+      const label = document.createElement("div");
+      label.className = "progress-label";
+      label.innerHTML = `<span>${data.varname}</span><span class="status">Pending</span>`;
 
-        const fill = document.createElement("div");
-        fill.className = "progress-fill";
+      const bar = document.createElement("div");
+      bar.className = "progress-bar";
 
-        const button = document.createElement("input");
-        button.type = "button";
-        button.value = "Start";
-        button.id = 'start_' + data.varname;
+      const fill = document.createElement("div");
+      fill.className = "progress-fill";
 
-        bar.appendChild(fill);
-        row.appendChild(label);
-        row.appendChild(bar);
-        row.appendChild(button);
-        progressContainer.appendChild(row);
+      const button = document.createElement("input");
+      button.type = "button";
+      button.value = "Start";
+      button.id = 'start_' + data.varname;
 
-        return { fill, status: label.querySelector(".status") };
-    }
+      bar.appendChild(fill);
+      row.appendChild(label);
+      row.appendChild(bar);
+      row.appendChild(button);
+      progressContainer.appendChild(row);
+
+      return { fill, status: label.querySelector(".status") };
+  }
 });
 
 

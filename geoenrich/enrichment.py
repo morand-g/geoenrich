@@ -17,15 +17,13 @@ from datetime import datetime
 
 from copy import deepcopy
 
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 import copernicusmarine
 import xarray as xr
 
 import geoenrich
 from geoenrich.satellite import *
-
-from celery import Celery
 
 import logging
 logging.getLogger("copernicus_marine_root_logger").setLevel("WARN")
@@ -41,8 +39,6 @@ tqdm.pandas()
 pd.options.mode.chained_assignment = None 
 
 
-celery = Celery("tasks", broker='redis://localhost:6379/0', backend='redis://localhost:6379/0')
-
 ##########################################################################
 ######                         Enrichment                           ######
 ##########################################################################
@@ -53,7 +49,7 @@ celery = Celery("tasks", broker='redis://localhost:6379/0', backend='redis://loc
 
 
 def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request = 'surface', 
-    downsample = {}, slice = None, maxpoints = None, force_download = False):
+    downsample = {}, slice = None, maxpoints = None, force_download = False, progress_callback = None):
 
     """
     Enrich the given dataset with data of the requested variable.
@@ -71,6 +67,7 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
         slice (int tuple): Slice of the enrichment file to use for enrichment.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
+        progress_callback (function): If provided, this function is called with the signature (current, total) every time the enrichment progress is updated. This allows to link the enrichment progress to a custom progress bar, for instance in a web application.
 
     Returns:
         None
@@ -103,15 +100,15 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
     
 
     if var_source['url'] == 'calculated':
-        indices = enrich_compute(to_enrich, var_id, geo_buff, time_buff, downsample)
+        indices = enrich_compute(to_enrich, var_id, geo_buff, time_buff, downsample, progress_callback=progress_callback)
     elif var_source['source'] == 'Copernicus':
         indices = enrich_copernicus(to_enrich, var_source['varname'], var_id, var_source['url'],
                                     geo_buff, time_buff, depth_request, downsample, maxpoints,
-                                    force_download, enrichment_id)
+                                    force_download, enrichment_id, progress_callback=progress_callback)
     else:
         indices = enrich_download(  to_enrich, var_source['varname'], var_id, var_source['url'],
                                     geo_buff, time_buff, depth_request, downsample, maxpoints,
-                                    force_download, enrichment_id)
+                                    force_download, enrichment_id, progress_callback=progress_callback)
 
     prefix = str(enrichment_id) + '_'
     indices = indices.add_prefix(prefix)
@@ -136,7 +133,7 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
 
 
 
-def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample):
+def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample, progress_callback):
 
     """
     Compute a calculated variable for the provided bounds and save into local netcdf file.
@@ -148,6 +145,7 @@ def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample):
         geo_buff (int): Geographic buffer for which to download data around occurrence point (kilometers).
         time_buff (float list): Time bounds for which to download data around occurrence day (days). For instance, time_buff = [-7, 0] will download data from 7 days before the occurrence to the occurrence date.
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
+        progress_callback (function): If provided, this function is called with the signature (current, total) every time the enrichment progress is updated. This allows to link the enrichment progress to a custom progress bar, for instance in a web application.
 
     Returns:
         pandas.DataFrame: DataFrame with indices of relevant data in the netCDF file.
@@ -219,6 +217,10 @@ def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample):
     if not(len(geodf2)):
         print('No data in input dataframe.')
         return(pd.DataFrame())
+    
+    if progress_callback:
+        tqdm.auto.tqdm = lambda *a, **k: TqdmWithCallback(*a, progress_callback=progress_callback, **k)
+
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, 'surface', downsample))
     res = geodf2.progress_apply(row_compute, axis=1, args = (local_ds, bool_ds, base_datasets,
@@ -244,7 +246,7 @@ def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample):
 
 
 
-def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_request, downsample, maxpoints, force_download, enrichment_id):
+def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_request, downsample, maxpoints, force_download, progress_callback):
     
     """
     Download data for the requested occurrences and buffer into local netcdf file.
@@ -261,7 +263,7 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
-        enrichment_id (int): ID of the enrichment, used for logging.
+        progress_callback (function): If provided, this function is called with the signature (current, total) every time the enrichment progress is updated. This allows to link the enrichment progress to a custom progress bar, for instance in a web application.
 
     Returns:
         pandas.DataFrame: DataFrame with indices of relevant data in the netCDF file.
@@ -319,6 +321,9 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
         print('No data in input dataframe.')
         return(pd.DataFrame())
 
+    if progress_callback:
+        tqdm.auto.tqdm = lambda *a, **k: TqdmWithCallback(*a, progress_callback=progress_callback, **k)
+
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, depth_request, downsample))
 
     if maxpoints is not None and (s:= checksize(geodf2['ind'])) > maxpoints:
@@ -328,8 +333,7 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
         res = pd.DataFrame()
 
     else:
-        res = geodf2.progress_apply(row_enrich, axis=1, args = (remote_ds, local_ds, bool_ds, dimdict, var, depth_request, downsample, force_download,
-                                                                enrichment_id, len(geodf2)), 
+        res = geodf2.progress_apply(row_enrich, axis=1, args = (remote_ds, local_ds, bool_ds, dimdict, var, depth_request, downsample, force_download), 
                             result_type = 'expand')
     
     # Update time variable in local dataset if needed
@@ -358,7 +362,7 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
     return(res)
 
 
-def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, depth_request, downsample, maxpoints, force_download, enrichment_id):
+def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, depth_request, downsample, maxpoints, force_download, progress_callback):
     
     """
     Download Copernicus data for the requested occurrences and buffer into local netcdf file.
@@ -375,7 +379,7 @@ def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, d
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
-        enrichment_id (int): ID of the enrichment, used for logging.
+        progress_callback (function): If provided, this function is called with the signature (current, total) every time the enrichment progress is updated. This allows to link the enrichment progress to a custom progress bar, for instance in a web application.
 
     Returns:
         pandas.DataFrame: DataFrame with indices of relevant data in the netCDF file.
@@ -432,6 +436,9 @@ def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, d
     if not(len(geodf2)):
         print('No data in input dataframe.')
         return(pd.DataFrame())
+    
+    if progress_callback:
+        tqdm.auto.tqdm = lambda *a, **k: TqdmWithCallback(*a, progress_callback=progress_callback, **k)
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, depth_request, downsample))
 
@@ -442,8 +449,7 @@ def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, d
         res = pd.DataFrame()
 
     else:
-        res = geodf2.progress_apply(row_enrich, axis=1, args = (remote_ds, local_ds, bool_ds, dimdict, var, depth_request, downsample, force_download,
-                                                                enrichment_id, len(geodf2)), 
+        res = geodf2.progress_apply(row_enrich, axis=1, args = (remote_ds, local_ds, bool_ds, dimdict, var, depth_request, downsample, force_download), 
                             result_type = 'expand')
     
     # Update time variable in local dataset if needed
@@ -552,8 +558,7 @@ def add_bounds(geodf1, geo_buff, time_buff):
 
 ############################# Element-wise enrichment #################################
 
-@celery.task(bind=True)
-def row_enrich(self, row, remote_ds, local_ds, bool_ds, dimdict, var, depth_request, downsample, force_download, enrichment_id, df_len):
+def row_enrich(self, row, remote_ds, local_ds, bool_ds, dimdict, var, depth_request, downsample, force_download):
 
     """
     Query geospatial data for the given GeoDataFrame row.
@@ -599,13 +604,6 @@ def row_enrich(self, row, remote_ds, local_ds, bool_ds, dimdict, var, depth_requ
             colnames.extend([dimdict[p]['standard_name'] + '_min',
                              dimdict[p]['standard_name'] + '_max'])
             coords.extend([ind[p]['min'], ind[p]['max']])
-
-    try:
-        self.update_state(task_id=str(enrichment_id), state='PROGRESS',
-                            meta={'action': '+1', 'total': df_len})
-    except redis.exceptions.ConnectionError:
-        ### Redis server not installed
-        pass
 
     return(pd.Series(coords, index = colnames))
 

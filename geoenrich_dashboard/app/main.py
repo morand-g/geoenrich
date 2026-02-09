@@ -1,7 +1,10 @@
+from multiprocessing.pool import AsyncResult
 import os
 import pandas as pd
 from flask import Flask, render_template, request, Response, send_from_directory, jsonify
+from flask_socketio import SocketIO, emit
 from celery import Celery
+
 from geoenrich.dataloader import *
 from geoenrich.enrichment import *
 from geoenrich.exports import *
@@ -9,7 +12,11 @@ from pathlib import Path
 
 from geoenrich.satellite import get_var_catalog
 
+import eventlet
+eventlet.monkey_patch()
+
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # enable debugging mode
 app.config["DEBUG"] = False
@@ -94,16 +101,21 @@ def add_variables():
                 enrichment_id = 1
             
             save_enrichment_config(dataset_ref, enrichment_id, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={})
-            push_status(enrichment_id, 'PENDING')
+            task = push_status.apply_async(args=[enrichment_id, 'PENDING', v], task_id=str(enrichment_id))
 
     return '', 204
 
 
 
 @celery.task(bind=True)
-def push_status(self, enrichment_id, status):
+def push_status(self, enrichment_id, status, varname):
 
-    self.update_state(task_id=str(enrichment_id), state=status)
+    self.update_state(task_id=str(enrichment_id), state=status, meta={})
+    socketio.emit('task_status', {'task_id': enrichment_id, 'state': status}, room = enrichment_id)
+    
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
 
 @app.route("/enrich/<enrichment_id>", methods=['POST'])
 def enrich_route():
@@ -158,4 +170,4 @@ def get_var_catalog_api():
 
 # Run app
 if (__name__ == "__main__"):
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8080, debug=True)
