@@ -131,7 +131,7 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
 
     # Save file
     if new_enrichment and len(indices):
-        save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample, status = 'Completed')
+        save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample)
     updated.to_csv(str(Path(biodiv_path, dataset_ref + '.csv')))
 
 
@@ -1132,17 +1132,14 @@ def get_enrichment_id(enrichments, var_id, geo_buff, time_buff, depth_request, d
         current_parameters['time_buff'] = list(time_buff)
 
     for enrichment in enrichments:
-        params = enrichment['parameters'].copy()
-        if 'status' in params:
-            del params['status']
-        if params == current_parameters:
+        if enrichment['parameters'] == current_parameters:
             result_id = enrichment['id']
 
 
     return(result_id)
 
 
-def save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample, status = 'None'):
+def save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample):
 
     """
     Save enrichment metadata in the json config file.
@@ -1168,8 +1165,7 @@ def save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_bu
                             'geo_buff':         geo_buff,
                             'time_buff':        time_buff,
                             'depth_request':    depth_request,
-                            'downsample':       downsample,
-                            'status':           status,
+                            'downsample':       downsample
                             }
                      }
 

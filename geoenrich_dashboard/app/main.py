@@ -1,16 +1,13 @@
 import os
 import pandas as pd
 from flask import Flask, render_template, request, Response, send_from_directory, jsonify
+from celery import Celery
 from geoenrich.dataloader import *
 from geoenrich.enrichment import *
 from geoenrich.exports import *
 from pathlib import Path
 
 from geoenrich.satellite import get_var_catalog
-
-
-latdict = {'latitude': 'latitude', 'decimallatitude': 'latitude', 'lat': 'latitude'}
-londict = {'longitude': 'longitude', 'decimallongitude': 'longitude', 'lon': 'longitude'}
 
 app = Flask(__name__)
 
@@ -21,6 +18,11 @@ app.config["DEBUG"] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 app.config['UPLOAD_EXTENSIONS'] = ['.csv']
 app.config['DS_REF'] = ''
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
 
 # Directory for enrichment outputs
 OUTPUT_DIR = "data/useroutputs/"  
@@ -81,7 +83,7 @@ def add_variables():
 
     for v in variables:
 
-        original, enrichment_metadata = load_enrichment_file(dataset_ref)
+        _, enrichment_metadata = load_enrichment_file(dataset_ref)
         enrichments = enrichment_metadata['enrichments']
         enrichment_id = get_enrichment_id(enrichments, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={})
 
@@ -91,11 +93,19 @@ def add_variables():
             else:
                 enrichment_id = 1
             
-            save_enrichment_config(dataset_ref, enrichment_id, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={}, status = 'Waiting')
+            save_enrichment_config(dataset_ref, enrichment_id, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={})
+            push_status(enrichment_id, 'PENDING')
 
     return '', 204
 
 
+
+@celery.task(bind=True)
+def push_status(self, enrichment_id, status):
+
+    self.update_state(task_id=str(enrichment_id), state=status)
+
+@app.route("/enrich/<enrichment_id>", methods=['POST'])
 def enrich_route():
         
         # var_id = request.form['var_id']

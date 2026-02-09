@@ -158,57 +158,96 @@ enrichBtn.addEventListener("click", () => {
   // Clear previous progress
   progressContainer.innerHTML = "";
 
-  // Create progress rows
-  progressState = selectedVariables.map(v => {
-    const row = document.createElement("div");
-    row.className = "progress-row";
+  // // Create progress rows
+  // progressState = selectedVariables.map(v => {
+  //   const row = document.createElement("div");
+  //   row.className = "progress-row";
 
-    const label = document.createElement("div");
-    label.className = "progress-label";
-    label.innerHTML = `<span>${v}</span><span class="status">Pending</span>`;
+  //   const label = document.createElement("div");
+  //   label.className = "progress-label";
+  //   label.innerHTML = `<span>${v}</span><span class="status">Pending</span>`;
 
-    const bar = document.createElement("div");
-    bar.className = "progress-bar";
+  //   const bar = document.createElement("div");
+  //   bar.className = "progress-bar";
 
-    const fill = document.createElement("div");
-    fill.className = "progress-fill";
+  //   const fill = document.createElement("div");
+  //   fill.className = "progress-fill";
 
-    bar.appendChild(fill);
-    row.appendChild(label);
-    row.appendChild(bar);
-    progressContainer.appendChild(row);
+  //   const button = document.createElement("input");
+  //   button.type = "button";
+  //   button.value = "Start";
+  //   button.id = 'start_' + v;
 
-    return { fill, status: label.querySelector(".status") };
-  });
+  //   bar.appendChild(fill);
+  //   row.appendChild(label);
+  //   row.appendChild(bar);
+  //   row.appendChild(button);
+  //   progressContainer.appendChild(row);
 
-  let current = 0;
+  //   return { fill, status: label.querySelector(".status") };
+  // });
 
-  function runNext() {
-    if (current >= progressState.length) return;
+  // let current = 0;
 
-    const item = progressState[current];
-    item.status.textContent = "Processing";
+  // function runNext() {
+  //   if (current >= progressState.length) return;
 
-    let progress = 0;
+  //   const item = progressState[current];
+  //   item.status.textContent = "Processing";
 
-    const interval = setInterval(() => {
-      progress += 5; 
-      if (progress > 100) progress = 100;
-      item.fill.style.width = progress + "%";
+  //   let progress = 0;
 
-      if (progress >= 100) {
-        clearInterval(interval);       
-        item.status.textContent = "Finished";
-        unlockSection4IfReady();       
+  //   const interval = setInterval(() => {
+  //     progress += 5; 
+  //     if (progress > 100) progress = 100;
+  //     item.fill.style.width = progress + "%";
 
-        current++;                       
-        setTimeout(runNext, 200);         
-      }
-    }, 120); 
-  }
+  //     if (progress >= 100) {
+  //       clearInterval(interval);       
+  //       item.status.textContent = "Finished";
+  //       unlockSection4IfReady();       
 
-  runNext(); 
+  //       current++;                       
+  //       setTimeout(runNext, 200);         
+  //     }
+  //   }, 120); 
+  // }
+
+  // runNext(); 
 });
+
+const socket = io();
+socket.on('task_status', (data) => {
+
+    if (data.status === 'PENDING') {
+        const row = document.createElement("div");
+        row.className = "progress-row";
+
+        const label = document.createElement("div");
+        label.className = "progress-label";
+        label.innerHTML = `<span>${data.varname}</span><span class="status">Pending</span>`;
+
+        const bar = document.createElement("div");
+        bar.className = "progress-bar";
+
+        const fill = document.createElement("div");
+        fill.className = "progress-fill";
+
+        const button = document.createElement("input");
+        button.type = "button";
+        button.value = "Start";
+        button.id = 'start_' + data.varname;
+
+        bar.appendChild(fill);
+        row.appendChild(label);
+        row.appendChild(bar);
+        row.appendChild(button);
+        progressContainer.appendChild(row);
+
+        return { fill, status: label.querySelector(".status") };
+    }
+});
+
 
 /* =========================
    SECTION 4
