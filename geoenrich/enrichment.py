@@ -558,7 +558,7 @@ def add_bounds(geodf1, geo_buff, time_buff):
 
 ############################# Element-wise enrichment #################################
 
-def row_enrich(self, row, remote_ds, local_ds, bool_ds, dimdict, var, depth_request, downsample, force_download):
+def row_enrich(row, remote_ds, local_ds, bool_ds, dimdict, var, depth_request, downsample, force_download):
 
     """
     Query geospatial data for the given GeoDataFrame row.
@@ -574,8 +574,6 @@ def row_enrich(self, row, remote_ds, local_ds, bool_ds, dimdict, var, depth_requ
         depth_request (str): For 4D data: 'all' -> data for all depths. 'nearest' -> closest available depth. 'nearest_lower' -> closest lower available depth. Anything else downloads surface data.
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
         force_download(bool): If True, download data regardless of cache status.
-        enrichment_id (int): ID of the enrichment, used for logging.
-        df_len (int): Length of the dataframe being enriched, used for logging.
     Returns:
         pandas.Series: Coordinates of the data of interest in the netCDF file.
 
