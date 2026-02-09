@@ -11,6 +11,9 @@ const variableSelect = document.getElementById("variableSelect");
 const selectedVariablesDiv = document.getElementById("selectedVariables");
 const selectedVariablesList = document.getElementById("selectedVariablesList");
 
+
+const socket = io();
+
 let csvFile = null;
 let selectedVariables = [];
 let availableVariables = [];
@@ -149,6 +152,39 @@ fetch("/get_var_catalog")
    SECTION 3 
 ========================= */
 
+socket.on("connect", () => {
+  console.log("connected");
+});
+
+socket.on("task_update", (data) => {
+  console.log("Task state:", data.state);
+  // if (data.state === "PENDING") {
+  //   const row = document.createElement("div");
+  //   row.className = "progress-row";
+
+  //   const label = document.createElement("div");
+  //   label.className = "progress-label";
+  //   label.innerHTML = `<span>${data.varname}</span><span class="status">Pending</span>`;
+
+  //   const bar = document.createElement("div");
+  //   bar.className = "progress-bar";
+
+  //   const fill = document.createElement("div");
+  //   fill.className = "progress-fill";
+
+  //   const button = document.createElement("input");
+  //   button.type = "button";
+  //   button.value = "Start";
+  //   button.id = 'start_' + data.varname;
+
+  //   bar.appendChild(fill);
+  //   row.appendChild(label);
+  //   row.appendChild(bar);
+  //   row.appendChild(button);
+  //   progressContainer.appendChild(row);
+  // }
+});
+
 enrichBtn.addEventListener("click", () => {
   if (!selectedVariables.length) return;
 
@@ -217,40 +253,10 @@ enrichBtn.addEventListener("click", () => {
 });
 
 
-const socket = io();
 
-socket.on('task_status', (data) => {
 
-  console.log('message: ' + data.status + ' for task ' + data.task_id);
 
-  if (data.status === 'PENDING') {
-      const row = document.createElement("div");
-      row.className = "progress-row";
 
-      const label = document.createElement("div");
-      label.className = "progress-label";
-      label.innerHTML = `<span>${data.varname}</span><span class="status">Pending</span>`;
-
-      const bar = document.createElement("div");
-      bar.className = "progress-bar";
-
-      const fill = document.createElement("div");
-      fill.className = "progress-fill";
-
-      const button = document.createElement("input");
-      button.type = "button";
-      button.value = "Start";
-      button.id = 'start_' + data.varname;
-
-      bar.appendChild(fill);
-      row.appendChild(label);
-      row.appendChild(bar);
-      row.appendChild(button);
-      progressContainer.appendChild(row);
-
-      return { fill, status: label.querySelector(".status") };
-  }
-});
 
 
 /* =========================
