@@ -104,11 +104,11 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
     elif var_source['source'] == 'Copernicus':
         indices = enrich_copernicus(to_enrich, var_source['varname'], var_id, var_source['url'],
                                     geo_buff, time_buff, depth_request, downsample, maxpoints,
-                                    force_download, enrichment_id, progress_callback=progress_callback)
+                                    force_download, progress_callback=progress_callback)
     else:
         indices = enrich_download(  to_enrich, var_source['varname'], var_id, var_source['url'],
                                     geo_buff, time_buff, depth_request, downsample, maxpoints,
-                                    force_download, enrichment_id, progress_callback=progress_callback)
+                                    force_download, progress_callback=progress_callback)
 
     prefix = str(enrichment_id) + '_'
     indices = indices.add_prefix(prefix)
