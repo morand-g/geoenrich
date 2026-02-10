@@ -1,35 +1,31 @@
-from multiprocessing.pool import AsyncResult
 import os
-from time import time
+import time
 import pandas as pd
-from flask import Flask, render_template, request, send_from_directory, jsonify
+from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO
-from celery import Celery
-from celery.signals import task_sent
 
 
-from geoenrich.dataloader import *
-from geoenrich.enrichment import *
-from geoenrich.exports import *
-from pathlib import Path
-
+from geoenrich.dataloader import import_occurrences_csv, load_areas_file, biodiv_path
+from geoenrich.enrichment import create_enrichment_file, save_enrichment_config, load_enrichment_file, get_enrichment_id
 from geoenrich.satellite import get_var_catalog
 
+from pathlib import Path
+
+from functions import enrich_wrapper
 
 app = Flask(__name__)
 
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode='threading', message_queue="redis://redis:6379/0")
 
 # App variables
-app.config["DEBUG"] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 app.config['UPLOAD_EXTENSIONS'] = ['.csv']
 app.config['DS_REF'] = ''
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-celery.conf.update(app.config)
+# celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+# celery.conf.update(app.config)
 
 # Directory for enrichment outputs
 OUTPUT_DIR = "data/useroutputs/"  
@@ -103,79 +99,44 @@ def add_variables():
                 enrichment_id = 1
             
             save_enrichment_config(dataset_ref, enrichment_id, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={})
-            push_status( task_id= enrichment_id,
-                                          status= "PENDING",
-                                          varname= v)
+            socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= "PENDING", varname= v)
 
-    return '', 204
-
-@celery.task(bind=True)
-def push_status(self, task_id=None, status='PENDING', varname=None, **kwargs):
-
-    self.update_state(task_id=str(task_id), status=status)
-    task_sent_handler(sender=None, task_id=str(task_id), status=status, varname=varname)
+    return '', 200
 
 
-@task_sent.connect
-def task_sent_handler(sender=None, task_id=None, status='PENDING', varname=None, **kwargs):
-    socketio.emit('task_status', {'task_id': task_id, 'status': status, 'varname': varname})
+def push_status(enrichment_id, **kwargs):
 
-
-@app.route('/task-status/<task_id>')
-def task_status(task_id):
-    task = AsyncResult(task_id, app=celery)
-    return jsonify({
-        'status': task.status,
-    })
-
-# class TqdmWithCallback(tqdm):
-#     def __init__(self, *args, progress_callback=None, **kwargs):
-#         self.progress_callback = progress_callback
-#         self._last_emit = 0
-#         super().__init__(*args, **kwargs)
-
-#     def update(self, n=1):
-#         super().update(n)
-
-#         if not self.progress_callback or not self.total:
-#             return
-
-#         # throttle: 5–10 Hz
-#         now = time.time()
-#         if now - self._last_emit < 0.2:
-#             return
-
-#         self._last_emit = now
-#         self.progress_callback(self.n, self.total)
+    time.sleep(1)
+    socketio.emit('enrichment_status', {'enrichment_id': enrichment_id, **kwargs})
 
 
 
-# @app.route("/enrich/<enrichment_id>", methods=['POST'])
-# def enrich_route():
+
+@app.route("/enrich/<enrichment_id>", methods=['GET'])
+def enrich_route():
         
-#         # var_id = request.form['var_id']
-#         # geo_buff = int(request.form['geo_buff'])
-#         # time_buff = [int(request.form['tbuff1']), int(request.form['tbuff2'])]
+        # enrichment_id = request.args.get('enrichment_id')
+        # ds_ref = app.config['DS_REF']
 
-#         # if request.form.get('checkbox'):
-#         #     depth_request = 'all'
-#         # else:
-#         #     depth_request = 'surface'
+        # _, enrichment_metadata = load_enrichment_file(ds_ref)
+        # enrichment = [en for en in enrichment_metadata['enrichments'] if en['id'] == int(enrichment_id)][0]
+        
+        # enrich_wrapper(ds_ref, enrichment)
+        # # var_id = request.form['var_id']
+        # # geo_buff = int(request.form['geo_buff'])
+        # # time_buff = [int(request.form['tbuff1']), int(request.form['tbuff2'])]
 
-
-#         # Run enrichment
-
-
-#         enrich(ds_ref, var_id, geo_buff, time_buff, depth_request)
-#         produce_stats(ds_ref, var_id, out_path=OUTPUT_DIR)
-
-
-#         # Build download link
-#         download_link = f"http://localhost:8080/download/{ds_ref}"
+        # # if request.form.get('checkbox'):
+        # #     depth_request = 'all'
+        # # else:
+        # #     depth_request = 'surface'
 
 
-#         return render_template('download.html', link=download_link)
+        # # Run enrichment
 
+
+
+    return '', 200
 
 #get var list
 @app.route("/get_var_catalog")
@@ -185,8 +146,6 @@ def get_var_catalog_api():
 
 
 # Run app
-if (__name__ == "__main__"):
+if __name__ == "__main__":
 
-    
-
-    socketio.run(app, debug=True, port=8080, host='0.0.0.0', allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)

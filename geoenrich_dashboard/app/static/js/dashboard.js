@@ -12,7 +12,7 @@ const selectedVariablesDiv = document.getElementById("selectedVariables");
 const selectedVariablesList = document.getElementById("selectedVariablesList");
 
 
-const socket = io();
+// const socket = io();
 
 let csvFile = null;
 let selectedVariables = [];
@@ -77,6 +77,14 @@ function processCSV(text) {
   section2.classList.remove("locked");
 }
 
+document.getElementById('datasetform').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent page reload
+        const response = await fetch('/uploadFile', {
+            method: 'POST',
+            body: new FormData(e.target)
+        });
+    });
+
 /* =========================
    SECTION 2 – VARIABLES
 ========================= */
@@ -134,6 +142,14 @@ function renderVariables() {
   });
 }
 
+document.getElementById('varform').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent page reload
+        const response = await fetch('/addVariables', {
+            method: 'POST',
+            body: new FormData(e.target)
+        });
+    });
+
 /* =========================
    FETCH VARIABLE CATALOG
 ========================= */
@@ -152,37 +168,52 @@ fetch("/get_var_catalog")
    SECTION 3 
 ========================= */
 
-socket.on("connect", () => {
-  console.log("connected");
-});
 
-socket.on("task_update", (data) => {
-  console.log("Task state:", data.state);
-  // if (data.state === "PENDING") {
-  //   const row = document.createElement("div");
-  //   row.className = "progress-row";
 
-  //   const label = document.createElement("div");
-  //   label.className = "progress-label";
-  //   label.innerHTML = `<span>${data.varname}</span><span class="status">Pending</span>`;
+socket.on("enrichment_status", (data) => {
+  console.log("Task state update:", data.enrichment_id, data.status, data.varname);
+  if (data.status === "PENDING") {
+    const row = document.createElement("div");
+    row.className = "progress-row";
 
-  //   const bar = document.createElement("div");
-  //   bar.className = "progress-bar";
+    const label = document.createElement("div");
+    label.className = "progress-label";
+    label.innerHTML = `<span>${data.varname}</span><span class="status">Pending</span>`;
+    label.id = "status_" + data.enrichment_id;
 
-  //   const fill = document.createElement("div");
-  //   fill.className = "progress-fill";
+    const bar = document.createElement("div");
+    bar.className = "progress-bar";
 
-  //   const button = document.createElement("input");
-  //   button.type = "button";
-  //   button.value = "Start";
-  //   button.id = 'start_' + data.varname;
+    const barcontainer = document.createElement("div");
+    barcontainer.className = "progress-bar-container";
 
-  //   bar.appendChild(fill);
-  //   row.appendChild(label);
-  //   row.appendChild(bar);
-  //   row.appendChild(button);
-  //   progressContainer.appendChild(row);
-  // }
+    const fill = document.createElement("div");
+    fill.className = "progress-fill";
+    fill.id = "fill_" + data.enrichment_id;
+
+    const button = document.createElement("input");
+    button.className = "progress-start-btn";
+    button.type = "button";
+    button.value = "Start";
+    button.id = 'start_' + data.enrichment_id;
+
+    button.onclick = () => fetch('/enrich/' + data.enrichment_id);
+
+    bar.appendChild(fill);
+    barcontainer.appendChild(label);
+    barcontainer.appendChild(bar);
+    row.appendChild(barcontainer);
+    row.appendChild(button);
+    progressContainer.appendChild(row);
+  }
+
+  if (data.status === "PROGRESS") {
+    const fill = document.getElementById("fill_" + data.enrichment_id);
+    const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
+    fill.style.width = data.progress + "%";
+    status.textContent = `In Progress (${data.progress}%)`;
+  }
+  
 });
 
 enrichBtn.addEventListener("click", () => {
@@ -194,62 +225,6 @@ enrichBtn.addEventListener("click", () => {
   // Clear previous progress
   progressContainer.innerHTML = "";
 
-  // // Create progress rows
-  // progressState = selectedVariables.map(v => {
-  //   const row = document.createElement("div");
-  //   row.className = "progress-row";
-
-  //   const label = document.createElement("div");
-  //   label.className = "progress-label";
-  //   label.innerHTML = `<span>${v}</span><span class="status">Pending</span>`;
-
-  //   const bar = document.createElement("div");
-  //   bar.className = "progress-bar";
-
-  //   const fill = document.createElement("div");
-  //   fill.className = "progress-fill";
-
-  //   const button = document.createElement("input");
-  //   button.type = "button";
-  //   button.value = "Start";
-  //   button.id = 'start_' + v;
-
-  //   bar.appendChild(fill);
-  //   row.appendChild(label);
-  //   row.appendChild(bar);
-  //   row.appendChild(button);
-  //   progressContainer.appendChild(row);
-
-  //   return { fill, status: label.querySelector(".status") };
-  // });
-
-  // let current = 0;
-
-  // function runNext() {
-  //   if (current >= progressState.length) return;
-
-  //   const item = progressState[current];
-  //   item.status.textContent = "Processing";
-
-  //   let progress = 0;
-
-  //   const interval = setInterval(() => {
-  //     progress += 5; 
-  //     if (progress > 100) progress = 100;
-  //     item.fill.style.width = progress + "%";
-
-  //     if (progress >= 100) {
-  //       clearInterval(interval);       
-  //       item.status.textContent = "Finished";
-  //       unlockSection4IfReady();       
-
-  //       current++;                       
-  //       setTimeout(runNext, 200);         
-  //     }
-  //   }, 120); 
-  // }
-
-  // runNext(); 
 });
 
 
