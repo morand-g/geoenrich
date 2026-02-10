@@ -1,17 +1,18 @@
 import os
+import shutil
 import time
 import pandas as pd
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO
-
+from celery import Celery
 
 from geoenrich.dataloader import import_occurrences_csv, load_areas_file, biodiv_path
-from geoenrich.enrichment import create_enrichment_file, save_enrichment_config, load_enrichment_file, get_enrichment_id
+from geoenrich.enrichment import create_enrichment_file, save_enrichment_config, load_enrichment_file, get_enrichment_id, enrich
 from geoenrich.satellite import get_var_catalog
 
 from pathlib import Path
 
-from functions import enrich_wrapper
+from functions import get_progress_callback
 
 app = Flask(__name__)
 
@@ -21,11 +22,10 @@ socketio = SocketIO(app, async_mode='threading', message_queue="redis://redis:63
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 app.config['UPLOAD_EXTENSIONS'] = ['.csv']
 app.config['DS_REF'] = ''
-# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+app.config['CELERY_BROKER_URL'] = 'redis://redis:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://redis:6379/1'
 
-# celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-# celery.conf.update(app.config)
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'], backend=app.config['CELERY_RESULT_BACKEND'])
 
 # Directory for enrichment outputs
 OUTPUT_DIR = "data/useroutputs/"  
@@ -113,28 +113,14 @@ def push_status(enrichment_id, **kwargs):
 
 
 @app.route("/enrich/<enrichment_id>", methods=['GET'])
-def enrich_route():
-        
-        # enrichment_id = request.args.get('enrichment_id')
-        # ds_ref = app.config['DS_REF']
+def enrich_route(enrichment_id):
+    
+    ds_ref = app.config['DS_REF']
 
-        # _, enrichment_metadata = load_enrichment_file(ds_ref)
-        # enrichment = [en for en in enrichment_metadata['enrichments'] if en['id'] == int(enrichment_id)][0]
-        
-        # enrich_wrapper(ds_ref, enrichment)
-        # # var_id = request.form['var_id']
-        # # geo_buff = int(request.form['geo_buff'])
-        # # time_buff = [int(request.form['tbuff1']), int(request.form['tbuff2'])]
-
-        # # if request.form.get('checkbox'):
-        # #     depth_request = 'all'
-        # # else:
-        # #     depth_request = 'surface'
-
-
-        # # Run enrichment
-
-
+    _, enrichment_metadata = load_enrichment_file(ds_ref)
+    enrichment = [en for en in enrichment_metadata['enrichments'] if en['id'] == int(enrichment_id)][0]
+    
+    enrich_wrapper.delay(ds_ref, enrichment_id, enrichment['parameters'])
 
     return '', 200
 
@@ -143,6 +129,24 @@ def enrich_route():
 def get_var_catalog_api():
     catalog = get_var_catalog()
     return jsonify(list(catalog.keys()))
+
+
+@celery.task(bind=True)
+def enrich_wrapper(self, ds_ref, enrichment_id, enrichment_params):
+
+    socketio.emit('enrichment_status', {'enrichment_id':  enrichment_id, 'status': "STARTING"})
+
+    var_id = enrichment_params['var_id']
+    geo_buff = enrichment_params['geo_buff']
+    time_buff = enrichment_params['time_buff']
+    depth_request = enrichment_params['depth_request']
+
+    shutil.copy(biodiv_path / (ds_ref + '.csv'), biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
+    shutil.copy(biodiv_path / (ds_ref + '-config.json'), biodiv_path / (ds_ref + str(enrichment_id) + '-config.json'))
+
+    # Run enrichment
+    enrich(ds_ref + str(enrichment_id), var_id, geo_buff, time_buff, depth_request, progress_callback= get_progress_callback(enrichment_id))
+
 
 
 # Run app

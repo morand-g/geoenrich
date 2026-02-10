@@ -171,7 +171,7 @@ fetch("/get_var_catalog")
 
 
 socket.on("enrichment_status", (data) => {
-  console.log("Task state update:", data.enrichment_id, data.status, data.varname);
+  console.log("Task state update:", data);
   if (data.status === "PENDING") {
     const row = document.createElement("div");
     row.className = "progress-row";
@@ -192,7 +192,7 @@ socket.on("enrichment_status", (data) => {
     fill.id = "fill_" + data.enrichment_id;
 
     const button = document.createElement("input");
-    button.className = "progress-start-btn";
+    button.className = "inputbutton";
     button.type = "button";
     button.value = "Start";
     button.id = 'start_' + data.enrichment_id;
@@ -207,13 +207,19 @@ socket.on("enrichment_status", (data) => {
     progressContainer.appendChild(row);
   }
 
+  if (data.status === "STARTING") {
+    const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
+    status.textContent = "Starting...";
+    const button = document.getElementById('start_' + data.enrichment_id);
+    button.disabled = true;
+  }
   if (data.status === "PROGRESS") {
     const fill = document.getElementById("fill_" + data.enrichment_id);
     const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
     fill.style.width = data.progress + "%";
     status.textContent = `In Progress (${data.progress}%)`;
   }
-  
+
 });
 
 enrichBtn.addEventListener("click", () => {

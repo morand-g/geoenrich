@@ -1,32 +1,36 @@
 from geoenrich.enrichment import *
 from pathlib import Path
-from tdqm.auto import tqdm
+from tqdm.auto import tqdm
 import time
+from celery import Celery
+from flask_socketio import SocketIO
 
-class TqdmWithCallback(tqdm):
-    def __init__(self, *args, progress_callback=None, **kwargs):
-        self.progress_callback = progress_callback
-        self._last_emit = 0
-        super().__init__(*args, **kwargs)
+# Celery worker needs its own SocketIO client
+socketio = SocketIO(
+    message_queue="redis://localhost:6379/0",
+    async_mode="threading",
+)
 
-    def update(self, n=1):
-        super().update(n)
+def update_bar(enrichment_id, **kwargs):
+    socketio.emit('enrichment_status', {'enrichment_id': enrichment_id, **kwargs})
+                  
 
-        if not self.progress_callback or not self.total:
-            return
+def get_progress_callback(enrichment_id):
 
-        # throttle: 5–10 Hz
-        now = time.time()
-        if now - self._last_emit < 0.2:
-            return
+    class TqdmWithCallback(tqdm):
+        def __init__(self, *args, **kwargs):
+            self._last_emit = 0
+            super().__init__(*args, **kwargs)
 
-        self._last_emit = now
-        self.progress_callback(self.n, self.total)
+        def update(self, n=1):
+            super().update(n)
+
+            # throttle: 5–10 Hz
+            now = time.time()
+            if now - self._last_emit < 0.2:
+                return
+
+            self._last_emit = now
+            socketio.start_background_task(target=update_bar, enrichment_id= enrichment_id, status= "PROGRESS", progress= self.n / self.total * 100 )
 
 
-# @celery.task(bind=True)
-# def enrich_wrapper(ds_ref, enrichment_params):
-
-#     # Run enrichment
-#     enrich(ds_ref, var_id, geo_buff, time_buff, depth_request)
-#     produce_stats(ds_ref, var_id, out_path=OUTPUT_DIR)

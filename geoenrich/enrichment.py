@@ -67,7 +67,7 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
         slice (int tuple): Slice of the enrichment file to use for enrichment.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
-        progress_callback (function): If provided, this function is called with the signature (current, total) every time the enrichment progress is updated. This allows to link the enrichment progress to a custom progress bar, for instance in a web application.
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
 
     Returns:
         None
@@ -145,7 +145,7 @@ def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample, progress_call
         geo_buff (int): Geographic buffer for which to download data around occurrence point (kilometers).
         time_buff (float list): Time bounds for which to download data around occurrence day (days). For instance, time_buff = [-7, 0] will download data from 7 days before the occurrence to the occurrence date.
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
-        progress_callback (function): If provided, this function is called with the signature (current, total) every time the enrichment progress is updated. This allows to link the enrichment progress to a custom progress bar, for instance in a web application.
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
 
     Returns:
         pandas.DataFrame: DataFrame with indices of relevant data in the netCDF file.
@@ -219,7 +219,7 @@ def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample, progress_call
         return(pd.DataFrame())
     
     if progress_callback:
-        tqdm.auto.tqdm = lambda *a, **k: TqdmWithCallback(*a, progress_callback=progress_callback, **k)
+        tqdm.pandas(progress_callback)
 
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, 'surface', downsample))
@@ -263,8 +263,7 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
-        progress_callback (function): If provided, this function is called with the signature (current, total) every time the enrichment progress is updated. This allows to link the enrichment progress to a custom progress bar, for instance in a web application.
-
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
     Returns:
         pandas.DataFrame: DataFrame with indices of relevant data in the netCDF file.
 
@@ -322,7 +321,7 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
         return(pd.DataFrame())
 
     if progress_callback:
-        tqdm.auto.tqdm = lambda *a, **k: TqdmWithCallback(*a, progress_callback=progress_callback, **k)
+        tqdm.pandas(progress_callback)
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, depth_request, downsample))
 
@@ -379,7 +378,7 @@ def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, d
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
-        progress_callback (function): If provided, this function is called with the signature (current, total) every time the enrichment progress is updated. This allows to link the enrichment progress to a custom progress bar, for instance in a web application.
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
 
     Returns:
         pandas.DataFrame: DataFrame with indices of relevant data in the netCDF file.
@@ -438,7 +437,7 @@ def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, d
         return(pd.DataFrame())
     
     if progress_callback:
-        tqdm.auto.tqdm = lambda *a, **k: TqdmWithCallback(*a, progress_callback=progress_callback, **k)
+        tqdm.pandas(progress_callback)
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, depth_request, downsample))
 
