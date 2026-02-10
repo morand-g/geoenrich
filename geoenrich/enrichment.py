@@ -219,7 +219,8 @@ def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample, progress_call
         return(pd.DataFrame())
     
     if progress_callback:
-        tqdm.pandas(tqdm_class=progress_callback)
+        tqdm.auto.tqdm = progress_callback
+        tqdm.auto.pandas()
 
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, 'surface', downsample))
@@ -321,7 +322,8 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
         return(pd.DataFrame())
 
     if progress_callback:
-        tqdm.pandas(tqdm_class=progress_callback)
+        tqdm.auto.tqdm = progress_callback
+        tqdm.auto.pandas()
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, depth_request, downsample))
 
@@ -437,7 +439,8 @@ def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, d
         return(pd.DataFrame())
     
     if progress_callback:
-        tqdm.pandas(tqdm_class=progress_callback)
+        tqdm.auto.tqdm = progress_callback
+        tqdm.auto.pandas()
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, depth_request, downsample))
 
