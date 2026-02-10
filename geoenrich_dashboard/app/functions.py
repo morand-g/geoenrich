@@ -6,7 +6,7 @@ from flask_socketio import SocketIO
 
 # Celery worker needs its own SocketIO client
 socketio = SocketIO(
-    message_queue="redis://localhost:6379/0",
+    message_queue="redis://redis:6379/0",
     async_mode="threading",
 )
 

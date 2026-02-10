@@ -19,11 +19,8 @@ services:
     depends_on:
       - redis
       - worker
-    command: bash -c "mkdir -p /root/.copernicusmarine \
-      && echo \"$COPERNICUS_TOKEN" > /root/.copernicusmarine/.copernicusmarine-credentials \
-      && cp /usr/local/lib/python3.10/site-packages/geoenrich/data/catalog.csv /app/static/js/ \
+    command: bash -c "cp /usr/local/lib/python3.10/site-packages/geoenrich/data/catalog.csv /app/static/js/ \
       && cp /home/geoenrich_host/data/personal_catalog.csv /usr/local/lib/python3.10/site-packages/geoenrich/data/personal_catalog.csv \
-      && cp /usr/local/lib/python3.10/site-packages/geoenrich/credentials_example.py /usr/local/lib/python3.10/site-packages/geoenrich/credentials.py \
       && python main.py"
   worker:
     image: geoenrich_dashboard
@@ -39,7 +36,10 @@ services:
       - COPERNICUS_TOKEN=${COPERNICUS_TOKEN}
     depends_on:
       - redis
-    command: celery -A main.celery worker --loglevel=INFO
+    command: bash -c "mkdir -p /root/.copernicusmarine \
+      && echo $COPERNICUS_TOKEN > /root/.copernicusmarine/.copernicusmarine-credentials \
+      && cp /home/geoenrich_host/data/personal_catalog.csv /usr/local/lib/python3.10/site-packages/geoenrich/data/personal_catalog.csv \
+      && celery -A main.celery worker --loglevel=INFO"
   redis:
     image: redis
     container_name: geoenrich_redis
