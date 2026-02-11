@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import time
@@ -89,12 +90,14 @@ def uploadFiles():
             enrichments = enrichment_metadata['enrichments']
             for enrichment in enrichments:
                 enrichment_id = enrichment['id']
-                try:
-                    res = AsyncResult(enrichment_id, app=celery)
-                    socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= res.status,
+                if enrichment['status'] == 'Enriched':
+                    socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= 'COMPLETED',
                                                    varname= enrichment['parameters']['var_id'])
-                except Exception as e:
+                elif enrichment['status'] == 'Pending':
                     socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= 'PENDING',
+                                                   varname= enrichment['parameters']['var_id'])
+                else:
+                    socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= 'UNKNOWN',
                                                    varname= enrichment['parameters']['var_id'])
 
 
@@ -126,7 +129,7 @@ def add_variables():
 
         _, enrichment_metadata = load_enrichment_file(dataset_ref)
         enrichments = enrichment_metadata['enrichments']
-        enrichment_id = get_enrichment_id(enrichments, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={})
+        enrichment_id = get_enrichment_id(enrichments, v, geo_buff, time_buff=(0,0), depth_request=depth_request)
 
         if enrichment_id == -1:
             if len(enrichments):
@@ -134,7 +137,7 @@ def add_variables():
             else:
                 enrichment_id = 1
             
-            save_enrichment_config(dataset_ref, enrichment_id, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={})
+            save_enrichment_config(dataset_ref, enrichment_id, v, geo_buff, time_buff=(0,0), depth_request=depth_request, status = 'Pending')
             socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= "PENDING", varname= v)
 
     return '', 200
@@ -169,15 +172,22 @@ def enrich_wrapper(self, ds_ref, enrichment_id, enrichment_params):
 
     socketio.emit('enrichment_status', {'enrichment_id':  enrichment_id, 'status': "STARTING"})
 
+    ### Create temp copy to allow parallel enrichment
+
+    original, enrichment_metadata = load_enrichment_file(ds_ref)
+    enrichment_metadata['enrichments'] = [en for en in enrichment_metadata['enrichments'] if en['id'] == int(enrichment_id)]
+    original[['geometry', 'eventDate']].to_csv(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
+    filepath_json = biodiv_path / (ds_ref + str(enrichment_id) + '-config.json')
+    with filepath_json.open('w') as f:
+        json.dump(enrichment_metadata, f, ensure_ascii=False, indent=4)
+
+    # Run enrichment
+
     var_id = enrichment_params['var_id']
     geo_buff = enrichment_params['geo_buff']
     time_buff = enrichment_params['time_buff']
     depth_request = enrichment_params['depth_request']
 
-    shutil.copy(biodiv_path / (ds_ref + '.csv'), biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
-    shutil.copy(biodiv_path / (ds_ref + '-config.json'), biodiv_path / (ds_ref + str(enrichment_id) + '-config.json'))
-
-    # Run enrichment
     try:
         enrich(ds_ref + str(enrichment_id), var_id, geo_buff, time_buff, depth_request, progress_callback= get_progress_callback(enrichment_id))
     except Exception as e:

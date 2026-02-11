@@ -48,3 +48,5 @@ Other functions (for internal use)
 .. autofunction:: geoenrich.enrichment.row_enrich
 
 .. autofunction:: geoenrich.enrichment.save_enrichment_config
+
+.. autofunction:: geoenrich.enrichment.update_enrichment_status

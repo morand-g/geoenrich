@@ -42,13 +42,14 @@ def merge_files(ds_ref, enrichment_id):
     # Repatriate temp enrichment data into main file and delete enrichment file and config
 
     original_df = pd.read_csv(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'), index_col = 'id').drop(columns = ['geometry', 'eventDate'])
-
     enrichment_df =  pd.read_csv(biodiv_path / (ds_ref + '.csv'), index_col = 'id')
 
-    for c in original_df.columns:
-        enrichment_df[str(enrichment_id) + '_' + c.split('_')[-1]] = original_df[c]
-    
+    enrichment_df[original_df.columns] = original_df
     enrichment_df.to_csv(biodiv_path / (ds_ref +'.csv'))
 
-    #os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
-    #os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '-config.json'))
+    update_enrichment_status(ds_ref, enrichment_id, 'Enriched')
+
+    os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
+    os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '-config.json'))
+
+

@@ -20,7 +20,6 @@ from copy import deepcopy
 from tqdm.auto import tqdm
 
 import copernicusmarine
-import xarray as xr
 
 import geoenrich
 from geoenrich.satellite import *
@@ -77,7 +76,6 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
 
     print(f"Starting enrichment for variable '{var_id}' on dataset '{dataset_ref}'...")
 
-    input_type = enrichment_metadata['input_type']
     enrichments = enrichment_metadata['enrichments']
 
     enrichment_id = get_enrichment_id(enrichments, var_id, geo_buff, time_buff, depth_request, downsample)
@@ -128,7 +126,13 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
     # Save file
     if new_enrichment and len(indices):
         save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample)
+
     updated.to_csv(str(Path(biodiv_path, dataset_ref + '.csv')))
+
+    if len(original) == len(to_enrich):
+        update_enrichment_status(dataset_ref, enrichment_id, 'Enriched')
+    else:
+        update_enrichment_status(dataset_ref, enrichment_id, 'Partially Enriched')
 
 
 
@@ -995,7 +999,6 @@ def reset_enrichment_file(dataset_ref, var_ids_to_remove):
     df, enrichment_metadata = load_enrichment_file(dataset_ref)
 
     enrichments = enrichment_metadata['enrichments']
-    input_type = enrichment_metadata['input_type']
 
     remaining_enrichments = []
     to_drop = []
@@ -1042,7 +1045,6 @@ def enrichment_status(dataset_ref):
     df, enrichment_metadata = load_enrichment_file(dataset_ref)
 
     enrichments = enrichment_metadata['enrichments']
-    input_type = enrichment_metadata['input_type']
 
     col_indices = parse_columns(df)
 
@@ -1133,7 +1135,7 @@ def get_enrichment_id(enrichments, var_id, geo_buff, time_buff, depth_request, d
     return(result_id)
 
 
-def save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample):
+def save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample, status = 'None'):
 
     """
     Save enrichment metadata in the json config file.
@@ -1153,15 +1155,17 @@ def save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_bu
     with Path(biodiv_path, dataset_ref + '-config.json').open() as f:
         enrichment_metadata = json.load(f)
 
-    new_enrichment = {'id': enrichment_id,
-                      'parameters':
+    new_enrichment =    {  
+                        'id': enrichment_id,
+                        'parameters':
                            {'var_id':           var_id,
                             'geo_buff':         geo_buff,
                             'time_buff':        time_buff,
                             'depth_request':    depth_request,
-                            'downsample':       downsample
-                            }
-                     }
+                            'downsample':       downsample,
+                            },
+                        'status':           status
+                        }
 
     enrichment_metadata['enrichments'].append(new_enrichment)
 
@@ -1185,3 +1189,31 @@ def read_ids(dataset_ref):
     df = pd.read_csv(str(filepath), index_col = 'id')
 
     return(list(df.index))
+
+
+def update_enrichment_status(ds_ref, enrichment_id, status):
+
+    """
+    Update enrichment status in the config file.
+    
+    Args:
+        ds_ref (str): The enrichment file name (e.g. gbif_taxonKey).
+        enrichment_id (int): Enrichment ID.
+        status (str): Enrichment status. Can be 'None', 'Enriched', 'Partially Enriched', etc.
+    Returns:
+        None
+    """
+
+    filepath_json = biodiv_path / (ds_ref + '-config.json')
+    with filepath_json.open('r') as f:
+        enrichment_metadata = json.load(f)
+
+    new_enrichments = []
+    for enrichment in enrichment_metadata['enrichments']:
+        if enrichment['id'] == int(enrichment_id):
+            enrichment['status'] = status
+        new_enrichments.append(enrichment)
+    enrichment_metadata['enrichments'] = new_enrichments
+
+    with filepath_json.open('w') as f:
+        json.dump(enrichment_metadata, f, ensure_ascii=False, indent=4)
