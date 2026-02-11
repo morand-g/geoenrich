@@ -1,8 +1,8 @@
 from geoenrich.enrichment import *
-from pathlib import Path
 from tqdm.auto import tqdm
 import time
 from flask_socketio import SocketIO
+import pandas as pd
 
 # Celery worker needs its own SocketIO client
 socketio = SocketIO(
@@ -11,6 +11,8 @@ socketio = SocketIO(
 )
 
 def get_progress_callback(enrichment_id):
+
+    # Custom tqdm class that emits progress updates to the client via SocketIO, throttled to 5-10 Hz
 
     class TqdmWithCallback(tqdm):
         def __init__(self, *args, **kwargs):
@@ -29,6 +31,24 @@ def get_progress_callback(enrichment_id):
                 return
 
             self._last_emit = now
-            socketio.emit('enrichment_status', {'enrichment_id': enrichment_id, 'status': "PROGRESS", 'progress': self.n / self.total * 100 })
+            socketio.emit('enrichment_status', {'enrichment_id': enrichment_id, 'status': "PROGRESS", 'progress': int(self.n / self.total * 100)})
 
     return TqdmWithCallback
+
+
+
+def merge_files(ds_ref, enrichment_id):
+
+    # Repatriate temp enrichment data into main file and delete enrichment file and config
+
+    original_df = pd.read_csv(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'), index_col = 'id').drop(columns = ['geometry', 'eventDate'])
+
+    enrichment_df =  pd.read_csv(biodiv_path / (ds_ref + '.csv'), index_col = 'id')
+
+    for c in original_df.columns:
+        enrichment_df[str(enrichment_id) + '_' + c.split('_')[-1]] = original_df[c]
+    
+    enrichment_df.to_csv(biodiv_path / (ds_ref +'.csv'))
+
+    #os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
+    #os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '-config.json'))

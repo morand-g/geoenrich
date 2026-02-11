@@ -39,7 +39,7 @@ services:
     command: bash -c "mkdir -p /root/.copernicusmarine \
       && echo $COPERNICUS_TOKEN > /root/.copernicusmarine/.copernicusmarine-credentials \
       && cp /home/geoenrich_host/data/personal_catalog.csv /usr/local/lib/python3.10/site-packages/geoenrich/data/personal_catalog.csv \
-      && celery -A main.celery worker --loglevel=INFO"
+      && celery -A main.celery worker --loglevel=INFO --statedb=/app/celery-working.state"
   redis:
     image: redis
     container_name: geoenrich_redis

@@ -117,9 +117,8 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
 
     # If variable is already present, update it
     if not(new_enrichment) and len(indices.columns):
-        relevant_cols = [c for c in original.columns if c[:len(prefix)] == prefix]
-        updated.loc[indices.index, relevant_cols] = indices[relevant_cols]
-        updated.loc[missing_index,relevant_cols] = -1
+        updated.loc[indices.index, indices.columns] = indices[indices.columns]
+        updated.loc[missing_index,indices.columns] = -1
 
     # If indices is not empty
     elif len(indices):

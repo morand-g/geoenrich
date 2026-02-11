@@ -171,7 +171,9 @@ fetch("/get_var_catalog")
 
 
 socket.on("enrichment_status", (data) => {
-  console.log("Task state update:", data);
+
+  document.getElementById("section3").classList.remove("locked");
+  
   if (data.status === "PENDING") {
     const row = document.createElement("div");
     row.className = "progress-row";
@@ -207,31 +209,54 @@ socket.on("enrichment_status", (data) => {
     progressContainer.appendChild(row);
   }
 
-  if (data.status === "STARTING") {
+  else if (data.status === "STARTING") {
     const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
     status.textContent = "Starting...";
     const button = document.getElementById('start_' + data.enrichment_id);
     button.disabled = true;
   }
-  if (data.status === "PROGRESS") {
+
+  else if (data.status === "PROGRESS") {
     const fill = document.getElementById("fill_" + data.enrichment_id);
     const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
     fill.style.width = data.progress + "%";
     status.textContent = `In Progress (${data.progress}%)`;
   }
 
+  else if (data.status === "COMPLETED") {
+    const fill = document.getElementById("fill_" + data.enrichment_id);
+    const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
+    fill.style.width = "100%";
+    status.textContent = "Finished";
+    status.style.color = "green";
+  }
+
+  else if (data.status === "ERROR") {
+    const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
+    status.textContent = 'Error';
+    status.style.color = "red";
+    status.title = data.error;
+    const button = document.getElementById('start_' + data.enrichment_id);
+    button.disabled = false;
+    button.value = "Retry";
+    button.onclick = () => fetch('/enrich/' + data.enrichment_id);
+  }
+
+  else {
+    console.log("Unknown status:", data);
+  }
 });
 
-enrichBtn.addEventListener("click", () => {
-  if (!selectedVariables.length) return;
+// enrichBtn.addEventListener("click", () => {
+//   if (!selectedVariables.length) return;
 
-  // Unlock Section 3
-  document.getElementById("section3").classList.remove("locked");
+//   // Unlock Section 3
+//   document.getElementById("section3").classList.remove("locked");
 
-  // Clear previous progress
-  progressContainer.innerHTML = "";
+//   // Clear previous progress
+//   progressContainer.innerHTML = "";
 
-});
+// });
 
 
 
