@@ -11,6 +11,7 @@ from celery.result import AsyncResult
 from geoenrich.dataloader import import_occurrences_csv, load_areas_file, biodiv_path
 from geoenrich.enrichment import create_enrichment_file, save_enrichment_config, load_enrichment_file, get_enrichment_id, enrich
 from geoenrich.satellite import get_var_catalog
+from geoenrich.exports import collate_npy
 
 from pathlib import Path
 
@@ -196,6 +197,28 @@ def enrich_wrapper(self, ds_ref, enrichment_id, enrichment_params):
     socketio.emit('enrichment_status', {'enrichment_id':  enrichment_id, 'status': "COMPLETED", 'progress': 100})
 
     return
+
+
+############################ Section 4 ################################################
+
+
+# Process uploaded file
+@app.route("/collateData", methods=['POST'])
+def collateData():
+
+    target_res = int(request.form['resInput'])
+    collate_wrapper.apply_async(args=[app.config['DS_REF'], target_res])
+
+
+
+@celery.task(bind=True)
+def collate_wrapper(self, ds_ref, target_res):
+
+    out_path = biodiv_path.parent / 'outputs_raw'
+    out_path.mkdir(exist_ok=True)
+
+    collate_npy(ds_ref, out_path, target_res)
+    shutil.copy(out_path / (ds_ref + '-npy') / '0000_npy_metadata.txt', out_path / (ds_ref + '_metadata.npy'))
 
 
 

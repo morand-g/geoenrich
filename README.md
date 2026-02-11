@@ -38,9 +38,13 @@ This project is being developed as part of the G2OI project, cofinanced by the E
 
 Installation instructions are in the documentation, for [python](https://geoenrich.readthedocs.io/en/latest/install.html) and [R](https://geoenrich.readthedocs.io/en/latest/r-install.html).
 
-## Using the plugin
+## Using the package
 
 Jupyter Notebook tutorials are available for [python](https://geoenrich.readthedocs.io/en/latest/tutorial.html) and [R](https://geoenrich.readthedocs.io/en/latest/r-tutorial.html).
+
+## Using the graphic interface
+
+A graphic interface is available through a Docker web app. See instructions [here](geoenrich_dashboard/README.md)
 
 ## Issues and further developments
 

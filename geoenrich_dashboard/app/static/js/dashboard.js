@@ -180,31 +180,45 @@ socket.on("enrichment_status", (data) => {
 
     const label = document.createElement("div");
     label.className = "progress-label";
-    label.innerHTML = `<span>${data.varname}</span><span class="status">Pending</span>`;
-    label.id = "status_" + data.enrichment_id;
+    label.innerHTML = `<span>${data.varname}</span>`;
+    
 
-    const bar = document.createElement("div");
-    bar.className = "progress-bar";
+    // const bar = document.createElement("div");
+    // bar.className = "progress-bar";
 
-    const barcontainer = document.createElement("div");
-    barcontainer.className = "progress-bar-container";
+    // const barcontainer = document.createElement("div");
+    // barcontainer.className = "progress-bar-container";
 
-    const fill = document.createElement("div");
-    fill.className = "progress-fill";
-    fill.id = "fill_" + data.enrichment_id;
+    // const fill = document.createElement("div");
+    // fill.className = "progress-fill";
+    // fill.id = "fill_" + data.enrichment_id;
 
-    const button = document.createElement("input");
-    button.className = "inputbutton";
+    const button = document.createElement("button");
+    button.className = "inputfillbutton";
     button.type = "button";
     button.value = "Start";
     button.id = 'start_' + data.enrichment_id;
 
-    button.onclick = () => fetch('/enrich/' + data.enrichment_id);
+    const fill = document.createElement("div");
+    fill.className = "fill";
+    fill.id = "fill_" + data.enrichment_id;
 
-    bar.appendChild(fill);
-    barcontainer.appendChild(label);
-    barcontainer.appendChild(bar);
-    row.appendChild(barcontainer);
+    button.onclick = () => {
+      button.style.background = "#d1d5db";
+      fill.style.background = "#22c55e";
+      fill.style.width = "0%";
+      fetch('/enrich/' + data.enrichment_id);
+    };
+
+    const buttonlabel = document.createElement("span");
+    buttonlabel.textContent = "Start";
+    buttonlabel.className = "label status";
+    buttonlabel.id = "status_" + data.enrichment_id;
+
+    button.appendChild(fill);
+    button.appendChild(buttonlabel);
+    
+    row.appendChild(label);
     row.appendChild(button);
     progressContainer.appendChild(row);
 
@@ -212,7 +226,7 @@ socket.on("enrichment_status", (data) => {
   }
 
   else if (data.status === "STARTING") {
-    const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
+    const status = document.getElementById("status_" + data.enrichment_id);
     status.textContent = "Starting...";
     const button = document.getElementById('start_' + data.enrichment_id);
     button.disabled = true;
@@ -220,17 +234,16 @@ socket.on("enrichment_status", (data) => {
 
   else if (data.status === "PROGRESS") {
     const fill = document.getElementById("fill_" + data.enrichment_id);
-    const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
+    const status = document.getElementById("status_" + data.enrichment_id);
     fill.style.width = data.progress + "%";
     status.textContent = `In Progress (${data.progress}%)`;
   }
 
   else if (data.status === "COMPLETED") {
     const fill = document.getElementById("fill_" + data.enrichment_id);
-    const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
+    const status = document.getElementById("status_" + data.enrichment_id);
     fill.style.width = "100%";
     status.textContent = "Finished";
-    status.style.color = "green";
     const button = document.getElementById('start_' + data.enrichment_id);
     button.disabled = true;
 
@@ -238,14 +251,17 @@ socket.on("enrichment_status", (data) => {
   }
 
   else if (data.status === "ERROR") {
-    const status = document.getElementById("status_" + data.enrichment_id).querySelector(".status");
-    status.textContent = 'Error';
-    status.style.color = "red";
+    const status = document.getElementById("status_" + data.enrichment_id);
+    status.textContent = 'Error. Retry?';
     status.title = data.error;
+
+    const fill = document.getElementById("fill_" + data.enrichment_id);
+    fill.style.background = "#ef4444";
+    fill.style.width = "100%";
+
     const button = document.getElementById('start_' + data.enrichment_id);
     button.disabled = false;
-    button.value = "Retry";
-    button.onclick = () => fetch('/enrich/' + data.enrichment_id);
+
   }
 
   else {
@@ -271,10 +287,10 @@ function unlockSection4IfReady() {
 
   if (allFinished) {
       document.getElementById("section4").classList.remove("locked");
-      document.getElementById("exportJsonBtn").disabled = false;
+      document.getElementById("collateBtn").disabled = false;
   }
   else {
       document.getElementById("section4").classList.add("locked");
-      document.getElementById("exportJsonBtn").disabled = true;
+      document.getElementById("collateBtn").disabled = true;
   }
 }

@@ -668,7 +668,7 @@ def export_raster(dataset_ref, occ_id, var_id, path = Path('./'), geo_buff = Non
             print('Abort. Array is smaller than 2x2 pixels.')
 
 
-def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {'example-var': 2}, duplicates = {}):
+def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {'example-var': 2}, duplicates = {}, progress_callback = None):
 
     """
     Export a 3D numpy array with all layers for each occurrence of a dataset.
@@ -681,7 +681,7 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
         slice (list[int]): if not None, only process the given slice of the dataset.
         dimension3 (dict): provides the expected 3rd dimension length (time dimension * depth dimension) for each variable where it is larger than 1.
         duplicates (dict): dictionnary of variables which should be merged, e.g. {'var_to_remove':'var_to_keep'}. If var_to_keep is empty, data from var_to_remove are used instead.
-
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
 
     Returns:
         None
@@ -726,6 +726,9 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
     var_list = [en['parameters']['var_id'] for en in enrichments]
     for v in duplicates.keys():
         var_list.remove(v)
+
+    if progress_callback:
+        tqdm = progress_callback
 
     for occ_id in tqdm(ids):
         all_bands = {}

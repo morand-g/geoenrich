@@ -38,7 +38,7 @@
             </div>
 
             <div id="section2" class="section locked">
-                <h2>2. Enrichment Settings</h2>
+                <h2>2. Add variables</h2>
 
                 <form id="varform" method="POST" action="/addVariables" enctype='application/x-www-form-urlencoded'>
                     <label>Variables</label>
@@ -80,7 +80,17 @@
                 <h2>4. Export / Collate</h2>
                 <p class="muted">Available once all variables are finished.</p>
                 <div class="export-actions">
-                    <button id="exportJsonBtn" disabled>Export JSON</button>
+                    <form method="POST" action="/collateData">
+                        <p>Collate numpy files with all variables.</p>
+                        <input type="number" id="resInput" name="resInput" placeholder="Target resolution (e.g., 32)" />
+                        <button class="inputbutton" type = 'submit' id="collateBtn" disabled>
+                            <span class="fill"></span>
+                            <span class="label">Collate</span>
+                        </button>
+                    </form>
+                    
+                    <p>Normalize the data.</p>
+                    <button id="normalizeBtn" class="inputbutton" disabled>Normalize</button>
                 </div>
             </div>
         </div>
