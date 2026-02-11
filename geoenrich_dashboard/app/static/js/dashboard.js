@@ -173,7 +173,7 @@ fetch("/get_var_catalog")
 socket.on("enrichment_status", (data) => {
 
   document.getElementById("section3").classList.remove("locked");
-  
+
   if (data.status === "PENDING") {
     const row = document.createElement("div");
     row.className = "progress-row";
@@ -207,6 +207,8 @@ socket.on("enrichment_status", (data) => {
     row.appendChild(barcontainer);
     row.appendChild(button);
     progressContainer.appendChild(row);
+
+    unlockSection4IfReady();
   }
 
   else if (data.status === "STARTING") {
@@ -229,6 +231,10 @@ socket.on("enrichment_status", (data) => {
     fill.style.width = "100%";
     status.textContent = "Finished";
     status.style.color = "green";
+    const button = document.getElementById('start_' + data.enrichment_id);
+    button.disabled = true;
+
+    unlockSection4IfReady();
   }
 
   else if (data.status === "ERROR") {
@@ -247,19 +253,6 @@ socket.on("enrichment_status", (data) => {
   }
 });
 
-// enrichBtn.addEventListener("click", () => {
-//   if (!selectedVariables.length) return;
-
-//   // Unlock Section 3
-//   document.getElementById("section3").classList.remove("locked");
-
-//   // Clear previous progress
-//   progressContainer.innerHTML = "";
-
-// });
-
-
-
 
 
 
@@ -269,15 +262,19 @@ socket.on("enrichment_status", (data) => {
    SECTION 4
 ========================= */
 function unlockSection4IfReady() {
-    if (!progressState.length) return;
 
-    const allFinished = progressState.every(
-        p => p.status.textContent === "Finished"
-    );
+  const statuses = document.querySelectorAll(".status");
 
-    if (allFinished) {
-        document.getElementById("section4").classList.remove("locked");
-        document.getElementById("exportCsvBtn").disabled = false;
-        document.getElementById("exportJsonBtn").disabled = false;
-    }
+  if (!statuses) return;
+
+  const allFinished = [...statuses].every(s => s.textContent.trim() === "Finished");;
+
+  if (allFinished) {
+      document.getElementById("section4").classList.remove("locked");
+      document.getElementById("exportJsonBtn").disabled = false;
+  }
+  else {
+      document.getElementById("section4").classList.add("locked");
+      document.getElementById("exportJsonBtn").disabled = true;
+  }
 }

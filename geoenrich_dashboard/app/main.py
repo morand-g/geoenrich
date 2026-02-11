@@ -90,14 +90,10 @@ def uploadFiles():
             enrichments = enrichment_metadata['enrichments']
             for enrichment in enrichments:
                 enrichment_id = enrichment['id']
+                socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= 'PENDING',
+                                                   varname= enrichment['parameters']['var_id'])
                 if enrichment['status'] == 'Enriched':
                     socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= 'COMPLETED',
-                                                   varname= enrichment['parameters']['var_id'])
-                elif enrichment['status'] == 'Pending':
-                    socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= 'PENDING',
-                                                   varname= enrichment['parameters']['var_id'])
-                else:
-                    socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= 'UNKNOWN',
                                                    varname= enrichment['parameters']['var_id'])
 
 
@@ -129,7 +125,7 @@ def add_variables():
 
         _, enrichment_metadata = load_enrichment_file(dataset_ref)
         enrichments = enrichment_metadata['enrichments']
-        enrichment_id = get_enrichment_id(enrichments, v, geo_buff, time_buff=(0,0), depth_request=depth_request)
+        enrichment_id = get_enrichment_id(enrichments, v, geo_buff, time_buff=(0,0), depth_request=depth_request, downsample={})
 
         if enrichment_id == -1:
             if len(enrichments):
@@ -137,7 +133,8 @@ def add_variables():
             else:
                 enrichment_id = 1
             
-            save_enrichment_config(dataset_ref, enrichment_id, v, geo_buff, time_buff=(0,0), depth_request=depth_request, status = 'Pending')
+            save_enrichment_config(dataset_ref, enrichment_id, v, geo_buff, time_buff=(0,0), depth_request=depth_request,
+                                   downsample={}, status = 'Pending')
             socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= "PENDING", varname= v)
 
     return '', 200

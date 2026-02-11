@@ -51,5 +51,3 @@ def merge_files(ds_ref, enrichment_id):
 
     os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
     os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '-config.json'))
-
-
