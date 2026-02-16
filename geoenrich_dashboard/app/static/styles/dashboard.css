@@ -224,6 +224,6 @@ font-size: 14px;
   z-index: 1;
 }
 
-.inputbutton:disabled {
+.inputfillbutton:disabled {
       cursor: not-allowed;
     }

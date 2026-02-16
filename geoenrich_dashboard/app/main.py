@@ -98,7 +98,7 @@ def uploadFiles():
                                                    varname= enrichment['parameters']['var_id'])
 
 
-    return '', 204
+    return '', 200
 
 
 
@@ -190,13 +190,13 @@ def enrich_wrapper(self, ds_ref, enrichment_id, enrichment_params):
         enrich(ds_ref + str(enrichment_id), var_id, geo_buff, time_buff, depth_request, progress_callback= get_progress_callback(enrichment_id))
     except Exception as e:
         socketio.emit('enrichment_status', {'enrichment_id':  enrichment_id, 'status': "ERROR", 'error': str(e)})
-        return
+        return '', 500
 
     merge_files(ds_ref, enrichment_id)
 
     socketio.emit('enrichment_status', {'enrichment_id':  enrichment_id, 'status': "COMPLETED", 'progress': 100})
 
-    return
+    return '', 200
 
 
 ############################ Section 4 ################################################
@@ -209,6 +209,7 @@ def collateData():
     target_res = int(request.form['resInput'])
     collate_wrapper.apply_async(args=[app.config['DS_REF'], target_res])
 
+    return '', 200
 
 
 @celery.task(bind=True)
@@ -217,10 +218,12 @@ def collate_wrapper(self, ds_ref, target_res):
     out_path = biodiv_path.parent / 'outputs_raw'
     out_path.mkdir(exist_ok=True)
 
-    collate_npy(ds_ref, out_path, target_res)
+    collate_npy(ds_ref, out_path, target_res, progress_callback= get_progress_callback('collation'))
     shutil.copy(out_path / (ds_ref + '-npy') / '0000_npy_metadata.txt', out_path / (ds_ref + '_metadata.npy'))
 
+    socketio.emit('enrichment_status', {'enrichment_id':  'collation', 'status': "COMPLETED", 'progress': 100})
 
+    return '', 200
 
 # Run app
 if __name__ == "__main__":

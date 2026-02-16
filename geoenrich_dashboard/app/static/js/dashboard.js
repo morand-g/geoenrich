@@ -83,6 +83,7 @@ document.getElementById('datasetform').addEventListener('submit', async (e) => {
             method: 'POST',
             body: new FormData(e.target)
         });
+        document.getElementById("section1").classList.add("locked");
     });
 
 /* =========================
@@ -174,24 +175,41 @@ socket.on("enrichment_status", (data) => {
 
   document.getElementById("section3").classList.remove("locked");
 
-  if (data.status === "PENDING") {
+  if (data.enrichment_id === "collation") {
+    document.getElementById("section2").classList.add("locked");
+    document.getElementById("section3").classList.add("locked");
+
+    const collateBtn = document.getElementById("collateBtn");
+      const fill = collateBtn.querySelector(".fill");
+      const label = collateBtn.querySelector(".label");
+
+    if (data.status === "PROGRESS") {
+
+      collateBtn.style.background = "#d1d5db";
+      fill.style.width = data.progress + "%";
+      label.textContent = `Collating... (${data.progress}%)`;
+    }
+    else if (data.status === "COMPLETED") {
+
+      fill.style.width = "100%";
+      label.textContent = "Collation complete";
+      collateBtn.disabled = true;
+      normalizeBtn.disabled = false;
+    }
+
+  }
+
+  else if (data.status === "PENDING") {
+
+    document.getElementById("progressContainer").querySelector('.muted').style.display = "none";
+
     const row = document.createElement("div");
     row.className = "progress-row";
 
     const label = document.createElement("div");
     label.className = "progress-label";
     label.innerHTML = `<span>${data.varname}</span>`;
-    
 
-    // const bar = document.createElement("div");
-    // bar.className = "progress-bar";
-
-    // const barcontainer = document.createElement("div");
-    // barcontainer.className = "progress-bar-container";
-
-    // const fill = document.createElement("div");
-    // fill.className = "progress-fill";
-    // fill.id = "fill_" + data.enrichment_id;
 
     const button = document.createElement("button");
     button.className = "inputfillbutton";
@@ -288,9 +306,19 @@ function unlockSection4IfReady() {
   if (allFinished) {
       document.getElementById("section4").classList.remove("locked");
       document.getElementById("collateBtn").disabled = false;
+      document.getElementById("section4").querySelector('.muted').style.display = "none";
   }
   else {
       document.getElementById("section4").classList.add("locked");
       document.getElementById("collateBtn").disabled = true;
+      document.getElementById("section4").querySelector('.muted').style.display = "block";
   }
 }
+
+document.getElementById('collateForm').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent page reload
+        const response = await fetch('/collateData', {
+            method: 'POST',
+            body: new FormData(e.target)
+        });
+    });
