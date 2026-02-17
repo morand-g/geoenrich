@@ -1,3 +1,6 @@
+nbsphinx
+sphinx_copybutton
+sphinx_rtd_theme
 numpy
 pandas
 geopandas
@@ -7,12 +10,9 @@ tqdm
 opencv-python
 pathlib
 rasterio
-pygbif>=0.6.1
 matplotlib
 appdirs
 geojson_rewind
 geomet
-nbsphinx
-sphinx_copybutton
-sphinx_rtd_theme
 copernicusmarine
+pyyaml

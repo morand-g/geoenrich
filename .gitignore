@@ -133,8 +133,6 @@ dmypy.json
 .pyre/
 
 # Passwords
-credentials.py
-run_enrichment.py
 
 # R
 .Rhistory
@@ -144,3 +142,4 @@ geoenrich_online/app/data/
 geoenrich_dashboard/app/data/
 geoenrich_online/app/static/uploads
 geoenrich_dashboard/app/static/uploads
+geoenrich/data/config.yml

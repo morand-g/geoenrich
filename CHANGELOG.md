@@ -1,7 +1,9 @@
 ## v1.0
 
 #### New functions:
-- Dashboard to help large enrichment jobs
+- Introduced dashboard to monitor large enrichment jobs
+- Removed credentials file, introduced function enrichment.set_cache_path
+- Removed GBIF dependency to avoid unsafe credentials storage
 
 
 #### Bug fixes:

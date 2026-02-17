@@ -11,125 +11,65 @@ import geopandas as gpd
 
 from dwca.read import DwCAReader
 
-from pygbif import species, caching
-from pygbif import occurrences as occ
-
 import geoenrich
 
-from geoenrich.enrichment import parse_columns
-
-try:
-    from geoenrich.credentials import *
-except:
-    from geoenrich.credentials_example import *
+import yaml
 
 pd.options.mode.chained_assignment = None
-#caching(True) # gbif caching
 
 
-############################ GBIF requests and downloads ###########################
+############################# Loading paths ###########################
 
+def load_paths():
 
-def get_taxon_key(query):
-    
     """
-    Look for a taxonomic category in GBIF database, print the best result and return its unique ID.
+    Loads paths for caching biodiversity and satellite data. If the config.yml file does not exist, it creates it and sets the cache path to a geoenrich_cache folder in the user's home directory.
 
     Args:
-        query (str): Scientific name of the genus or species to search for.
-    Returns:
-        int: GBIF taxon ID
-    """
-
-    search_results = species.name_suggest(query)
-    taxon = ''
-
-    for d in search_results:
-        if d['status'] == 'ACCEPTED':
-            taxon = d
-            break
-
-    if isinstance(taxon, dict):
-        print('Selected taxon: {}: {}'.format(taxon['rank'], taxon['scientificName']))
-        return(d['key'])
-    else:
-        print('No taxon found')
-        return(-1)
-
-
-
-def request_from_gbif(taxon_key, override = False):
-
-
-    """
-    Request all georeferenced occurrences for the given taxonKey. Return the request key.
-    If the same request was already done for this gbif account, return the key of the first request.
-    In this case a new request can be made with *override = True*.
-    
-    Args:
-        taxonKey (int): GBIF ID of the taxonomic category to request.
-        override (bool): Force new request to be made if one already exists.
-    Returns:
-        int: Request key
-
-    """
-
-    l = occ.download_list(user = gbif_username, pwd = gbif_pw, limit = 100)
-
-    existing = False
-    request_id = None
-
-    for e in l['results']:
-        preds = e['request']['predicate']['predicates']
-        for predicate in preds:
-            if predicate['key'] == 'TAXON_KEY' and predicate['value'] == str(taxon_key):
-                existing = True
-                if not(override):
-                    print('Request already made on ' + e['created'])
-                    print('Run again with override = True to force new request.')
-                    request_id = e['key']
-
-    if not(existing) or override:
-        req = ['taxonKey = {}'.format(taxon_key), 'hasCoordinate = True']
-        res = occ.download(req, user=gbif_username, pwd=gbif_pw, email = email, pred_type='and')
-
-        return(res[0])
-
-    else:
-        return(request_id)
-
-
-
-def download_requested(request_key):
-
-    """
-    Download GBIF data for the given request key.
-    Download previously requested data if available, otherwise print request status.
-    
-    Args:
-        request_key (int): Request key as returned by the :func:`geoenrich.dataloader.request_from_gbif` function.
-    Returns:
         None
+    Returns:
+        tuple: (biodiv_path, sat_path)
     """
 
-    metadata = occ.download_meta(request_key)
+    conf_path = Path(geoenrich.__file__).parent / 'data' / 'config.yml'
 
-    if metadata['status'] == 'SUCCEEDED':
-
-        taxKey = ''
-        for p in metadata['request']['predicate']['predicates']:
-            if p['key'] == 'TAXON_KEY':
-                taxKey = p['value']
-
-        path = biodiv_path / 'gbif'
-        if not path.exists():
-            path.mkdir()
-
-        occ.download_get(request_key, str(path))
-        path.rename(path.with_stem(str(taxKey)))
+    if not conf_path.exists():
+        with open(conf_path, 'w') as f:
+            yaml.dump({}, f)
+        
+        cache_path = Path.home() / 'geoenrich_cache'
 
     else:
-        print('Requested data not available. Request status: ' + metadata['status'])
+
+        with open(Path(geoenrich.__file__).parent / 'data' / 'config.yml', 'r') as f:
+            conf = yaml.load(f, Loader=yaml.SafeLoader)
+
+        if 'cache_path' in conf:
+            cache_path = Path(conf['cache_path'])
+        else:
+            cache_path = Path.home() / 'geoenrich_cache'
+
+
+    with open(Path(geoenrich.__file__).parent / 'data' / 'config.yml', 'w') as f:
+        conf = {'cache_path': str(cache_path)}
+        yaml.dump(conf, f)
+
+
+
+    biodiv_path = cache_path / 'biodiv'
+    sat_path = cache_path / 'sat'
+
+    if not biodiv_path.exists():
+        biodiv_path.mkdir()
+
+    if not sat_path.exists():
+        sat_path.mkdir()
+
+    return(biodiv_path, sat_path)
+
+
+############# Load paths at import to avoid having to load them multiple times in different functions #############
+biodiv_path, sat_path = load_paths()
 
 
 ############################ Loading input files ###########################

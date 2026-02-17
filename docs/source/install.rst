@@ -30,27 +30,12 @@ Installation of geoenrich is done in the classic way::
 4.1.1. Root folder for geoenrich
 """"""""""""""""""""""""""""""""
 
-The first time you import the dataloader or enrichment module, it will display the location of the *credentials_example.py* configuration file. You will need to edit it and then remove *_example* from the file name so its name is just *credentials.py*. You can also get the location by typing ``geoenrich.__file__`` in Python.
+Geoenrich data is cached locally to avoid downloading the same data multiple times. By default, the cache is stored in your home path, in a geoenrich_cache subfolder. If you want ot change that, you can edit the config.yml file that is located in the same folder as the geoenrich package (you can find the location of that folder by running ``print(geoenrich.__file__)`` in Python).
 
-In this file, you need to specify the *root_path* where all persistent data will be stored. You should pick a stable location with plenty of free space available (depending on your data download needs).
 
 3.1.2. Credentials
 """"""""""""""""""
 
-If you want to use services that require authentification, you need to specify your credentials there.
-You will see 3 variables that need to be filled with GBIF credentials if you want to download occurrence data from GBIF. If you don't already have an account you can register on the `GBIF website <https://www.gbif.org/user/profile/>`_.
-
-There is also a dictionary named *dap_creds* that is intended to store credentials to OpenDAP servers. The server domains are the keys, like the example provided for Copernicus. You can add as many credentials as you need into that dictionary.
-
-
-.. warning::
-  If there are reserved characters in your username or password, you need to replace them with the %XX code as you would in an URL (eg. replace '@' by '%40'). See the full list below.
-
-
-===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===
-␣	!	"	#	$	%	&	'	(	)	*	+	,	/	:	;	=	?	@	[	] 
-%20	%21	%22	%23	%24	%25	%26	%27	%28	%29	%2A	%2B	%2C	%2F	%3A	%3B	%3D	%3F	%40	%5B	%5D
-===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===	===
 
 
 

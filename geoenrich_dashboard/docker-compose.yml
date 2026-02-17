@@ -21,7 +21,6 @@ services:
       - worker
     command: bash -c "cp /usr/local/lib/python3.10/site-packages/geoenrich/data/catalog.csv /app/static/js/ \
       && cp /home/data/personal_catalog.csv /usr/local/lib/python3.10/site-packages/geoenrich/data/personal_catalog.csv \
-      && cp /home/data/credentials.py /usr/local/lib/python3.10/site-packages/geoenrich/credentials.py \
       && python main.py"
   worker:
     image: geoenrich_dashboard
@@ -40,7 +39,6 @@ services:
     command: bash -c "mkdir -p /root/.copernicusmarine \
       && echo $COPERNICUS_TOKEN > /root/.copernicusmarine/.copernicusmarine-credentials \
       && cp /home/data/personal_catalog.csv /usr/local/lib/python3.10/site-packages/geoenrich/data/personal_catalog.csv \
-      && cp /home/data/credentials.py /usr/local/lib/python3.10/site-packages/geoenrich/credentials.py \
       && celery -A main.celery worker --loglevel=INFO --statedb=/app/celery-working.state"
   redis:
     image: redis

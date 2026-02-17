@@ -10,21 +10,14 @@ from pathlib import Path
 import json
 import pandas as pd
 import cv2
-import random
 from matplotlib import cm
 
 import rasterio
 from rasterio.transform import from_origin
 
-import geoenrich
-
-try:
-    from geoenrich.credentials import *
-except:
-    from geoenrich.credentials_example import *
-
 from geoenrich.enrichment import *
 from geoenrich.satellite import *
+from geoenrich.dataloader import biodiv_path, sat_path
 
 
 def retrieve_data(dataset_ref, occ_id, var_id, geo_buff = None, time_buff = None, depth_request = None,
@@ -92,7 +85,7 @@ def retrieve_data(dataset_ref, occ_id, var_id, geo_buff = None, time_buff = None
             var_source = get_var_catalog()[var_id]
 
         if -1 in [row.iloc[d['min']] for d in var_ind.values()]:
-            results = {'coords': None, 'values': None}
+            return {'coords': None, 'values': None}
 
         else:
 
@@ -120,9 +113,9 @@ def retrieve_data(dataset_ref, occ_id, var_id, geo_buff = None, time_buff = None
             if shape == 'buffer' and input_type == 'occurrence':
                 geo_buff = en['parameters']['geo_buff']
                 mask = ellipsoid_mask(data, coords, row['geometry'], geo_buff)
-                return({'coords': coords, 'values': np.ma.masked_where(mask, data), 'unit': unit})
+                return {'coords': coords, 'values': np.ma.masked_where(mask, data), 'unit': unit}
             else:
-                return({'coords': coords, 'values': data, 'unit': unit})
+                return {'coords': coords, 'values': data, 'unit': unit}
 
 
 def fetch_data(row, var_id, var_indices, ds, dimdict, var, downsample, indices = None):
@@ -299,9 +292,6 @@ def compute_stats(row, en_params, input_type, var_indices, ds, dimdict, var):
 
     data, coords = fetch_data(row, var_id, var_indices, ds, dimdict, var, downsample)
 
-    params = [dimdict[n]['standard_name'] for n in var['params']]
-    ordered_indices_cols = [var_indices[p] for p in params]
-
     if input_type == 'occurrences':
 
         # If data was calulated around an occurrence
@@ -375,7 +365,7 @@ def get_derivative(dataset_ref, occ_id, var_id, days = (0,0), geo_buff = None, d
     ind2 = calculate_indices(dimdict, row2.iloc[0], var, depth_request, downsample)
 
     data1, coords1 = fetch_data(None, var_id, None, ds, dimdict, var, downsample, ind1)
-    data2, coords2 = fetch_data(None, var_id, None, ds, dimdict, var, downsample, ind2)
+    data2, _ = fetch_data(None, var_id, None, ds, dimdict, var, downsample, ind2)
     ds.close()
 
     data = (data2 - data1) / (days[1] - days[0])
@@ -694,7 +684,6 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
 
     df, enrichment_metadata = load_enrichment_file(ds_ref, mute=True)
     enrichments = enrichment_metadata['enrichments']
-    input_type = enrichment_metadata['input_type']
     serial_dict = {}
 
 

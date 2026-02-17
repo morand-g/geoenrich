@@ -21,17 +21,11 @@ from tqdm.auto import tqdm
 
 import copernicusmarine
 
-import geoenrich
 from geoenrich.satellite import *
+from geoenrich.dataloader import biodiv_path, sat_path
 
 import logging
 logging.getLogger("copernicus_marine_root_logger").setLevel("WARN")
-
-try:
-    from geoenrich.credentials import *
-except:
-    from geoenrich.credentials_example import *
-
 
 tqdm.pandas()
 
@@ -259,7 +253,7 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
         geodf (geopandas.GeoDataFrame): Data to be enriched.
         varname(str): Variable name in the dataset.
         var_id (str): ID of the variable to download.
-        url (str): Dataset url (including credentials if needed).
+        url (str): Dataset url.
         geo_buff (int): Geographic buffer for which to download data around occurrence point (kilometers).
         time_buff (float list): Time bounds for which to download data around occurrence day (days). For instance, time_buff = [-7, 0] will download data from 7 days before the occurrence to the occurrence date.
         depth_request (str): For 4D data: 'all' -> data for all depths. 'nearest' -> closest available depth. 'nearest_lower' -> closest lower available depth. Anything else downloads surface data.

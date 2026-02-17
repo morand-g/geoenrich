@@ -7,14 +7,10 @@ Occurrences can be loaded straight from GBIF, from a local DarwinCore archive, o
 Areas have to be loaded from a csv file. See :func:`geoenrich.dataloader.load_areas_file`.
 
 
-.. autofunction:: geoenrich.dataloader.download_requested
-
-.. autofunction:: geoenrich.dataloader.get_taxon_key
-
 .. autofunction:: geoenrich.dataloader.import_occurrences_csv
 
 .. autofunction:: geoenrich.dataloader.load_areas_file
 
-.. autofunction:: geoenrich.dataloader.open_dwca
+.. autofunction:: geoenrich.dataloader.load_paths
 
-.. autofunction:: geoenrich.dataloader.request_from_gbif
+.. autofunction:: geoenrich.dataloader.open_dwca
