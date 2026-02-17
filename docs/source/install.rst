@@ -32,11 +32,10 @@ Installation of geoenrich is done in the classic way::
 
 Geoenrich data is cached locally to avoid downloading the same data multiple times. By default, the cache is stored in your home path, in a geoenrich_cache subfolder. If you want ot change that, you can edit the config.yml file that is located in the same folder as the geoenrich package (you can find the location of that folder by running ``print(geoenrich.__file__)`` in Python).
 
-
-3.1.2. Credentials
+4.1.2. Credentials
 """"""""""""""""""
 
-
+Some data sources require authentification. Please follow the instructions in the `available variables page <https://geoenrich.readthedocs.io/en/latest/variables.html>`_ to set up your credentials properly.
 
 
 4.2. Adding other data sources
