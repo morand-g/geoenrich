@@ -1,4 +1,5 @@
 from geoenrich.enrichment import *
+from geoenrich.dataloader import biodiv_path
 from tqdm.auto import tqdm
 import time
 from flask_socketio import SocketIO
@@ -51,3 +52,30 @@ def merge_files(ds_ref, enrichment_id):
 
     os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
     os.remove(biodiv_path / (ds_ref + str(enrichment_id) + '-config.json'))
+
+
+
+def normalization_values(ds_ref):
+
+    # Get normalization values for a dataset, used in the normalization step
+
+    in_path = biodiv_path.parent / 'outputs_raw' / (ds_ref + '-npy')
+
+    l = []
+
+    file_list = list(in_path.glob('*.npy'))
+
+    for file in file_list:
+        item = np.load(file)
+        l.append(item)
+
+    bigdata = np.array(l)
+
+    meds = np.nanmedian(bigdata, axis = [0,1,2])
+    perc1 = np.nanpercentile(bigdata, 1, axis = [0,1,2])
+    perc99 = np.nanpercentile(bigdata, 99, axis = [0,1,2])
+
+    to_save = np.stack([meds, perc1, perc99])
+    np.save(biodiv_path.parent / f"{ds_ref}-stats.npy", to_save)
+
+    return meds, perc1, perc99

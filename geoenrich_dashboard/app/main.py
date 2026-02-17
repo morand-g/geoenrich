@@ -1,7 +1,8 @@
 import json
 import os
 import shutil
-import time
+
+import numpy as np
 import pandas as pd
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO
@@ -15,7 +16,7 @@ from geoenrich.exports import collate_npy
 
 from pathlib import Path
 
-from functions import get_progress_callback, merge_files
+from functions import get_progress_callback, merge_files, normalization_values
 
 app = Flask(__name__)
 
@@ -202,7 +203,7 @@ def enrich_wrapper(self, ds_ref, enrichment_id, enrichment_params):
 ############################ Section 4 ################################################
 
 
-# Process uploaded file
+# Start collation of enriched data into .npy format
 @app.route("/collateData", methods=['POST'])
 def collateData():
 
@@ -224,6 +225,65 @@ def collate_wrapper(self, ds_ref, target_res):
     socketio.emit('enrichment_status', {'enrichment_id':  'collation', 'status': "COMPLETED", 'progress': 100})
 
     return '', 200
+
+
+# Normalize data
+@app.route("/normalizeData", methods=['POST'])
+def normalizeData():
+
+    uploaded_file = request.files['file']
+    if uploaded_file.filename != '':
+        npy_filepath = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+        uploaded_file.save(npy_filepath)
+
+        normalize_task.apply_async(args=[app.config['DS_REF'], npy_filepath])
+    
+    else:
+        normalize_task.apply_async(args=[app.config['DS_REF']])
+
+    return '', 200
+
+
+@celery.task(bind=True)
+def normalize_task(self, ds_ref, npy_filepath = None):
+
+    if npy_filepath:
+        meds, perc1, perc99 = np.load(npy_filepath)
+    else:
+        socketio.emit('enrichment_status', {'enrichment_id':  'normalization', 'status': "PENDING", 'progress': 0})
+        meds, perc1, perc99 = normalization_values(ds_ref)
+
+    in_path = out_path = biodiv_path.parent / 'outputs_raw' / (ds_ref + '-npy')
+    out_path = biodiv_path.parent / 'outputs_normalized' / (ds_ref + '-npy')
+
+    out_path.mkdir(exist_ok=True)
+
+    file_list = list(in_path.glob('*.npy'))
+
+    for i in range(len(file_list)):
+        file = file_list[i]
+        item = np.load(file)
+
+        # Fill NaNs with average values
+        all_nans = np.isnan(item).all(axis=(0,1))
+        some_nans = np.logical_and(~all_nans, np.isnan(item).any(axis=(0,1)))
+        fill_values = all_nans * meds + some_nans * np.nan_to_num(np.nanmedian(item, axis = [0,1]), nan=0)
+        filled = np.nan_to_num(item, nan=fill_values)
+
+        # Normalize
+        normed = (filled - perc1) / (perc99 - perc1)
+
+        # Remove extreme values
+        final = np.clip(normed, 0,1)
+
+        # Save
+        np.save(out_path / file.name, final)
+
+        socketio.emit('enrichment_status', {'enrichment_id':  'normalization', 'status': "PROGRESS", 'progress': int((i+1) / len(file_list) * 100)})
+
+    socketio.emit('enrichment_status', {'enrichment_id':  'normalization', 'status': "COMPLETED", 'progress': 100})
+    return '', 200
+
 
 # Run app
 if __name__ == "__main__":

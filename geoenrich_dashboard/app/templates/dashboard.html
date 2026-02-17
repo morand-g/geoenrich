@@ -88,9 +88,18 @@
                             <span class="label">Collate</span>
                         </button>
                     </form>
-                    
+
                     <p>Normalize the data.</p>
-                    <button id="normalizeBtn" class="inputbutton" disabled>Normalize</button>
+                    <div class="normalizecontainer">
+                        <form id="normform" method="POST" action="/normalizeData" enctype="multipart/form-data">
+                            <div id="uploadBox2" class="upload-box">
+                                <span id="uploadText2">Use custom normalization values<br />(.npy file)</span>
+                                <input type="file" id="fileInput2" accept=".npy" name="file" hidden />
+                            </div>
+                            <button id="normalizeBtn" class="inputbutton" disabled>Normalize</button>
+                        </form>
+                    </div>
+                    
                 </div>
             </div>
         </div>

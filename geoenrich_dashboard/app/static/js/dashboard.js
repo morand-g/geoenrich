@@ -1,7 +1,11 @@
 const uploadBox = document.getElementById("uploadBox");
+const uploadBox2 = document.getElementById("uploadBox2");
 const uploadText = document.getElementById("uploadText");
+const uploadText2 = document.getElementById("uploadText2");
 const fileInput = document.getElementById("fileInput");
+const fileInput2 = document.getElementById("fileInput2");
 const startBtn = document.getElementById("startBtn");
+const normalizeBtn = document.getElementById("normalizeBtn");
 const statsDiv = document.getElementById("stats");
 const section2 = document.getElementById("section2");
 const enrichBtn = document.getElementById("enrichBtn");
@@ -173,6 +177,9 @@ fetch("/get_var_catalog")
 
 socket.on("enrichment_status", (data) => {
 
+
+  // ####### Split for enrichment, Collation and normalization status updates #######
+
   document.getElementById("section3").classList.remove("locked");
 
   if (data.enrichment_id === "collation") {
@@ -321,4 +328,43 @@ document.getElementById('collateForm').addEventListener('submit', async (e) => {
             method: 'POST',
             body: new FormData(e.target)
         });
+    });
+
+
+
+uploadBox2.addEventListener("click", () => fileInput2.click());
+
+uploadBox2.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  uploadBox2.classList.add("dragover");
+});
+
+uploadBox2.addEventListener("dragleave", () => {
+  uploadBox2.classList.remove("dragover");
+});
+
+uploadBox2.addEventListener("drop", (e) => {
+  e.preventDefault();
+  uploadBox2.classList.remove("dragover");
+  handleFile2(e.dataTransfer.files[0]);
+});
+
+fileInput2.addEventListener("change", () => {
+  handleFile2(fileInput2.files[0]);
+});
+
+function handleFile2(file) {
+  if (!file || !file.name.endsWith(".npy")) return;
+  npyFile = file;
+  uploadText2.textContent = file.name;
+  normalizeBtn.disabled = false;
+}
+
+document.getElementById('normform').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent page reload
+        const response = await fetch('/normalizeData', {
+            method: 'POST',
+            body: new FormData(e.target)
+        });
+        normalizeBtn.disabled = true;
     });

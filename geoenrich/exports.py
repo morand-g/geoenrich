@@ -713,6 +713,8 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
     # Export np arrays for each occurrence
 
     var_list = [en['parameters']['var_id'] for en in enrichments]
+    buff_dict = {en['parameters']['var_id']: en['parameters']['geo_buff'] for en in enrichments}
+
     for v in duplicates.keys():
         var_list.remove(v)
 
@@ -760,7 +762,7 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
 
     with open(folderpath / '0000_npy_metadata.txt', 'w') as f:
         for line in var_list:
-            f.write(f"{line}\n")
+            f.write(f"{line}: {buff_dict[line]}km\n")
 
 
 

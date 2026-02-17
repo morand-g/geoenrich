@@ -227,3 +227,7 @@ font-size: 14px;
 .inputfillbutton:disabled {
       cursor: not-allowed;
     }
+
+.normalizecontainer {
+  display: flex;
+}
