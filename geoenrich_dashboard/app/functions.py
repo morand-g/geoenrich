@@ -54,8 +54,14 @@ def get_progress_callback(enrichment_id):
 def merge_files(ds_ref, enrichment_id):
 
     # Repatriate temp enrichment data into main file and delete enrichment file and config
-
-    original_df = pd.read_csv(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'), index_col = 'id').drop(columns = ['geometry', 'eventDate'])
+    
+    original_df = pd.read_csv(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'), index_col = 'id')
+    
+    if 'geometry' in original_df.columns:
+        original_df = original_df.drop(columns=['geometry', 'eventDate'])
+    else:
+        original_df = original_df.drop(columns=['mint', 'maxt', 'minx', 'maxx', 'miny', 'maxy'])
+        
     enrichment_df =  pd.read_csv(biodiv_path / (ds_ref + '.csv'), index_col = 'id')
 
     enrichment_df[original_df.columns] = original_df

@@ -175,7 +175,13 @@ def enrich_wrapper(self, ds_ref, enrichment_id, enrichment_params):
 
     original, enrichment_metadata = load_enrichment_file(ds_ref)
     enrichment_metadata['enrichments'] = [en for en in enrichment_metadata['enrichments'] if en['id'] == int(enrichment_id)]
-    original[['geometry', 'eventDate']].to_csv(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
+
+    if enrichment_metadata['input_type'] == 'occurrence':
+        original[['geometry', 'eventDate']].to_csv(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
+    else:
+        original[['mint', 'maxt', 'minx', 'maxx', 'miny', 'maxy']].to_csv(biodiv_path / (ds_ref + str(enrichment_id) + '.csv'))
+
+        
     filepath_json = biodiv_path / (ds_ref + str(enrichment_id) + '-config.json')
     with filepath_json.open('w') as f:
         json.dump(enrichment_metadata, f, ensure_ascii=False, indent=4)
