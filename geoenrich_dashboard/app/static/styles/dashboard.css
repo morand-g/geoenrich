@@ -228,6 +228,24 @@ font-size: 14px;
       cursor: not-allowed;
     }
 
-.normalizecontainer {
+.sidebysidecontainer {
   display: flex;
+  gap: 12px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.sidebysidecontainer input {
+  flex: 1;
+  margin-top: 12px;
+}
+
+.sidebysidecontainer button {
+  flex: 4;
+}
+
+.sidebysidecontainer #uploadBox2 {
+  flex: 1;
+  padding: 8px;
+  margin-top: 12px;
 }

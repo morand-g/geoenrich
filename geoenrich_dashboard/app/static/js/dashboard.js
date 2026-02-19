@@ -6,6 +6,7 @@ const fileInput = document.getElementById("fileInput");
 const fileInput2 = document.getElementById("fileInput2");
 const startBtn = document.getElementById("startBtn");
 const normalizeBtn = document.getElementById("normalizeBtn");
+const collateBtn = document.getElementById("collateBtn");
 const statsDiv = document.getElementById("stats");
 const section2 = document.getElementById("section2");
 const enrichBtn = document.getElementById("enrichBtn");
@@ -14,9 +15,6 @@ const progressContainer = document.getElementById("progressContainer");
 const variableSelect = document.getElementById("variableSelect");
 const selectedVariablesDiv = document.getElementById("selectedVariables");
 const selectedVariablesList = document.getElementById("selectedVariablesList");
-
-
-// const socket = io();
 
 let csvFile = null;
 let selectedVariables = [];
@@ -175,127 +173,6 @@ fetch("/get_var_catalog")
 
 
 
-socket.on("enrichment_status", (data) => {
-
-
-  // ####### Split for enrichment, Collation and normalization status updates #######
-
-  document.getElementById("section3").classList.remove("locked");
-
-  if (data.enrichment_id === "collation") {
-    document.getElementById("section2").classList.add("locked");
-    document.getElementById("section3").classList.add("locked");
-
-    const collateBtn = document.getElementById("collateBtn");
-      const fill = collateBtn.querySelector(".fill");
-      const label = collateBtn.querySelector(".label");
-
-    if (data.status === "PROGRESS") {
-
-      collateBtn.style.background = "#d1d5db";
-      fill.style.width = data.progress + "%";
-      label.textContent = `Collating... (${data.progress}%)`;
-    }
-    else if (data.status === "COMPLETED") {
-
-      fill.style.width = "100%";
-      label.textContent = "Collation complete";
-      collateBtn.disabled = true;
-      normalizeBtn.disabled = false;
-    }
-
-  }
-
-  else if (data.status === "PENDING") {
-
-    document.getElementById("progressContainer").querySelector('.muted').style.display = "none";
-
-    const row = document.createElement("div");
-    row.className = "progress-row";
-
-    const label = document.createElement("div");
-    label.className = "progress-label";
-    label.innerHTML = `<span>${data.varname}</span>`;
-
-
-    const button = document.createElement("button");
-    button.className = "inputfillbutton";
-    button.type = "button";
-    button.value = "Start";
-    button.id = 'start_' + data.enrichment_id;
-
-    const fill = document.createElement("div");
-    fill.className = "fill";
-    fill.id = "fill_" + data.enrichment_id;
-
-    button.onclick = () => {
-      button.style.background = "#d1d5db";
-      fill.style.background = "#22c55e";
-      fill.style.width = "0%";
-      fetch('/enrich/' + data.enrichment_id);
-    };
-
-    const buttonlabel = document.createElement("span");
-    buttonlabel.textContent = "Start";
-    buttonlabel.className = "label status";
-    buttonlabel.id = "status_" + data.enrichment_id;
-
-    button.appendChild(fill);
-    button.appendChild(buttonlabel);
-    
-    row.appendChild(label);
-    row.appendChild(button);
-    progressContainer.appendChild(row);
-
-    unlockSection4IfReady();
-  }
-
-  else if (data.status === "STARTING") {
-    const status = document.getElementById("status_" + data.enrichment_id);
-    status.textContent = "Starting...";
-    const button = document.getElementById('start_' + data.enrichment_id);
-    button.disabled = true;
-  }
-
-  else if (data.status === "PROGRESS") {
-    const fill = document.getElementById("fill_" + data.enrichment_id);
-    const status = document.getElementById("status_" + data.enrichment_id);
-    fill.style.width = data.progress + "%";
-    status.textContent = `In Progress (${data.progress}%)`;
-  }
-
-  else if (data.status === "COMPLETED") {
-    const fill = document.getElementById("fill_" + data.enrichment_id);
-    const status = document.getElementById("status_" + data.enrichment_id);
-    fill.style.width = "100%";
-    status.textContent = "Finished";
-    const button = document.getElementById('start_' + data.enrichment_id);
-    button.disabled = true;
-
-    unlockSection4IfReady();
-  }
-
-  else if (data.status === "ERROR") {
-    const status = document.getElementById("status_" + data.enrichment_id);
-    status.textContent = 'Error. Retry?';
-    status.title = data.error;
-
-    const fill = document.getElementById("fill_" + data.enrichment_id);
-    fill.style.background = "#ef4444";
-    fill.style.width = "100%";
-
-    const button = document.getElementById('start_' + data.enrichment_id);
-    button.disabled = false;
-
-  }
-
-  else {
-    console.log("Unknown status:", data);
-  }
-});
-
-
-
 
 
 
@@ -314,6 +191,7 @@ function unlockSection4IfReady() {
       document.getElementById("section4").classList.remove("locked");
       document.getElementById("collateBtn").disabled = false;
       document.getElementById("section4").querySelector('.muted').style.display = "none";
+      fetch("/checkExported");
   }
   else {
       document.getElementById("section4").classList.add("locked");
@@ -328,6 +206,7 @@ document.getElementById('collateForm').addEventListener('submit', async (e) => {
             method: 'POST',
             body: new FormData(e.target)
         });
+        collateBtn.disabled = true;
     });
 
 

@@ -217,12 +217,12 @@ def collateData():
 def collate_wrapper(self, ds_ref, target_res):
 
     out_path = biodiv_path.parent / 'outputs_raw'
-    out_path.mkdir(exist_ok=True)
+    out_path.mkdir(exist_ok=True, parents=True)
 
     collate_npy(ds_ref, out_path, target_res, progress_callback= get_progress_callback('collation'))
     shutil.copy(out_path / (ds_ref + '-npy') / '0000_npy_metadata.txt', out_path / (ds_ref + '_metadata.npy'))
 
-    socketio.emit('enrichment_status', {'enrichment_id':  'collation', 'status': "COMPLETED", 'progress': 100})
+    socketio.emit('collation_status', {'enrichment_id':  'collation', 'status': "COMPLETED", 'progress': 100})
 
     return '', 200
 
@@ -250,13 +250,12 @@ def normalize_task(self, ds_ref, npy_filepath = None):
     if npy_filepath:
         meds, perc1, perc99 = np.load(npy_filepath)
     else:
-        socketio.emit('enrichment_status', {'enrichment_id':  'normalization', 'status': "PENDING", 'progress': 0})
         meds, perc1, perc99 = normalization_values(ds_ref)
 
     in_path = out_path = biodiv_path.parent / 'outputs_raw' / (ds_ref + '-npy')
     out_path = biodiv_path.parent / 'outputs_normalized' / (ds_ref + '-npy')
 
-    out_path.mkdir(exist_ok=True)
+    out_path.mkdir(exist_ok=True, parents=True)
 
     file_list = list(in_path.glob('*.npy'))
 
@@ -283,6 +282,30 @@ def normalize_task(self, ds_ref, npy_filepath = None):
 
     socketio.emit('enrichment_status', {'enrichment_id':  'normalization', 'status': "COMPLETED", 'progress': 100})
     return '', 200
+
+
+
+@app.route("/checkExported", methods=['GET'])
+def checkExported():
+    verifyfilenumber.apply_async(args=[app.config['DS_REF']])
+
+    return '', 200
+
+
+@celery.task(bind=True)
+def verifyfilenumber(self, ds_ref):
+
+    out_path = biodiv_path.parent / 'outputs_raw'
+    out_path.mkdir(exist_ok=True, parents=True)
+
+    filelist = list((out_path / (ds_ref + '-npy')).glob('*.npy'))
+    csv, _  = load_enrichment_file(ds_ref)
+
+    if len(filelist) == len(csv):
+        socketio.emit('collation_status', {'enrichment_id':  'collation', 'status': "COMPLETED", 'progress': 100})
+
+    return '', 200
+
 
 
 # Run app
