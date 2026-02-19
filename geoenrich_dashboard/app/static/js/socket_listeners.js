@@ -135,9 +135,9 @@ socket.on("normalization_status", (data) => {
     normalizeBtn.style.background = "#d1d5db";
     fill.style.width = data.progress + "%";
     if (data.subsample) {
-      label.textContent = `Calculating normalization values (${data.progress}%)<br />(Using a random subsample)`;
+      label.innerHTML = `Calculating normalization values... (${data.progress}%)<br />(Using a random subsample)`;
     } else {
-      label.textContent = `Calculating normalization values... (${data.progress}%)`;
+      label.innerHTML = `Calculating normalization values... (${data.progress}%)`;
     }
   }
 

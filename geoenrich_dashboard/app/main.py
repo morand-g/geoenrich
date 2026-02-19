@@ -278,9 +278,9 @@ def normalize_task(self, ds_ref, npy_filepath = None):
         # Save
         np.save(out_path / file.name, final)
 
-        socketio.emit('enrichment_status', {'enrichment_id':  'normalization', 'status': "PROGRESS", 'progress': int((i+1) / len(file_list) * 100)})
+        socketio.emit('normalization_status', {'enrichment_id':  'normalization', 'status': "PROGRESS", 'progress': int((i+1) / len(file_list) * 100)})
 
-    socketio.emit('enrichment_status', {'enrichment_id':  'normalization', 'status': "COMPLETED", 'progress': 100})
+    socketio.emit('normalization_status', {'enrichment_id':  'normalization', 'status': "COMPLETED", 'progress': 100})
     return '', 200
 
 
