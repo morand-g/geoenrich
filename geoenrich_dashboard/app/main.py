@@ -31,6 +31,10 @@ app.config['CELERY_RESULT_BACKEND'] = 'redis://redis:6379/1'
 
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'], backend=app.config['CELERY_RESULT_BACKEND'])
 
+
+app.config['UPLOAD_FOLDER'] = '/app/static/uploads'
+biodiv_path = Path('/home/data/biodiv')
+
 # Directory for enrichment outputs
 OUTPUT_DIR = "data/useroutputs/"  
 
@@ -48,61 +52,112 @@ def push_status(enrichment_id, **kwargs):
 ########################## Section 1 ################################################
 
 
+@app.route("/getPreviousFiles", methods=["GET"])
+def get_previous_files():
+    # List files in the /app/static/uploads folder that correspond to JSON filenames in /home/data
+    previous_files = set()
+    for json_file in os.listdir(biodiv_path):
+        if json_file.endswith('-config.json'):
+            base_name = json_file.split('-')[0]
+            base_name = ''.join([char for char in base_name if not char.isdigit()])
 
-# Process uploaded file
+            csv_file = f"{base_name}.csv"
+            # if Path(app.config['UPLOAD_FOLDER'] / csv_file).exists():
+            previous_files.add(csv_file)
+    return jsonify(list(previous_files))
+
 @app.route("/uploadFile", methods=['POST'])
 def uploadFiles():
-    uploaded_file = request.files['file']
-    if uploaded_file.filename != '':
 
-        # Handle file
+    uploaded_file = request.files.get('file')
+    selected_previous_file = request.form.get('previous_file')
+
+    # CASE 1️⃣: User selected a previous file
+    if selected_previous_file:
+        csv_filepath = os.path.join(app.config['UPLOAD_FOLDER'], selected_previous_file)
+
+        if not os.path.exists(csv_filepath):
+            return "File not found", 400
+
+        app.config['DS_REF'] = selected_previous_file.split('.')[0]
+
+    # CASE 2️⃣: User uploaded a new file
+    elif uploaded_file and uploaded_file.filename != '':
         csv_filepath = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
         uploaded_file.save(csv_filepath)
+
         app.config['DS_REF'] = uploaded_file.filename.split('.')[0]
 
+    else:
+        return "No file selected", 400
 
-        # Create enrichment file if needed
-        if not Path(biodiv_path / uploaded_file.filename).exists():
 
-            # Guess column names
-            lat_col, lon_col, date_col = 'latitude', 'longitude', 'date'
-            colnames = pd.read_csv(csv_filepath, nrows=0).columns.tolist()
-            for col in colnames:
-                if col.lower() in ['latitude', 'y', 'lat', 'decimallatitude']:
-                    lat_col = col
-                elif col.lower() in ['longitude', 'x', 'lon', 'decimallongitude']:
-                    lon_col = col
-                elif col.lower() in ['date', 'eventdate']:
-                    date_col = col
+    # ---------------------------------------------------
+    # From here, both cases use the same csv_filepath
+    # ---------------------------------------------------
 
-            # Try loading uploaded file as occurrences, and if it doesn't work, as areas
-            try:
-                df = import_occurrences_csv(
-                    path=csv_filepath,
-                    id_col='id', date_col=date_col, lat_col=lat_col, lon_col=lon_col
+    if not Path(biodiv_path / os.path.basename(csv_filepath)).exists():
+
+        # Guess column names
+        lat_col, lon_col, date_col = 'latitude', 'longitude', 'date'
+        colnames = pd.read_csv(csv_filepath, nrows=0).columns.tolist()
+
+        for col in colnames:
+            if col.lower() in ['latitude', 'y', 'lat', 'decimallatitude']:
+                lat_col = col
+            elif col.lower() in ['longitude', 'x', 'lon', 'decimallongitude']:
+                lon_col = col
+            elif col.lower() in ['date', 'eventdate']:
+                date_col = col
+
+        try:
+            df = import_occurrences_csv(
+                path=csv_filepath,
+                id_col='id',
+                date_col=date_col,
+                lat_col=lat_col,
+                lon_col=lon_col
+            )
+        except:
+            df = load_areas_file(csv_filepath)
+
+        create_enrichment_file(df, app.config['DS_REF'])
+
+    else:
+        _, enrichment_metadata = load_enrichment_file(app.config['DS_REF'])
+        enrichments = enrichment_metadata['enrichments']
+
+        for enrichment in enrichments:
+            enrichment_id = enrichment['id']
+
+            socketio.start_background_task(
+                target=push_status,
+                enrichment_id=enrichment_id,
+                status='PENDING',
+                varname=enrichment['parameters']['var_id']
+            )
+
+            if enrichment['status'] == 'Enriched':
+                socketio.start_background_task(
+                    target=push_status,
+                    enrichment_id=enrichment_id,
+                    status='COMPLETED',
+                    varname=enrichment['parameters']['var_id']
                 )
-            except:
-                df = load_areas_file(csv_filepath)
-
-            create_enrichment_file(df, app.config['DS_REF'])
-        
-        else:
-
-            _, enrichment_metadata = load_enrichment_file(app.config['DS_REF'])
-            enrichments = enrichment_metadata['enrichments']
-            for enrichment in enrichments:
-                enrichment_id = enrichment['id']
-                socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= 'PENDING',
-                                                   varname= enrichment['parameters']['var_id'])
-                if enrichment['status'] == 'Enriched':
-                    socketio.start_background_task(target=push_status, enrichment_id= enrichment_id, status= 'COMPLETED',
-                                                   varname= enrichment['parameters']['var_id'])
-
 
     return '', 200
 
+@app.route("/getFileContent/<filename>", methods=["GET"])
+def get_file_content(filename):
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
+    if not os.path.exists(filepath):
+        return "File not found", 404
 
+    with open(filepath, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    return content, 200
 ########################## Section 2 ################################################
 
 @app.route("/get_var_catalog")
@@ -311,6 +366,11 @@ def verifyfilenumber(self, ds_ref):
         socketio.emit('collation_status', {'enrichment_id':  'collation', 'status': "COMPLETED", 'progress': 100})
 
     return '', 200
+
+
+
+
+
 
 
 

@@ -24,6 +24,9 @@ let availableVariables = [];
    SECTION 1 – CSV UPLOAD
 ========================= */
 
+
+const previousFileSelect = document.getElementById('previousFileSelect');
+
 uploadBox.addEventListener("click", () => fileInput.click());
 
 uploadBox.addEventListener("dragover", (e) => {
@@ -52,7 +55,41 @@ function handleFile(file) {
   startBtn.disabled = false;
 }
 
-startBtn.addEventListener("click", () => {
+// Fetch and populate the dropdown with previous session files
+async function fetchPreviousFiles() {
+  const response = await fetch('/getPreviousFiles');
+  const files = await response.json();
+  if (files.length > 0) {
+    previousFileSelect.hidden = false;
+    files.forEach(file => {
+      const option = document.createElement('option');
+      option.value = file;
+      option.textContent = file;
+      previousFileSelect.appendChild(option);
+    });
+  }
+}
+
+// Use selected previous file if present
+previousFileSelect.addEventListener('change', () => {
+  if (previousFileSelect.value) {
+    uploadText.textContent = previousFileSelect.value;
+    startBtn.disabled = false;
+  }
+});
+
+
+// Process the selected or uploaded CSV file
+startBtn.addEventListener("click", (e) => {
+
+  // If a previous file is selected, let form submit normally
+  if (previousFileSelect.value) {
+    return;
+  }
+
+  // Otherwise process uploaded file
+  if (!csvFile) return;
+
   const reader = new FileReader();
   reader.onload = () => processCSV(reader.result);
   reader.readAsText(csvFile);
@@ -79,14 +116,35 @@ function processCSV(text) {
   section2.classList.remove("locked");
 }
 
+// Initialize the page by fetching previous files
+fetchPreviousFiles();
+
 document.getElementById('datasetform').addEventListener('submit', async (e) => {
-        e.preventDefault(); // Prevent page reload
-        const response = await fetch('/uploadFile', {
-            method: 'POST',
-            body: new FormData(e.target)
-        });
-        document.getElementById("section1").classList.add("locked");
-    });
+  e.preventDefault(); // Prevent page reload
+
+  const formData = new FormData(e.target);
+
+  // Send to backend
+  await fetch('/uploadFile', {
+    method: 'POST',
+    body: formData
+  });
+
+  // Now handle frontend logic depending on file type
+
+  if (previousFileSelect.value) {
+    // 🔥 Fetch file content from server
+    const response = await fetch(`/getFileContent/${previousFileSelect.value}`);
+    const text = await response.text();
+    processCSV(text);
+  } else if (csvFile) {
+    // 🔥 Use uploaded file
+    const reader = new FileReader();
+    reader.onload = () => processCSV(reader.result);
+    reader.readAsText(csvFile);
+  }
+});
+
 
 /* =========================
    SECTION 2 – VARIABLES
@@ -123,6 +181,25 @@ function renderVariables() {
     const div = document.createElement("div");
     div.className = "variable-item";
     div.textContent = v;
+
+    // Create a delete button (X)
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "X";
+    deleteBtn.className = "delete-btn";
+
+    // Add event listener to delete button
+    deleteBtn.onclick = () => {
+      // Remove the variable from the array
+      selectedVariables.splice(index, 1);
+      // Update the selected variables list
+      selectedVariablesList.value = selectedVariables.join(',');
+      // Re-render the variables
+      renderVariables();
+    };
+
+    // Append the delete button to the div
+    div.appendChild(deleteBtn);
+
     div.draggable = true;
 
     div.ondragstart = () => {

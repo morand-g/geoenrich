@@ -249,3 +249,30 @@ font-size: 14px;
   padding: 8px;
   margin-top: 12px;
 }
+
+.variable-item {
+  position: relative; /* To position the delete button absolutely */
+  padding-right: 30px; /* Make space for the button on the right */
+}
+
+.delete-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px; /* Position it at the far right */
+  transform: translateY(-50%); /* Vertically center the button */
+  width: 24px;
+  height: 24px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%; /* Make it circular */
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.delete-btn:hover {
+  background-color: darkred;
+}
