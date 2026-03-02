@@ -276,3 +276,85 @@ font-size: 14px;
 .delete-btn:hover {
   background-color: darkred;
 }
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.25); /* soft overlay */
+    backdrop-filter: blur(2px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 800px;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    color: #333;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #222;
+}
+
+/* ===== Preview Container ===== */
+
+#csvPreviewContainer {
+    max-height: 350px;
+    overflow: auto;
+    margin: 20px 0;
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+/* ===== Table Styling ===== */
+
+#csvPreviewTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 14px;
+}
+
+#csvPreviewTable th {
+    background: #eeeeee;
+    color: #333;
+    font-weight: 600;
+}
+
+#csvPreviewTable th,
+#csvPreviewTable td {
+    border: 1px solid #dddddd;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+#csvPreviewTable tr:nth-child(even) {
+    background: #fafafa;
+}
+
+#csvPreviewTable tr:hover {
+    background: #f0f0f0;
+}
+
+/* ===== Buttons Area ===== */
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}

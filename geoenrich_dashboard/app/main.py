@@ -1,10 +1,10 @@
 import json
 import os
 import shutil
-
+import io
 import numpy as np
 import pandas as pd
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 from flask_socketio import SocketIO
 from celery import Celery
 from celery.result import AsyncResult
@@ -372,6 +372,36 @@ def verifyfilenumber(self, ds_ref):
 
 
 
+
+#popUp routes
+@app.route("/preview_csv")
+def preview_csv():
+    # Dummy data
+    df = pd.DataFrame({
+        "Variable1": [1, 2, 3],
+        "Variable2": [4, 5, 6],
+        "Variable3": [7, 8, 9]
+    })
+    return jsonify(df.to_dict(orient="records"))
+
+@app.route("/download_csv")
+def download_csv():
+    df = pd.DataFrame({
+        "Variable1": [1, 2, 3],
+        "Variable2": [4, 5, 6],
+        "Variable3": [7, 8, 9]
+    })
+
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False)
+    buffer.seek(0)
+
+    return send_file(
+        io.BytesIO(buffer.getvalue().encode()),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="export.csv"
+    )
 
 
 # Run app

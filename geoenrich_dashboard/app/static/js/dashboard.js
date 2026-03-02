@@ -324,3 +324,60 @@ document.getElementById('normform').addEventListener('submit', async (e) => {
         });
         normalizeBtn.disabled = true;
     });
+
+//modal Js
+const exportBtn = document.getElementById("exportCsvBtn");
+const modal = document.getElementById("csvModal");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const downloadBtn = document.getElementById("downloadCsvBtn");
+const previewTable = document.getElementById("csvPreviewTable");
+
+exportBtn.addEventListener("click", () => {
+    fetch("/preview_csv")
+        .then(response => response.json())
+        .then(data => {
+            generateTable(data);
+            modal.style.display = "flex";
+        });
+});
+
+closeModalBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+});
+
+downloadBtn.addEventListener("click", () => {
+    window.location.href = "/download_csv";
+});
+
+function generateTable(data) {
+    previewTable.innerHTML = "";
+
+    if (!data.length) return;
+
+    const headers = Object.keys(data[0]);
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    previewTable.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    data.forEach(row => {
+        const tr = document.createElement("tr");
+        headers.forEach(header => {
+            const td = document.createElement("td");
+            td.textContent = row[header];
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+
+    previewTable.appendChild(tbody);
+}

@@ -102,6 +102,14 @@
                             </button>
                         </div>
                     </form>
+
+                    <p>Export dataset as CSV.</p>
+                    <div class="sidebysidecontainer">
+                        <button class="inputfillbutton" type="button" id="exportCsvBtn">
+                            <div class="fill"></div>
+                            <span class="label">Export CSV</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -109,6 +117,31 @@
         </div>
 
     </div>
+
+
+    <!-- modal for previewing CSV data -->
+    <div id="csvModal" class="modal">
+        <div class="modal-content">
+            <h3>CSV Preview</h3>
+
+            <div id="csvPreviewContainer">
+                <table id="csvPreviewTable"></table>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="downloadCsvBtn" class="inputfillbutton">
+                    <div class="fill"></div>
+                    <span class="label">Download</span>
+                </button>
+
+                <button id="closeModalBtn" class="inputfillbutton">
+                    <div class="fill"></div>
+                    <span class="label">Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script> 
     <script src="{{ url_for('static', filename='js/socket_listeners.js') }}"></script> 
