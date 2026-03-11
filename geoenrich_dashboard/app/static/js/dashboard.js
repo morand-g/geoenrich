@@ -133,12 +133,12 @@ document.getElementById('datasetform').addEventListener('submit', async (e) => {
   // Now handle frontend logic depending on file type
 
   if (previousFileSelect.value) {
-    // 🔥 Fetch file content from server
+    // Fetch file content from server
     const response = await fetch(`/getFileContent/${previousFileSelect.value}`);
     const text = await response.text();
     processCSV(text);
   } else if (csvFile) {
-    // 🔥 Use uploaded file
+    // Use uploaded file
     const reader = new FileReader();
     reader.onload = () => processCSV(reader.result);
     reader.readAsText(csvFile);
@@ -228,6 +228,9 @@ document.getElementById('varform').addEventListener('submit', async (e) => {
             method: 'POST',
             body: new FormData(e.target)
         });
+        selectedVariables = [];
+        selectedVariablesList.value = '';
+        renderVariables();
     });
 
 /* =========================

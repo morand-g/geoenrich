@@ -158,3 +158,26 @@ socket.on("normalization_status", (data) => {
 });
 
 
+
+socket.on("csvexport_status", (data) => {
+
+  const exportCsvBtn = document.getElementById("exportCsvBtn");
+  const fill = exportCsvBtn.querySelector(".fill");
+  const label = exportCsvBtn.querySelector(".label");
+
+  if (data.status === "PROGRESS") {
+    fill.style.background = "#22c55e";
+    exportCsvBtn.style.background = "#d1d5db";
+    fill.style.width = data.progress + "%";
+    label.textContent = `Processing variables... (${data.progress}%)`;
+  }
+
+  else if (data.status === "COMPLETED") {
+    fill.style.width = "100%";
+    label.textContent = "CSV export complete. Restart?";
+    exportCsvBtn.disabled = false;
+    }
+
+});
+
+

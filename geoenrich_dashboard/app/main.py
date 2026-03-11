@@ -6,13 +6,14 @@ import numpy as np
 import pandas as pd
 from flask import Flask, render_template, request, jsonify, send_file
 from flask_socketio import SocketIO
-from celery import Celery
+from celery import Celery, chord, group
 from celery.result import AsyncResult
 
-from geoenrich.dataloader import import_occurrences_csv, load_areas_file, biodiv_path
-from geoenrich.enrichment import create_enrichment_file, save_enrichment_config, load_enrichment_file, get_enrichment_id, enrich
+from geoenrich.dataloader import import_occurrences_csv, load_areas_file, biodiv_path, sat_path
+from geoenrich.enrichment import create_enrichment_file, save_enrichment_config, load_enrichment_file, get_enrichment_id, enrich, get_metadata
 from geoenrich.satellite import get_var_catalog
-from geoenrich.exports import collate_npy
+from geoenrich.exports import collate_npy, parse_columns, compute_stats
+import netCDF4 as nc
 
 from pathlib import Path
 
@@ -58,12 +59,11 @@ def get_previous_files():
     previous_files = set()
     for json_file in os.listdir(biodiv_path):
         if json_file.endswith('-config.json'):
-            base_name = json_file.split('-')[0]
-            base_name = ''.join([char for char in base_name if not char.isdigit()])
+            base_name = json_file[:-12] # Remove '-config.json' suffix
 
             csv_file = f"{base_name}.csv"
-            # if Path(app.config['UPLOAD_FOLDER'] / csv_file).exists():
             previous_files.add(csv_file)
+
     return jsonify(list(previous_files))
 
 @app.route("/uploadFile", methods=['POST'])
@@ -72,7 +72,7 @@ def uploadFiles():
     uploaded_file = request.files.get('file')
     selected_previous_file = request.form.get('previous_file')
 
-    # CASE 1️⃣: User selected a previous file
+    # CASE 1: User selected a previous file
     if selected_previous_file:
         csv_filepath = os.path.join(app.config['UPLOAD_FOLDER'], selected_previous_file)
 
@@ -81,7 +81,7 @@ def uploadFiles():
 
         app.config['DS_REF'] = selected_previous_file.split('.')[0]
 
-    # CASE 2️⃣: User uploaded a new file
+    # CASE 2: User uploaded a new file
     elif uploaded_file and uploaded_file.filename != '':
         csv_filepath = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
         uploaded_file.save(csv_filepath)
@@ -158,6 +158,8 @@ def get_file_content(filename):
         content = f.read()
 
     return content, 200
+
+
 ########################## Section 2 ################################################
 
 @app.route("/get_var_catalog")
@@ -174,7 +176,9 @@ def add_variables():
 
     dataset_ref = app.config['DS_REF']
 
-    variables = request.form['selectedVariablesList'].split(',')[1:]
+    variables = request.form['selectedVariablesList'].split(',')
+    variables = [v for v in variables if v]  # Remove empty strings
+
     geo_buff = int(request.form['bufferInput'])
     depth_request = request.form['depthMode']
 
@@ -250,11 +254,14 @@ def enrich_wrapper(self, ds_ref, enrichment_id, enrichment_params):
 
     try:
         enrich(ds_ref + str(enrichment_id), var_id, geo_buff, time_buff, depth_request, progress_callback= get_progress_callback(enrichment_id))
+        merge_files(ds_ref, enrichment_id)
     except Exception as e:
         socketio.emit('enrichment_status', {'enrichment_id':  enrichment_id, 'status': "ERROR", 'error': str(e)})
+        Path(biodiv_path / (ds_ref + str(enrichment_id) + '.csv')).unlink()
+        Path(biodiv_path / (ds_ref + str(enrichment_id) + '-config.json')).unlink()
         return '', 500
 
-    merge_files(ds_ref, enrichment_id)
+    
 
     socketio.emit('enrichment_status', {'enrichment_id':  enrichment_id, 'status': "COMPLETED", 'progress': 100})
 
@@ -376,16 +383,55 @@ def verifyfilenumber(self, ds_ref):
 #popUp routes
 @app.route("/preview_csv")
 def preview_csv():
-    # Dummy data
-    df = pd.DataFrame({
-        "Variable1": [1, 2, 3],
-        "Variable2": [4, 5, 6],
-        "Variable3": [7, 8, 9]
-    })
+    # IN PROGRESS
+    
+    df, enrichment_metadata = load_enrichment_file(app.config['DS_REF'])
+
+    workflow = chord(
+        group(export_variable.s(en, df, enrichment_metadata['input_type']) for en in enrichment_metadata['enrichments'])
+    )(on_all_variables_ready.s())
+
+    workflow.get()  # Wait for all tasks to complete and get the result
+
     return jsonify(df.to_dict(orient="records"))
+
+
+# Define your parallel tasks
+@celery.task(bind=True)
+def export_variable(self, enrichment, df, input_type):
+    # IN PROGRESS
+
+    var_ind = parse_columns(df)[enrichment['id']]
+    var_id = enrichment['parameters']['var_id']
+
+    var_source = get_var_catalog()[var_id]
+    ds = nc.Dataset(str(Path(sat_path, var_id + '.nc')))
+    dimdict, var = get_metadata(ds, var_source['varname'])
+
+    print('Computing stats for ' + var_id + '...')
+    res = df.progress_apply(compute_stats, axis=1, args = (enrichment['parameters'], input_type, var_ind, ds, dimdict, var),
+                                    result_type = 'expand')
+    ds.close()
+
+    for c in res.columns:
+        res.rename(columns={c: f"{var_id}_{c}"}, inplace=True)
+
+    return res
+
+
+@celery.task(bind=True)
+def on_all_variables_ready(self, results):
+    # IN PROGRESS
+
+    df = pd.concat(results, axis=1)
+    return df
+
+
 
 @app.route("/download_csv")
 def download_csv():
+    # IN PROGRESS
+    
     df = pd.DataFrame({
         "Variable1": [1, 2, 3],
         "Variable2": [4, 5, 6],

@@ -78,8 +78,17 @@
                 <h2>4. Export / Collate</h2>
                 <p class="muted">Available once all variables are finished.</p>
                 <div class="export-actions">
+
+                    <p>Option 1: export variable summaries as CSV.</p>
+                    <div class="sidebysidecontainer">
+                        <button class="inputfillbutton" type="button" id="exportCsvBtn">
+                            <div class="fill"></div>
+                            <span class="label">Export CSV</span>
+                        </button>
+                    </div>
+
                     <form id="collateForm" method="POST" action="/collateData" enctype='application/x-www-form-urlencoded'>
-                        <p>Collate numpy files with all variables.</p>
+                        <p>Option 2a: collate numpy files with all variables (e.g. for deep learning training).</p>
                         <div class="sidebysidecontainer">
                             <input type="number" id="resInput" name="resInput" placeholder="Target resolution (e.g., 32)"/>
                             <button class="inputfillbutton" type = 'submit' id="collateBtn" disabled>
@@ -89,7 +98,7 @@
                         </div>
                     </form>
 
-                    <p>Normalize the data.</p>
+                    <p>Option 2b: normalize the exported numpy files.</p>
                     <form id="normform" method="POST" action="/normalizeData" enctype="multipart/form-data">
                         <div class="sidebysidecontainer">
                             <div id="uploadBox2" class="upload-box" >
@@ -103,13 +112,7 @@
                         </div>
                     </form>
 
-                    <p>Export dataset as CSV.</p>
-                    <div class="sidebysidecontainer">
-                        <button class="inputfillbutton" type="button" id="exportCsvBtn">
-                            <div class="fill"></div>
-                            <span class="label">Export CSV</span>
-                        </button>
-                    </div>
+                    
                 </div>
             </div>
 
