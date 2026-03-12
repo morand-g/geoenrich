@@ -19,3 +19,5 @@ First open `docker-compose.yaml`, there are some adjustments to make:
 
 
 Then you can run `docker compose up --build` and access the app in your browser by typing `localhost:8081`.
+
+![Illustration of the dashboard interface](../geoenrich/data/geoenrich_dashboard_screenshot.png "Illustration of the dashboard interface")

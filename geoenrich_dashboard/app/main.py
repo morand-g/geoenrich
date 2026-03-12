@@ -223,8 +223,8 @@ def enrich_route(enrichment_id):
 
 
 
-@celery.task(bind=True)
-def enrich_wrapper(self, ds_ref, enrichment_id, enrichment_params):
+@celery.task()
+def enrich_wrapper(ds_ref, enrichment_id, enrichment_params):
 
     # Launch enrichment as a Celery task, so it can run asynchronously and report progress back to the client via SocketIO
 
@@ -281,8 +281,8 @@ def collateData():
     return '', 200
 
 
-@celery.task(bind=True)
-def collate_wrapper(self, ds_ref, target_res):
+@celery.task()
+def collate_wrapper(ds_ref, target_res):
 
     out_path = biodiv_path.parent / 'outputs_raw'
     out_path.mkdir(exist_ok=True, parents=True)
@@ -312,8 +312,8 @@ def normalizeData():
     return '', 200
 
 
-@celery.task(bind=True)
-def normalize_task(self, ds_ref, npy_filepath = None):
+@celery.task()
+def normalize_task(ds_ref, npy_filepath = None):
 
     if npy_filepath:
         meds, perc1, perc99 = np.load(npy_filepath)
@@ -360,8 +360,8 @@ def checkExported():
     return '', 200
 
 
-@celery.task(bind=True)
-def verifyfilenumber(self, ds_ref):
+@celery.task()
+def verifyfilenumber(ds_ref):
 
     out_path = biodiv_path.parent / 'outputs_raw'
     out_path.mkdir(exist_ok=True, parents=True)
@@ -381,25 +381,26 @@ def verifyfilenumber(self, ds_ref):
 
 
 #popUp routes
-@app.route("/preview_csv")
-def preview_csv():
-    # IN PROGRESS
+@app.route("/prepare_csv_export", methods=['GET'])
+def launch_csv_export():
     
-    df, enrichment_metadata = load_enrichment_file(app.config['DS_REF'])
+    socketio.emit('csvexport_status', {'status': "PROGRESS", 'progress': 0})
+
+    _, enrichment_metadata = load_enrichment_file(app.config['DS_REF'])
 
     workflow = chord(
-        group(export_variable.s(en, df, enrichment_metadata['input_type']) for en in enrichment_metadata['enrichments'])
+        group(export_variable.s(app.config['DS_REF'], en) for en in enrichment_metadata['enrichments'])
     )(on_all_variables_ready.s())
 
-    workflow.get()  # Wait for all tasks to complete and get the result
-
-    return jsonify(df.to_dict(orient="records"))
+    return jsonify({"task_id": workflow.id})
 
 
 # Define your parallel tasks
-@celery.task(bind=True)
-def export_variable(self, enrichment, df, input_type):
-    # IN PROGRESS
+@celery.task()
+def export_variable(ds_ref, enrichment):
+
+    df, enrichment_metadata = load_enrichment_file(ds_ref)
+    input_type = enrichment_metadata['input_type']
 
     var_ind = parse_columns(df)[enrichment['id']]
     var_id = enrichment['parameters']['var_id']
@@ -413,41 +414,53 @@ def export_variable(self, enrichment, df, input_type):
                                     result_type = 'expand')
     ds.close()
 
-    for c in res.columns:
-        res.rename(columns={c: f"{var_id}_{c}"}, inplace=True)
+    socketio.emit('csvexport_status', {'status': "PROGRESS", 'progress': np.floor(1 / len(enrichment_metadata['enrichments']) * 100)})
 
-    return res
-
-
-@celery.task(bind=True)
-def on_all_variables_ready(self, results):
-    # IN PROGRESS
-
-    df = pd.concat(results, axis=1)
-    return df
+    return ds_ref, res.to_json()
 
 
+@celery.task()
+def on_all_variables_ready(results):
 
-@app.route("/download_csv")
-def download_csv():
-    # IN PROGRESS
+    compiled_result = pd.concat([pd.read_json(r[1]) for r in results], axis=1)
+    socketio.emit('csvexport_status', {'status': "COMPLETED"})
+
+    return results[0][0], compiled_result.to_json()
+
+
+@app.route("/get_csv_export/<task_id>", methods=['GET'])
+def download_csv(task_id):
+
+    result = celery.AsyncResult(task_id)
+    if result.ready():
+        ds_ref, df_json = result.get()
+        df = pd.read_json(df_json)
+
+        buffer = io.StringIO()
+        df.to_csv(buffer)
+        buffer.seek(0)
+
+        return send_file(
+            io.BytesIO(buffer.getvalue().encode()),
+            mimetype="text/csv",
+            as_attachment=True,
+            download_name=f"{ds_ref}_export.csv"
+        )
     
-    df = pd.DataFrame({
-        "Variable1": [1, 2, 3],
-        "Variable2": [4, 5, 6],
-        "Variable3": [7, 8, 9]
-    })
+    return jsonify({"status": result.status}), 202
 
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False)
-    buffer.seek(0)
 
-    return send_file(
-        io.BytesIO(buffer.getvalue().encode()),
-        mimetype="text/csv",
-        as_attachment=True,
-        download_name="export.csv"
-    )
+@app.route("/get_csv_export_preview/<task_id>", methods=['GET'])
+def preview_csv(task_id):
+
+    result = celery.AsyncResult(task_id)
+    if result.ready():
+        _, df_json = result.get()
+        df = pd.read_json(df_json)
+        return jsonify(df.head(10).to_dict(orient="records"))
+    return jsonify({"status": result.status}), 202
+
+
 
 
 # Run app

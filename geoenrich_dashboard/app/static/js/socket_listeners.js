@@ -166,16 +166,25 @@ socket.on("csvexport_status", (data) => {
   const label = exportCsvBtn.querySelector(".label");
 
   if (data.status === "PROGRESS") {
+    exportCsvBtn.disabled = true;
     fill.style.background = "#22c55e";
     exportCsvBtn.style.background = "#d1d5db";
-    fill.style.width = data.progress + "%";
-    label.textContent = `Processing variables... (${data.progress}%)`;
+    fill.style.width = parseInt(fill.style.width) + parseInt(data.progress) + "%";
+    label.textContent = `Processing variables... (${fill.style.width })`;
   }
 
   else if (data.status === "COMPLETED") {
     fill.style.width = "100%";
     label.textContent = "CSV export complete. Restart?";
     exportCsvBtn.disabled = false;
+    
+    fetch("/get_csv_export_preview/<task_id>".replace("<task_id>", csvexportTaskId))
+        .then(response => response.json())
+        .then(data => {
+            generateTable(data);
+            modal.style.display = "flex";
+        });
+
     }
 
 });

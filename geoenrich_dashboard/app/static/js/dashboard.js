@@ -334,13 +334,13 @@ const modal = document.getElementById("csvModal");
 const closeModalBtn = document.getElementById("closeModalBtn");
 const downloadBtn = document.getElementById("downloadCsvBtn");
 const previewTable = document.getElementById("csvPreviewTable");
+let csvexportTaskId = null;
 
 exportBtn.addEventListener("click", () => {
-    fetch("/preview_csv")
+    fetch("/prepare_csv_export")
         .then(response => response.json())
         .then(data => {
-            generateTable(data);
-            modal.style.display = "flex";
+            csvexportTaskId = data.task_id;
         });
 });
 
@@ -349,7 +349,7 @@ closeModalBtn.addEventListener("click", () => {
 });
 
 downloadBtn.addEventListener("click", () => {
-    window.location.href = "/download_csv";
+    window.location.href = "/get_csv_export/<task_id>".replace("<task_id>", csvexportTaskId);
 });
 
 function generateTable(data) {

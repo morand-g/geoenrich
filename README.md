@@ -27,7 +27,7 @@ The package provides functions to retrieve occurrence data directly from GBIF, o
 
 Documentation on [Read the Docs](https://geoenrich.readthedocs.io).
 
-![Illustration of an occurrence dataset enriched with bathymetry data](https://github.com/morand-g/geoenrich/blob/main/geoenrich/data/readme_illus_1.png?raw=true "Illustration of an occurrence dataset enriched with bathymetry data")
+![Illustration of an occurrence dataset enriched with bathymetry data](geoenrich/data/readme_illus_1.png "Illustration of an occurrence dataset enriched with bathymetry data")
 
 # Acknowledgment
 This project is being developed as part of the G2OI project, cofinanced by the European union, the Reunion region, and the French Republic.
