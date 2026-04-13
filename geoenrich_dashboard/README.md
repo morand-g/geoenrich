@@ -1,12 +1,12 @@
 # Geoenrich Dashboard
 
 The **Geoenrich Dashboard** web app may be useful to you if you want to download many variables on a large data set, as a way to track your progress.
-This subfolder contains all needed files to run it in a web browser.
+These instructions will help you launch the docker container containing GeoEnrich ant its dashboard web interface.
 
 ## Prerequisites
 
 - [Git](https://github.com/git-guides/install-git)
-- [Docker](https://docs.docker.com/engine/install/)
+- [Docker Engine](https://docs.docker.com/engine/install/)
 - if you plan to use Copernicus data, [Python](https://www.python.org/downloads/).
 
 ## Installation
