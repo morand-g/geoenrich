@@ -5,7 +5,7 @@ This subfolder contains all needed files to run it in a web browser.
 
 ## Instructions
 
-Prerequisites: ![Git](https://github.com/git-guides/install-git), ![Docker](https://docs.docker.com/engine/install/), and if you plan to use Copernicus data, [Python](https://www.python.org/downloads/).
+Prerequisites: [Git](https://github.com/git-guides/install-git), [Docker](https://docs.docker.com/engine/install/), and if you plan to use Copernicus data, [Python](https://www.python.org/downloads/).
 
 First clone the github repository:
 ```
@@ -25,4 +25,4 @@ Then you can edit `docker-compose.yaml` to customize your settings:
 
 Finally you can run `docker compose up --build` and access the app in your browser by typing `localhost:8081`.
 
-![Illustration of the dashboard interface](../geoenrich/data/geoenrich_dashboard_screenshot.png "Illustration of the dashboard interface")
+![Illustration of the dashboard interface](https://github.com/morand-g/geoenrich/blob/main/geoenrich/data/geoenrich_dashboard_screenshot.png?raw=True "Illustration of the dashboard interface")
