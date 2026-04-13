@@ -5,8 +5,9 @@ This subfolder contains all needed files to run it in a web browser.
 
 ## Instructions
 
-First clone the github repository:
+Prerequisites: `Git <https://github.com/git-guides/install-git>`_, `Docker <https://docs.docker.com/engine/install/>`_, and if you plan to use Copernicus data, `Python <https://www.python.org/downloads/>`_.
 
+First clone the github repository:
 ```
 git clone https://github.com/morand-g/geoenrich
 cd geoenrich/geoenrich_dashboard

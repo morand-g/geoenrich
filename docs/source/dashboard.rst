@@ -1,0 +1,1 @@
+.. mdinclude:: ../../geoenrich_dashboard/README.md
