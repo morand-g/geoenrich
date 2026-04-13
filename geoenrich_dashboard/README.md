@@ -9,7 +9,7 @@ First clone the github repository:
 
 ```
 git clone https://github.com/morand-g/geoenrich
-cd geoenrich_dashboard
+cd geoenrich/geoenrich_dashboard
 ```
 
 Then you can edit `docker-compose.yaml` to customize your settings:
