@@ -19,13 +19,13 @@ cd geoenrich/geoenrich_dashboard
 
 Then you can edit `docker-compose.yaml` to customize your settings:
 - In lines 9 and 31, you can change where geoenrich data is stored on you computer. The default is `~/geoenrich_dashboard_data`. 
-- If you want to use local netcdf data sets, uncomment line 32 and update the path to your files.
+- If you want to use local netcdf data sets, uncomment line 32 and update the path to your files. In this case you need to read the *Adding other data sources* section from the *Installation instructions*. You can save the `personal_catalog.csv` file directly to the geoenrich data location chosen in the previous bullet point.
 
 Finally you can run `docker compose up --build` and access the app in your browser by typing `localhost:8081`.
 
 ## Available variables
 
-For tests, you can use the *bathymetry* variable as it does not require any authentification. If you want to use Copernicus or FSLE data, you need to follow login instructions as explained on the [variables page](https://geoenrich.readthedocs.io/en/latest/variables.html), and then copy either the `~/.netrc` file or the `~/.copernicusmarine/.copernicusmarine-credentials` file to the folder chosen just before (mentioned in lines 9 and 31 of the *docker_compose.yaml* file). 
+For tests, you can use the *bathymetry* variable as it does not require any authentification. If you want to use Copernicus or FSLE data, you need to follow login instructions as explained on the [variables page](https://geoenrich.readthedocs.io/en/latest/variables.html), and then copy either the `~/.netrc` file or the `~/.copernicusmarine/.copernicusmarine-credentials` file to the geoenrich data location chosen previously. 
 
 
 ![Illustration of the dashboard interface](https://github.com/morand-g/geoenrich/blob/main/geoenrich/data/geoenrich_dashboard_screenshot.png?raw=True "Illustration of the dashboard interface")
