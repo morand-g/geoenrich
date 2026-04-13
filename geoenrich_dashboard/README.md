@@ -5,7 +5,7 @@ This subfolder contains all needed files to run it in a web browser.
 
 ## Instructions
 
-Prerequisites: `Git <https://github.com/git-guides/install-git>`_, `Docker <https://docs.docker.com/engine/install/>`_, and if you plan to use Copernicus data, `Python <https://www.python.org/downloads/>`_.
+Prerequisites: ![Git](https://github.com/git-guides/install-git), ![Docker](<https://docs.docker.com/engine/install/), and if you plan to use Copernicus data, [Python](https://www.python.org/downloads/).
 
 First clone the github repository:
 ```
@@ -19,7 +19,7 @@ Then you can edit `docker-compose.yaml` to customize your settings:
 
 
 .. note::
-  For tests, you can use the *bathymetry* variable as it does not require any authentification. If you want to use Copernicus or FSLE data, you need to follow login instructions as explained on the `variables page <https://geoenrich.readthedocs.io/en/latest/variables.html>`_, and then copy either the `~/.netrc` file or the `~/.copernicusmarine/.copernicusmarine-credentials` file to the folder chosen just before (mentioned in lines 9 and 31 of the *docker_compose.yaml* file). 
+  For tests, you can use the *bathymetry* variable as it does not require any authentification. If you want to use Copernicus or FSLE data, you need to follow login instructions as explained on the [variables page](https://geoenrich.readthedocs.io/en/latest/variables.html), and then copy either the `~/.netrc` file or the `~/.copernicusmarine/.copernicusmarine-credentials` file to the folder chosen just before (mentioned in lines 9 and 31 of the *docker_compose.yaml* file). 
 
 
 
