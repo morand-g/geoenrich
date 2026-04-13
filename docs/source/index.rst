@@ -1,4 +1,4 @@
-geoenrich 0.6.8 documentation
+geoenrich 1.0 documentation
 ==============================
 
 |Read the Docs| |License| |PyPI| |Python versions| |Last commit| |DOI|
@@ -44,7 +44,7 @@ As this package is distributed under a GPLv3 license, you have no obligation to 
 
 .. epigraph::
 
-   Gaetan Morand. (2025). GeoEnrich v0.X: a new tool for scientists to painlessly enrich species occurrence data with environmental variables (v0.X). Zenodo. DOI:10.5281/zenodo.6458090
+   Gaetan Morand. (2026). GeoEnrich v1.X: a new tool for scientists to painlessly enrich species occurrence data with environmental variables (v1.X). Zenodo. DOI:10.5281/zenodo.6458090
 
 You can find the specific DOI for the version you are using on the `package's Zenodo page <http://doi.org/10.5281/zenodo.6458090>`_.
 
@@ -67,6 +67,7 @@ You can find the specific DOI for the version you are using on the `package's Ze
 .. toctree::
    :caption: Online version
 
+   dashboard
    online
 
 Modules

@@ -10,21 +10,14 @@ from pathlib import Path
 import json
 import pandas as pd
 import cv2
-import random
 from matplotlib import cm
 
 import rasterio
 from rasterio.transform import from_origin
 
-import geoenrich
-
-try:
-    from geoenrich.credentials import *
-except:
-    from geoenrich.credentials_example import *
-
 from geoenrich.enrichment import *
 from geoenrich.satellite import *
+from geoenrich.dataloader import biodiv_path, sat_path
 
 
 def retrieve_data(dataset_ref, occ_id, var_id, geo_buff = None, time_buff = None, depth_request = None,
@@ -92,7 +85,7 @@ def retrieve_data(dataset_ref, occ_id, var_id, geo_buff = None, time_buff = None
             var_source = get_var_catalog()[var_id]
 
         if -1 in [row.iloc[d['min']] for d in var_ind.values()]:
-            results = {'coords': None, 'values': None}
+            return {'coords': None, 'values': None}
 
         else:
 
@@ -120,9 +113,9 @@ def retrieve_data(dataset_ref, occ_id, var_id, geo_buff = None, time_buff = None
             if shape == 'buffer' and input_type == 'occurrence':
                 geo_buff = en['parameters']['geo_buff']
                 mask = ellipsoid_mask(data, coords, row['geometry'], geo_buff)
-                return({'coords': coords, 'values': np.ma.masked_where(mask, data), 'unit': unit})
+                return {'coords': coords, 'values': np.ma.masked_where(mask, data), 'unit': unit}
             else:
-                return({'coords': coords, 'values': data, 'unit': unit})
+                return {'coords': coords, 'values': data, 'unit': unit}
 
 
 def fetch_data(row, var_id, var_indices, ds, dimdict, var, downsample, indices = None):
@@ -299,9 +292,6 @@ def compute_stats(row, en_params, input_type, var_indices, ds, dimdict, var):
 
     data, coords = fetch_data(row, var_id, var_indices, ds, dimdict, var, downsample)
 
-    params = [dimdict[n]['standard_name'] for n in var['params']]
-    ordered_indices_cols = [var_indices[p] for p in params]
-
     if input_type == 'occurrences':
 
         # If data was calulated around an occurrence
@@ -309,6 +299,7 @@ def compute_stats(row, en_params, input_type, var_indices, ds, dimdict, var):
         mask = ellipsoid_mask(data, coords, row['geometry'], geo_buff)
         data = np.ma.masked_where(mask, data)
 
+    data = np.ma.masked_invalid(data)
     av, std = np.ma.average(data), np.ma.std(data)
     minv, maxv, count = np.ma.min(data), np.ma.max(data), np.ma.count(data)
     names = [var_id + '_av', var_id + '_std', var_id + '_min', var_id + '_max', var_id + '_count']
@@ -374,7 +365,7 @@ def get_derivative(dataset_ref, occ_id, var_id, days = (0,0), geo_buff = None, d
     ind2 = calculate_indices(dimdict, row2.iloc[0], var, depth_request, downsample)
 
     data1, coords1 = fetch_data(None, var_id, None, ds, dimdict, var, downsample, ind1)
-    data2, coords2 = fetch_data(None, var_id, None, ds, dimdict, var, downsample, ind2)
+    data2, _ = fetch_data(None, var_id, None, ds, dimdict, var, downsample, ind2)
     ds.close()
 
     data = (data2 - data1) / (days[1] - days[0])
@@ -667,7 +658,7 @@ def export_raster(dataset_ref, occ_id, var_id, path = Path('./'), geo_buff = Non
             print('Abort. Array is smaller than 2x2 pixels.')
 
 
-def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {'example-var': 2}, duplicates = {}):
+def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {'example-var': 2}, duplicates = {}, progress_callback = None):
 
     """
     Export a 3D numpy array with all layers for each occurrence of a dataset.
@@ -680,7 +671,7 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
         slice (list[int]): if not None, only process the given slice of the dataset.
         dimension3 (dict): provides the expected 3rd dimension length (time dimension * depth dimension) for each variable where it is larger than 1.
         duplicates (dict): dictionnary of variables which should be merged, e.g. {'var_to_remove':'var_to_keep'}. If var_to_keep is empty, data from var_to_remove are used instead.
-
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
 
     Returns:
         None
@@ -693,7 +684,6 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
 
     df, enrichment_metadata = load_enrichment_file(ds_ref, mute=True)
     enrichments = enrichment_metadata['enrichments']
-    input_type = enrichment_metadata['input_type']
     serial_dict = {}
 
 
@@ -723,8 +713,13 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
     # Export np arrays for each occurrence
 
     var_list = [en['parameters']['var_id'] for en in enrichments]
+    buff_dict = {en['parameters']['var_id']: en['parameters']['geo_buff'] for en in enrichments}
+
     for v in duplicates.keys():
         var_list.remove(v)
+
+    if progress_callback:
+        tqdm = progress_callback
 
     for occ_id in tqdm(ids):
         all_bands = {}
@@ -767,7 +762,7 @@ def collate_npy(ds_ref, data_path, output_res = 32, slice = None, dimension3 = {
 
     with open(folderpath / '0000_npy_metadata.txt', 'w') as f:
         for line in var_list:
-            f.write(f"{line}\n")
+            f.write(f"{line}: {buff_dict[line]}km\n")
 
 
 

@@ -1,0 +1,360 @@
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: #f1f3f5;
+}
+
+
+h1 {
+padding: 20px;
+margin: 0;
+}
+
+
+.dashboard {
+display: grid;
+grid-template-columns: 350px 1fr;
+gap: 20px;
+padding: 20px;
+height: calc(100vh - 80px);
+}
+
+
+.left {
+display: flex;
+flex-direction: column;
+gap: 20px;
+}
+
+
+.section {
+background: #d1d5db;
+border-radius: 12px;
+padding: 16px;
+}
+
+
+.section.locked {
+opacity: 0.5;
+pointer-events: none;
+}
+
+
+.section h2 {
+margin-top: 0;
+font-size: 18px;
+}
+
+
+.upload-box {
+border: 2px dashed #9ca3af;
+background: #e5e7eb;
+border-radius: 10px;
+padding: 30px;
+text-align: center;
+cursor: pointer;
+}
+
+
+.upload-box.dragover {
+background: #f3f4f6;
+border-color: #6b7280;
+}
+
+
+.inputbutton {
+      margin-top: 12px;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #111827;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+.inputbutton:disabled {
+      background: #6b7280;
+      cursor: not-allowed;
+    }
+
+
+.stats {
+      margin-top: 12px;
+      background: #f9fafb;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+/* section2 */
+
+
+
+.hidden { display: none; }
+
+
+label {
+display: block;
+margin-top: 10px;
+font-size: 14px;
+}
+
+
+select {
+width: 100%;
+padding: 8px;
+margin-top: 4px;
+border-radius: 6px;
+border: 1px solid #9ca3af;
+}
+
+input {
+width: 95%;
+padding: 8px;
+margin-top: 4px;
+border-radius: 6px;
+border: 1px solid #9ca3af;
+}
+
+.variable-list {
+margin-top: 10px;
+}
+
+
+.variable-item {
+background: #f9fafb;
+padding: 8px;
+border-radius: 6px;
+margin-bottom: 6px;
+cursor: grab;
+}
+
+
+.variable-item.dragging {
+opacity: 0.5;
+}
+
+
+
+.progress-container {
+margin-top: 10px;
+}
+
+
+.progress-row {
+background: #e5e7eb;
+border-radius: 8px;
+padding: 8px;
+margin-bottom: 10px;
+}
+
+
+.progress-label {
+display: flex;
+justify-content: space-between;
+font-size: 14px;
+margin-bottom: 6px;
+width: 100%;
+}
+
+
+.progress-bar {
+width: 100%;
+height: 10px;
+background: #d1d5db;
+border-radius: 999px;
+overflow: hidden;
+flex-grow: 1;
+}
+
+.barcontainer {
+width: 80%;
+display: flex;
+}
+
+
+.progress-fill {
+height: 100%;
+width: 0%;
+background: #111827;
+transition: width 0.2s linear;
+}
+
+.muted {
+color: #6b7280;
+font-size: 14px;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+
+.inputfillbutton {
+  position: relative;
+  overflow: hidden;
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.inputfillbutton .label {
+  position: relative;
+  z-index: 2;
+}
+
+.inputfillbutton .fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: #22c55e;
+  transition: width 0.2s linear;
+  z-index: 1;
+}
+
+.inputfillbutton:disabled {
+      cursor: not-allowed;
+    }
+
+.sidebysidecontainer {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.sidebysidecontainer input {
+  flex: 1;
+  margin-top: 12px;
+}
+
+.sidebysidecontainer button {
+  flex: 4;
+}
+
+.sidebysidecontainer #uploadBox2 {
+  flex: 1;
+  padding: 8px;
+  margin-top: 12px;
+}
+
+.variable-item {
+  position: relative; /* To position the delete button absolutely */
+  padding-right: 30px; /* Make space for the button on the right */
+}
+
+.delete-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px; /* Position it at the far right */
+  transform: translateY(-50%); /* Vertically center the button */
+  width: 24px;
+  height: 24px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%; /* Make it circular */
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.delete-btn:hover {
+  background-color: darkred;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.25); /* soft overlay */
+    backdrop-filter: blur(2px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 800px;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    color: #333;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #222;
+}
+
+/* ===== Preview Container ===== */
+
+#csvPreviewContainer {
+    max-height: 350px;
+    overflow: auto;
+    margin: 20px 0;
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+/* ===== Table Styling ===== */
+
+#csvPreviewTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 14px;
+}
+
+#csvPreviewTable th {
+    background: #eeeeee;
+    color: #333;
+    font-weight: 600;
+}
+
+#csvPreviewTable th,
+#csvPreviewTable td {
+    border: 1px solid #dddddd;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+#csvPreviewTable tr:nth-child(even) {
+    background: #fafafa;
+}
+
+#csvPreviewTable tr:hover {
+    background: #f0f0f0;
+}
+
+/* ===== Buttons Area ===== */
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
