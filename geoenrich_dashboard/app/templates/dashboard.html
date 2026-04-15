@@ -39,7 +39,13 @@
           <div id="section2" class="section locked">
             <h2>2. Add variables</h2>
             <form id="varform" method="POST" action="/addVariables" enctype='application/x-www-form-urlencoded'>
-                <label>Variables</label>
+                <div style="display: flex; align-items: center; gap: 64%;">
+                    <label>Variables</label>
+                   
+                    <a href="https://geoenrich.readthedocs.io/en/latest/variables.html" target="_blank" style="text-decoration: none;margin-top: 10px;">Catalog</a>
+
+                </div>
+                
                 <select id="variableSelect">
                     <option value="">Loading variables...</option>
                 </select>

@@ -189,11 +189,17 @@ function renderVariables() {
 
     // Add event listener to delete button
     deleteBtn.onclick = () => {
-      // Remove the variable from the array
-      selectedVariables.splice(index, 1);
-      // Update the selected variables list
+      const removed = selectedVariables.splice(index, 1)[0];
+
+      // Add it back to available variables
+      availableVariables.push(removed);
+
+      // Optional: keep list sorted
+      availableVariables.sort();
+
       selectedVariablesList.value = selectedVariables.join(',');
-      // Re-render the variables
+
+      renderVariableSelect(); // 🔥 important
       renderVariables();
     };
 
