@@ -79,6 +79,38 @@ previousFileSelect.addEventListener('change', () => {
 });
 
 
+
+function processCSV(text) {
+  const rows = text.trim().split("\n").map(r => r.split(","));
+  const headers = rows[0].map(h => h.trim().toLowerCase());
+  const data = rows.slice(1);
+
+  const dateColIndex = headers.findIndex(h => h.includes("date"));
+  //STOP if invalid
+  if (!validateCSVHeaders(headers)) {
+    showFormatModal();
+
+    //KEEP section 2 locked
+    section2.classList.add("locked");
+
+    return; 
+  }
+
+  let html = `<strong>Rows:</strong> ${data.length}<br>`;
+
+  if (dateColIndex !== -1) {
+    const dates = data.map(r => r[dateColIndex]).filter(Boolean).sort();
+    html += `<strong>Date range:</strong> ${dates[0]} → ${dates[dates.length - 1]}`;
+  } else {
+    html += "No date column found";
+  }
+
+  statsDiv.style.display = "block";
+  statsDiv.innerHTML = html;
+  section2.classList.remove("locked");
+}
+
+
 // Process the selected or uploaded CSV file
 startBtn.addEventListener("click", (e) => {
 
@@ -94,27 +126,6 @@ startBtn.addEventListener("click", (e) => {
   reader.onload = () => processCSV(reader.result);
   reader.readAsText(csvFile);
 });
-
-function processCSV(text) {
-  const rows = text.trim().split("\n").map(r => r.split(","));
-  const headers = rows[0].map(h => h.trim().toLowerCase());
-  const data = rows.slice(1);
-
-  const dateColIndex = headers.findIndex(h => h.includes("date"));
-
-  let html = `<strong>Rows:</strong> ${data.length}<br>`;
-
-  if (dateColIndex !== -1) {
-    const dates = data.map(r => r[dateColIndex]).filter(Boolean).sort();
-    html += `<strong>Date range:</strong> ${dates[0]} → ${dates[dates.length - 1]}`;
-  } else {
-    html += "No date column found";
-  }
-
-  statsDiv.style.display = "block";
-  statsDiv.innerHTML = html;
-  section2.classList.remove("locked");
-}
 
 // Initialize the page by fetching previous files
 fetchPreviousFiles();
@@ -390,3 +401,79 @@ function generateTable(data) {
 
     previewTable.appendChild(tbody);
 }
+
+
+//popup//
+function validateCSVHeaders(cols) {
+  const hasId = cols.includes("id");
+
+  const latOptions = ["latitude", "lat", "decimallatitude", "y"];
+  const lonOptions = ["longitude", "lon", "decimallongitude", "x"];
+  const dateOptions = ["date", "eventdate"];
+
+  const hasLat = latOptions.some(opt => cols.includes(opt));
+  const hasLon = lonOptions.some(opt => cols.includes(opt));
+  const hasDate = dateOptions.some(opt => cols.includes(opt));
+
+  const case1Valid = hasId && hasLat && hasLon && hasDate;
+
+  const case2Required = [
+    "id",
+    "latitude_min",
+    "latitude_max",
+    "longitude_min",
+    "longitude_max",
+    "date_min",
+    "date_max"
+  ];
+
+  const case2Valid = case2Required.every(req => cols.includes(req));
+
+  return case1Valid || case2Valid;
+}
+
+document.getElementById("fileInput").addEventListener("change", function () {
+    const file = this.files[0];
+    document.getElementById("startBtn").disabled = !file;
+});
+
+document.getElementById("datasetform").addEventListener("submit", function (e) {
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+
+    if (!file) return; // let browser handle it
+
+    e.preventDefault(); // 🚫 stop form submission
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+        const text = event.target.result;
+        const firstLine = text.split("\n")[0];
+
+        const delimiter = firstLine.includes(";") ? ";" : ",";
+        const headers = firstLine.split(delimiter).map(h => h.trim().toLowerCase());
+
+        const result = validateCSVHeaders(headers);
+
+        if (!result.valid) {
+            showFormatModal();
+        } else {
+            // ✅ valid → submit for real
+            e.target.submit();
+        }
+    };
+
+    reader.readAsText(file);
+});
+
+
+
+
+function showFormatModal() {
+  document.getElementById("formatErrorModal").style.display = "flex";
+}
+
+document.getElementById("closeFormatErrorModal").addEventListener("click", () => {
+  document.getElementById("formatErrorModal").style.display = "none";
+});
