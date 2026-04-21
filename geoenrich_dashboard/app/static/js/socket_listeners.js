@@ -1,4 +1,29 @@
+const style = document.createElement("style");
+style.textContent = `
+.progress-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
+.top-row {
+  display: flex;
+  align-items: center;
+}
+
+.progress-label {
+  flex: 1;
+}
+
+.remove-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 16px;
+}
+`;
+document.head.appendChild(style);
 
 socket.on("enrichment_status", (data) => {
 
@@ -14,6 +39,15 @@ socket.on("enrichment_status", (data) => {
     label.className = "progress-label";
     label.innerHTML = `<span>${data.varname}</span>`;
 
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "✕";
+    removeBtn.className = "remove-btn";
+    removeBtn.type = "button";
+
+    removeBtn.onclick = () => {
+      row.remove();
+      unlockSection4IfReady();
+    };
 
     const button = document.createElement("button");
     button.className = "inputfillbutton";
@@ -40,8 +74,16 @@ socket.on("enrichment_status", (data) => {
     button.appendChild(fill);
     button.appendChild(buttonlabel);
     
-    row.appendChild(label);
+    //testing
+    const topRow = document.createElement("div");
+    topRow.className = "top-row";
+    topRow.appendChild(label);
+    topRow.appendChild(removeBtn);
+    //test end
+    // row.appendChild(label);
+    row.appendChild(topRow);//test included
     row.appendChild(button);
+    // row.appendChild(removeBtn);
     progressContainer.appendChild(row);
 
     unlockSection4IfReady();
