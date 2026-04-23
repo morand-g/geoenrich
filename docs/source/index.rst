@@ -65,7 +65,7 @@ You can find the specific DOI for the version you are using on the `package's Ze
 
 
 .. toctree::
-   :caption: Online version
+   :caption: Graphic interface
 
    dashboard
    online

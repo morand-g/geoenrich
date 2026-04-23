@@ -1,6 +1,7 @@
 nbsphinx
 sphinx_copybutton
 sphinx_rtd_theme
+sphinx-mdinclude
 numpy
 pandas
 geopandas
