@@ -101,3 +101,39 @@ def normalization_values(ds_ref):
     np.save(biodiv_path.parent / f"{ds_ref}-stats.npy", to_save)
 
     return meds, perc1, perc99
+
+
+
+
+def delete_enrichment(dataset_ref, en_id):
+
+    df, enrichment_metadata = load_enrichment_file(dataset_ref)
+
+    enrichments = enrichment_metadata['enrichments']
+
+    remaining_enrichments = []
+    to_drop = []
+
+    for enrichment in enrichments:
+        if enrichment['id'] == en_id:
+
+            prefix = str(enrichment['id']) + '_'
+            for col in df.columns:
+                if col[:len(prefix)] == prefix:
+                    to_drop.append(col)
+        else:
+            remaining_enrichments.append(enrichment)
+
+
+    to_save = df.drop(columns = to_drop)
+    
+    filepath = Path(biodiv_path, dataset_ref + '.csv')
+
+    to_save.to_csv(filepath)
+
+    enrichment_metadata['enrichments'] = remaining_enrichments
+
+    with Path(biodiv_path, dataset_ref + '-config.json').open('w') as f:
+        json.dump(enrichment_metadata, f, ensure_ascii=False, indent=4)
+
+    print(f'Enrichment {en_id} for dataset {dataset_ref} was removed.')

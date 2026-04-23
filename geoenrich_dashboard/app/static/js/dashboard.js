@@ -1,3 +1,4 @@
+const section1 = document.getElementById("section1");
 const uploadBox = document.getElementById("uploadBox");
 const uploadBox2 = document.getElementById("uploadBox2");
 const uploadText = document.getElementById("uploadText");
@@ -81,6 +82,9 @@ previousFileSelect.addEventListener('change', () => {
 });
 
 
+// Initialize the page by fetching previous files
+fetchPreviousFiles();
+
 
 function processCSV(text) {
   const rows = text.trim().split("\n").map(r => r.split(","));
@@ -88,15 +92,6 @@ function processCSV(text) {
   const data = rows.slice(1);
 
   const dateColIndex = headers.findIndex(h => h.includes("date"));
-  //STOP if invalid
-  if (!validateCSVHeaders(headers)) {
-    showFormatModal();
-
-    //KEEP section 2 locked
-    section2.classList.add("locked");
-
-    return; 
-  }
 
   let html = `<strong>Rows:</strong> ${data.length}<br>`;
 
@@ -109,69 +104,42 @@ function processCSV(text) {
 
   statsDiv.style.display = "block";
   statsDiv.innerHTML = html;
-  section2.classList.remove("locked");
 }
 
-
-// Process the selected or uploaded CSV file
-startBtn.addEventListener("click", (e) => {
-
-  // If a previous file is selected, let form submit normally
-  if (previousFileSelect.value) {
-    return;
-  }
-
-  // Otherwise process uploaded file
-  if (!csvFile) return;
-
-  const reader = new FileReader();
-  reader.onload = () => processCSV(reader.result);
-  reader.readAsText(csvFile);
-});
-
-// Initialize the page by fetching previous files
-fetchPreviousFiles();
 
 datasetForm.addEventListener("submit", async (e) => {
     e.preventDefault(); // Prevent page reload
 
     let fileText = "";
 
-    if (previousFileSelect.value) {
-        // Load CSV content from server for previous file
-        const response = await fetch(`/getFileContent/${previousFileSelect.value}`);
-        fileText = await response.text();
-    } else if (fileInput.files[0]) {
-        // Read uploaded file
+    if (!previousFileSelect.value) {
+
         const reader = new FileReader();
         fileText = await new Promise((resolve, reject) => {
             reader.onload = () => resolve(reader.result);
             reader.onerror = reject;
             reader.readAsText(fileInput.files[0]);
         });
-    } else {
-        return; // Nothing selected
+
+        // Validate headers
+        const firstLine = fileText.split("\n")[0];
+        const delimiter = firstLine.includes(";") ? ";" : ",";
+        const headers = firstLine.split(delimiter).map(h => h.trim().toLowerCase());
+
+        if (!validateCSVHeaders(headers)) {
+            showFormatModal();
+            return;
+        }
+
+        processCSV(fileText);
+    
     }
 
-    // Validate headers
-    const firstLine = fileText.split("\n")[0];
-    const delimiter = firstLine.includes(";") ? ";" : ",";
-    const headers = firstLine.split(delimiter).map(h => h.trim().toLowerCase());
-
-    if (!validateCSVHeaders(headers)) {
-        showFormatModal();
-        section2.classList.add("locked");
-        return;
-    }
-
-    // Send file to backend via fetch if a new file was uploaded
-    if (fileInput.files[0]) {
-        const formData = new FormData(datasetForm);
-        await fetch('/uploadFile', { method: 'POST', body: formData });
-    }
-
-    // Process CSV on frontend
-    processCSV(fileText);
+    const formData = new FormData(datasetForm);
+    await fetch('/uploadFile', { method: 'POST', body: formData });
+    section1.classList.add("locked");
+    section2.classList.remove("locked");
+    
 });
 
 
@@ -449,42 +417,6 @@ function validateCSVHeaders(cols) {
 
   return case1Valid || case2Valid;
 }
-
-document.getElementById("fileInput").addEventListener("change", function () {
-    const file = this.files[0];
-    document.getElementById("startBtn").disabled = !file;
-});
-
-// document.getElementById("datasetform").addEventListener("submit", function (e) {
-//     const fileInput = document.getElementById("fileInput");
-//     const file = fileInput.files[0];
-
-//     if (!file) return; // let browser handle it
-
-//     e.preventDefault(); // 🚫 stop form submission
-
-//     const reader = new FileReader();
-
-//     reader.onload = function (event) {
-//         const text = event.target.result;
-//         const firstLine = text.split("\n")[0];
-
-//         const delimiter = firstLine.includes(";") ? ";" : ",";
-//         const headers = firstLine.split(delimiter).map(h => h.trim().toLowerCase());
-
-//         const result = validateCSVHeaders(headers);
-
-//         if (!result) {
-//             showFormatModal();
-//         } else {
-//             // ✅ valid → submit for real
-//             e.target.submit();
-//         }
-//     };
-
-//     reader.readAsText(file);
-// });
-
 
 
 

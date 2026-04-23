@@ -46,6 +46,7 @@ socket.on("enrichment_status", (data) => {
 
     removeBtn.onclick = () => {
       row.remove();
+      fetch('/delete/' + data.enrichment_id);
       unlockSection4IfReady();
     };
 
@@ -74,16 +75,14 @@ socket.on("enrichment_status", (data) => {
     button.appendChild(fill);
     button.appendChild(buttonlabel);
     
-    //testing
     const topRow = document.createElement("div");
     topRow.className = "top-row";
     topRow.appendChild(label);
     topRow.appendChild(removeBtn);
-    //test end
-    // row.appendChild(label);
-    row.appendChild(topRow);//test included
+
+    row.appendChild(topRow);
     row.appendChild(button);
-    // row.appendChild(removeBtn);
+
     progressContainer.appendChild(row);
 
     unlockSection4IfReady();

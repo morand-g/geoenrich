@@ -17,7 +17,7 @@ import netCDF4 as nc
 
 from pathlib import Path
 
-from functions import get_progress_callback, merge_files, normalization_values
+from functions import get_progress_callback, merge_files, normalization_values, delete_enrichment
 
 app = Flask(__name__)
 
@@ -66,10 +66,10 @@ def get_previous_files():
 
     return jsonify(list(previous_files))
 
+
 @app.route("/uploadFile", methods=['POST'])
 def uploadFiles():
 
-    uploaded_file = request.files.get('file')
     selected_previous_file = request.form.get('previous_file')
 
     # CASE 1: User selected a previous file
@@ -82,70 +82,67 @@ def uploadFiles():
         app.config['DS_REF'] = selected_previous_file.split('.')[0]
 
     # CASE 2: User uploaded a new file
-    elif uploaded_file and uploaded_file.filename != '':
+    else:
+        
+        uploaded_file = request.files.get('file')
         csv_filepath = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
         uploaded_file.save(csv_filepath)
 
         app.config['DS_REF'] = uploaded_file.filename.split('.')[0]
 
-    else:
-        return "No file selected", 400
+        # Create enrichment file if it doesn't already exist (i.e. if user uploaded a new file rather than selecting a previous one)  
+
+        if not Path(biodiv_path / os.path.basename(csv_filepath)).exists():
+
+            # Guess column names
+            lat_col, lon_col, date_col = 'latitude', 'longitude', 'date'
+            colnames = pd.read_csv(csv_filepath, nrows=0).columns.tolist()
+
+            for col in colnames:
+                if col.lower() in ['latitude', 'y', 'lat', 'decimallatitude']:
+                    lat_col = col
+                elif col.lower() in ['longitude', 'x', 'lon', 'decimallongitude']:
+                    lon_col = col
+                elif col.lower() in ['date', 'eventdate']:
+                    date_col = col
+
+            try:
+                df = import_occurrences_csv(
+                    path=csv_filepath,
+                    id_col='id',
+                    date_col=date_col,
+                    lat_col=lat_col,
+                    lon_col=lon_col
+                )
+            except:
+                df = load_areas_file(csv_filepath)
+
+            create_enrichment_file(df, app.config['DS_REF'])
 
 
-    # ---------------------------------------------------
-    # From here, both cases use the same csv_filepath
-    # ---------------------------------------------------
+    _, enrichment_metadata = load_enrichment_file(app.config['DS_REF'])
+    enrichments = enrichment_metadata['enrichments']
 
-    if not Path(biodiv_path / os.path.basename(csv_filepath)).exists():
+    for enrichment in enrichments:
+        enrichment_id = enrichment['id']
 
-        # Guess column names
-        lat_col, lon_col, date_col = 'latitude', 'longitude', 'date'
-        colnames = pd.read_csv(csv_filepath, nrows=0).columns.tolist()
+        socketio.start_background_task(
+            target=push_status,
+            enrichment_id=enrichment_id,
+            status='PENDING',
+            varname=enrichment['parameters']['var_id']
+        )
 
-        for col in colnames:
-            if col.lower() in ['latitude', 'y', 'lat', 'decimallatitude']:
-                lat_col = col
-            elif col.lower() in ['longitude', 'x', 'lon', 'decimallongitude']:
-                lon_col = col
-            elif col.lower() in ['date', 'eventdate']:
-                date_col = col
-
-        try:
-            df = import_occurrences_csv(
-                path=csv_filepath,
-                id_col='id',
-                date_col=date_col,
-                lat_col=lat_col,
-                lon_col=lon_col
-            )
-        except:
-            df = load_areas_file(csv_filepath)
-
-        create_enrichment_file(df, app.config['DS_REF'])
-
-    else:
-        _, enrichment_metadata = load_enrichment_file(app.config['DS_REF'])
-        enrichments = enrichment_metadata['enrichments']
-
-        for enrichment in enrichments:
-            enrichment_id = enrichment['id']
-
+        if enrichment['status'] == 'Enriched':
             socketio.start_background_task(
                 target=push_status,
                 enrichment_id=enrichment_id,
-                status='PENDING',
+                status='COMPLETED',
                 varname=enrichment['parameters']['var_id']
             )
 
-            if enrichment['status'] == 'Enriched':
-                socketio.start_background_task(
-                    target=push_status,
-                    enrichment_id=enrichment_id,
-                    status='COMPLETED',
-                    varname=enrichment['parameters']['var_id']
-                )
-
     return '', 200
+
 
 @app.route("/getFileContent/<filename>", methods=["GET"])
 def get_file_content(filename):
@@ -221,6 +218,16 @@ def enrich_route(enrichment_id):
 
     return '', 200
 
+
+@app.route("/delete/<enrichment_id>", methods=['GET'])
+def delete_route(enrichment_id):
+
+    # Catch delete signal and delete enrichment
+    ds_ref = app.config['DS_REF']
+
+    delete_enrichment(ds_ref, int(enrichment_id))
+
+    return '', 200
 
 
 @celery.task()
