@@ -5,9 +5,13 @@
     <title>GeoEnrich Dashboard</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/dashboard.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static',filename='assets/favicon.ico') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"> 
 </head>
 <body>
-    <h1>GeoEnrich Dashboard</h1>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <!-- <img src="{{ url_for('static', filename='assets/favicon.ico') }}" alt="Logo" style="height: 40px;"> -->
+        <h1 style="margin: 0;">GeoEnrich Dashboard</h1>
+    </div>
 
 
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
@@ -22,13 +26,13 @@
             <!-- SECTION 1 -->
             <div id="section1" class="section">
                 <h2>1. Upload CSV</h2>
-                <div style="display: flex; align-items: center;gap: 2%;">
-                    <label>Select your georeferenced file</label>
-                    <a href="https://geoenrich.readthedocs.io/en/latest/online.html" target="_blank" style="text-decoration: none;margin-top: 10px; font-size: smaller; text-align: right;">File formatting guide</a>
+                <div style="display: flex; align-items: center;bottom: 7px; margin-bottom: 7px;gap: 9%;">
+                    <label>Select your georeferenced file:</label>
+                    <a href="https://geoenrich.readthedocs.io/en/latest/online.html" target="_blank" style="text-decoration: none;margin-top: 10px; font-size: smaller; text-align: right;">formatting guide</a>
 
                 </div>
                 <form id="datasetform" method="POST" action="/uploadFile" enctype="multipart/form-data">
-                    <div id="uploadBox" class="upload-box">
+                    <div id="uploadBox" class="upload-box" style="bottom: 7px; margin-bottom: 7px;">
                         <span id="uploadText">Drag & drop CSV here<br />or click to upload</span>
                         <input type="file" id="fileInput" accept=".csv" name="file" hidden />
                     </div>
@@ -45,7 +49,7 @@
             <h2>2. Add variables</h2>
             <form id="varform" method="POST" action="/addVariables" enctype='application/x-www-form-urlencoded'>
                 <div style="display: flex; align-items: center; gap: 35%;">
-                    <label>Variables</label>
+                    <label>Variables:</label>
                    
                     <a href="https://geoenrich.readthedocs.io/en/latest/variables.html" target="_blank" style="text-decoration: none;margin-top: 10px; font-size: smaller; text-align: right;">View available variables</a>
 
@@ -58,10 +62,10 @@
                 <div id="selectedVariables" name="selectedVariables" class="variable-list"></div>
                 <input type="hidden" id="selectedVariablesList" name="selectedVariablesList" />
 
-                <label>Geographic buffer (km)</label>
-                <input type="number" id="bufferInput" name="bufferInput" placeholder="e.g. 5" />
+                <label>Geographic buffer (km):</label>
+                <input type="number" id="bufferInput" name="bufferInput" placeholder="e.g. 5" style="width: 94%;" />
 
-                <label>Depth mode</label>
+                <label>Depth mode:</label>
                 <select id="depthMode" name="depthMode">
                     <option value="surface">Surface</option>
                     <option value="all">All depths</option>

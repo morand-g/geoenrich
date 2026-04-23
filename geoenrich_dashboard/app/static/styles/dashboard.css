@@ -376,3 +376,127 @@ font-size: 14px;
 
   z-index: 1000;
 }
+
+
+
+/* new css */
+
+/* ===== LIGHT BLUE THEME PATCH (non-destructive) ===== */
+
+body {
+  background: linear-gradient(135deg, #eef6ff, #f7fbff);
+  color: #1e293b;
+}
+
+/* Headings */
+h1 {
+  color: #1d4ed8;
+}
+
+/* Sections (keep structure, just restyle) */
+.section {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+
+.section h2 {
+  color: #2563eb;
+}
+
+/* Upload box */
+.upload-box {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.upload-box.dragover {
+  background: #dbeafe;
+  border-color: #2563eb;
+}
+
+/* Buttons (keep your classes) */
+.inputbutton,
+.inputfillbutton {
+  background: #3b82f6;
+}
+
+.inputbutton:hover,
+.inputfillbutton:hover {
+  background: #2563eb;
+}
+
+/* Disabled */
+.inputbutton:disabled {
+  background: #93c5fd;
+}
+
+/* Inputs */
+input,
+select {
+  border: 1px solid #bfdbfe;
+  background: #f8fbff;
+}
+
+input:focus,
+select:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* Variable items */
+.variable-item {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+}
+
+/* Progress bars */
+.progress-row {
+  background: #e0ecff;
+}
+
+.progress-bar {
+  background: #c7dbff;
+}
+
+.progress-fill {
+  background: #3b82f6;
+}
+
+/* Stats box */
+.stats {
+  background: #f0f7ff;
+}
+
+/* Modal */
+.modal {
+  background: rgba(37, 99, 235, 0.15);
+}
+
+.modal-content {
+  border: 1px solid #dbeafe;
+}
+
+/* Table */
+#csvPreviewTable th {
+  background: #dbeafe;
+}
+
+#csvPreviewTable tr:nth-child(even) {
+  background: #f0f7ff;
+}
+
+#csvPreviewTable tr:hover {
+  background: #e0ecff;
+}
+
+/* Muted text */
+.muted {
+  color: #64748b;
+}
+
+a {
+  color: #5469d4;
+  text-decoration: unset;
+}
