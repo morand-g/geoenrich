@@ -42,8 +42,6 @@ def get_progress_callback(enrichment_id):
 
             if enrichment_id == 'collation':
                 socketio.emit('collation_status', {'status': "PROGRESS", 'progress': int(self.n / self.total * 100)})
-            elif enrichment_id == 'normalization':
-                socketio.emit('normalization_status', {'status': "PROGRESS", 'progress': int(self.n / self.total * 100)})
             else:
                 socketio.emit('enrichment_status', {'enrichment_id': enrichment_id, 'status': "PROGRESS", 'progress': int(self.n / self.total * 100)})
 
