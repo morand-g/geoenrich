@@ -12,6 +12,7 @@ const statsDiv = document.getElementById("stats");
 const section2 = document.getElementById("section2");
 const enrichBtn = document.getElementById("enrichBtn");
 const progressContainer = document.getElementById("progressContainer");
+const resInput = document.getElementById("resInput");
 
 const variableSelect = document.getElementById("variableSelect");
 const selectedVariablesDiv = document.getElementById("selectedVariables");
@@ -262,6 +263,25 @@ fetch("/get_var_catalog")
 /* =========================
    SECTION 4
 ========================= */
+
+//collate button
+function isValidInteger(value) {
+  return value !== "" && Number.isInteger(Number(value));
+}
+
+function updateCollateButton() {
+  const statuses = document.querySelectorAll(".status");
+  const allFinished = [...statuses].every(s => s.textContent.trim() === "Finished");
+
+  if (allFinished && isValidInteger(resInput.value)) {
+    collateBtn.disabled = false;
+  } else {
+    collateBtn.disabled = true;
+  }
+}
+
+resInput.addEventListener("input", updateCollateButton);
+
 function unlockSection4IfReady() {
 
   const statuses = document.querySelectorAll(".status");
@@ -281,6 +301,7 @@ function unlockSection4IfReady() {
       document.getElementById("collateBtn").disabled = true;
       document.getElementById("section4").querySelector('.muted').style.display = "block";
   }
+  updateCollateButton();
 }
 
 document.getElementById('collateForm').addEventListener('submit', async (e) => {
