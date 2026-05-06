@@ -21,15 +21,15 @@ Illustration of an occurrence dataset enriched with bathymetry data
 
 This project is being developed as part of the G2OI project, cofinanced by the European union, the Reunion region, and the French Republic.
 
-.. image:: https://raw.githubusercontent.com/morand-g/geoenrich/main/docker/app/static/assets/logo_ue.png
+.. image:: https://raw.githubusercontent.com/morand-g/geoenrich/main/geoenrich_online/app/static/assets/logo_ue.png
    :target: https://european-union.europa.eu/index_fr
    :alt: Union Européenne
    :height: 40
-.. image:: https://raw.githubusercontent.com/morand-g/geoenrich/main/docker/app/static/assets/logo_reunion.png
+.. image:: https://raw.githubusercontent.com/morand-g/geoenrich/main/geoenrich_online/app/static/assets/logo_reunion.png
    :target: https://regionreunion.com/
    :alt: Région Réunion
    :height: 40
-.. image:: https://raw.githubusercontent.com/morand-g/geoenrich/main/docker/app/static/assets/logo_france.png
+.. image:: https://raw.githubusercontent.com/morand-g/geoenrich/main/geoenrich_online/app/static/assets/logo_france.png
    :target: https://www.gouvernement.fr
    :alt: République Française
    :height: 40
@@ -44,7 +44,7 @@ As this package is distributed under a GPLv3 license, you have no obligation to 
 
 .. epigraph::
 
-   Gaetan Morand. (2026). GeoEnrich v1.X: a new tool for scientists to painlessly enrich species occurrence data with environmental variables (v1.X). Zenodo. DOI:10.5281/zenodo.6458090
+   Morand, G., Nabil, T., Poulain, S., Barde, J. & Mouillot, D. (2026). GeoEnrich v1.0: a new tool for scientists to painlessly enrich species occurrence data with environmental variables (v1.0). Zenodo. http://doi.org/10.5281/zenodo.6458090
 
 You can find the specific DOI for the version you are using on the `package's Zenodo page <http://doi.org/10.5281/zenodo.6458090>`_.
 

@@ -41,6 +41,16 @@ Jupyter Notebook tutorials are available for [python](https://geoenrich.readthed
 
 A graphic interface is available through a Docker web app. See instructions [here](geoenrich_dashboard/README.md)
 
+
+## How to cite
+
+As this package is distributed under a GPLv3 license, you have no obligation to cite the authors when you use it. If you want to cite the package to ensure reproducibility, please consider doing it the following way:
+
+> Morand, G., Nabil, T., Poulain, S., Barde, J. & Mouillot, D. (2026). GeoEnrich v1.0: a new tool for scientists to painlessly enrich species occurrence data with environmental variables (v1.0). Zenodo. http://doi.org/10.5281/zenodo.6458090
+
+You can find the specific DOI for the version you are using on the [package's Zenodo page](http://doi.org/10.5281/zenodo.6458090).
+
+
 ## Issues and further developments
 
 ### User suggestions
