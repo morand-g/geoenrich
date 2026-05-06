@@ -6,24 +6,29 @@
             "name": "Morand, Gaetan"
         },
         {
-            "affiliation": "UMR Marbec, IRD",
-            "name": "Poulain, Sylvain"
-        },
-        {
             "orcid": "0009-0005-3317-3930",
             "affiliation": "UMR Marbec, Université de Montpellier",
             "name": "Nabil, Taha"
         },
         {
+            "affiliation": "UMR Marbec, IRD",
+            "name": "Poulain, Sylvain"
+        },
+        {
             "orcid": "0000-0002-3519-6141",
             "affiliation": "UMR Marbec, IRD",
             "name": "Barde, Julien"
+        },
+        {
+            "orcid": "0000-0003-0402-2605",
+            "affiliation": "UMR Marbec, Université de Montpellier",
+            "name": "Mouillot, David"
         }
     ],
 
     "license": "GPL-3.0",
 
-    "title": "GeoEnrich v0.6.8: a new tool for scientists to painlessly enrich species occurrence data with environmental variables",
+    "title": "GeoEnrich v1.0: a new tool for scientists to painlessly enrich species occurrence data with environmental variables",
 
     "related_identifiers": [
         {

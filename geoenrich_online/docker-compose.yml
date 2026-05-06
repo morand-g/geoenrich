@@ -1,0 +1,19 @@
+#version: '3'
+
+services:
+  web:
+    build: .
+    container_name: geoenrich_online
+    restart: always
+    volumes:
+      - ./app:/app
+    ports:
+      - "8082:8080"
+    environment:
+      - FLASK_APP=main.py
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    working_dir: /app
+    command: bash -c "cp /usr/local/lib/python3.10/site-packages/geoenrich/data/catalog.csv /app/static/js/ \
+                      && python copy_my_files.py \
+                      && flask run --host=0.0.0.0 --port=8080 --reload"

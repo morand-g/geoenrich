@@ -1,4 +1,3 @@
-import os
 from copy import deepcopy
 
 import json
@@ -14,12 +13,7 @@ from cftime import num2date, num2pydate, date2num
 import geoenrich
 import copernicusmarine
 
-try:
-    from geoenrich.credentials import *
-except:
-    from geoenrich.credentials_example import *
-    print('Please rename credentials_example.py to credentials.py and fill in the root path and credentials, if needed')
-    print('File location: ' + str(Path(geoenrich.__file__).with_name('credentials_example.py')))
+from geoenrich.dataloader import sat_path
 
 
 def get_metadata(ds, varname):
@@ -208,11 +202,6 @@ def get_var_catalog():
 
     for v in var_catalog:
         var_catalog[v]['var_id'] = v
-        for domain in dap_creds:
-            if domain in var_catalog[v]['url']:
-                protocol, tail = var_catalog[v]['url'].split('://')
-                creds = dap_creds[domain]['user'] + ':' + dap_creds[domain]['pw']
-                var_catalog[v]['url'] = protocol + '://' + creds + '@' + tail
 
     
     return(var_catalog)

@@ -1,22 +1,22 @@
 ## Docker image
 
-You may use GeoEnrich and its associated webapp locally by loading a Docker container.
-
-To do this you can download *docker-compose.yml* and *Dockerfile*, and load the container the following way:
+You may use GeoEnrich and its associated webapp locally by loading a Docker container the following way:
 
 ```
+git clone https://github.com/morand-g/geoenrich
+cd geoenrich_online
 docker-compose up -d --build
 ```
 
 You can then use geoenrich from the command line:
 
 ```
-docker exec -it geoenrich python
+docker exec -it geoenrich_online python
 ```
 
 Or launch the web app in a browser:
 ```
-localhost:8080
+localhost:8082
 ```
 
 If you need to use datasets that require authentification, you can follow the configuration instructions [here](https://geoenrich.readthedocs.io/en/latest/install.html#first-configuration)

@@ -17,27 +17,19 @@ from datetime import datetime
 
 from copy import deepcopy
 
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 import copernicusmarine
-import xarray as xr
 
-import geoenrich
 from geoenrich.satellite import *
+from geoenrich.dataloader import biodiv_path, sat_path
 
 import logging
 logging.getLogger("copernicus_marine_root_logger").setLevel("WARN")
 
-try:
-    from geoenrich.credentials import *
-except:
-    from geoenrich.credentials_example import *
-
-
 tqdm.pandas()
 
 pd.options.mode.chained_assignment = None 
-
 
 
 ##########################################################################
@@ -50,7 +42,7 @@ pd.options.mode.chained_assignment = None
 
 
 def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request = 'surface', 
-    downsample = {}, slice = None, maxpoints = None, force_download = False):
+    downsample = {}, slice = None, maxpoints = None, force_download = False, progress_callback = None):
 
     """
     Enrich the given dataset with data of the requested variable.
@@ -68,6 +60,7 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
         slice (int tuple): Slice of the enrichment file to use for enrichment.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
 
     Returns:
         None
@@ -77,7 +70,6 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
 
     print(f"Starting enrichment for variable '{var_id}' on dataset '{dataset_ref}'...")
 
-    input_type = enrichment_metadata['input_type']
     enrichments = enrichment_metadata['enrichments']
 
     enrichment_id = get_enrichment_id(enrichments, var_id, geo_buff, time_buff, depth_request, downsample)
@@ -100,15 +92,15 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
     
 
     if var_source['url'] == 'calculated':
-        indices = enrich_compute(to_enrich, var_id, geo_buff, time_buff, downsample)
+        indices = enrich_compute(to_enrich, var_id, geo_buff, time_buff, downsample, progress_callback=progress_callback)
     elif var_source['source'] == 'Copernicus':
         indices = enrich_copernicus(to_enrich, var_source['varname'], var_id, var_source['url'],
                                     geo_buff, time_buff, depth_request, downsample, maxpoints,
-                                    force_download)
+                                    force_download, progress_callback=progress_callback)
     else:
         indices = enrich_download(  to_enrich, var_source['varname'], var_id, var_source['url'],
                                     geo_buff, time_buff, depth_request, downsample, maxpoints,
-                                    force_download)
+                                    force_download, progress_callback=progress_callback)
 
     prefix = str(enrichment_id) + '_'
     indices = indices.add_prefix(prefix)
@@ -117,9 +109,8 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
 
     # If variable is already present, update it
     if not(new_enrichment) and len(indices.columns):
-        relevant_cols = [c for c in original.columns if c[:len(prefix)] == prefix]
-        updated.loc[indices.index, relevant_cols] = indices[relevant_cols]
-        updated.loc[missing_index,relevant_cols] = -1
+        updated.loc[indices.index, indices.columns] = indices[indices.columns]
+        updated.loc[missing_index,indices.columns] = -1
 
     # If indices is not empty
     elif len(indices):
@@ -129,11 +120,17 @@ def enrich(dataset_ref, var_id, geo_buff = None, time_buff = None, depth_request
     # Save file
     if new_enrichment and len(indices):
         save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample)
+
     updated.to_csv(str(Path(biodiv_path, dataset_ref + '.csv')))
 
+    if len(original) == len(to_enrich):
+        update_enrichment_status(dataset_ref, enrichment_id, 'Enriched')
+    else:
+        update_enrichment_status(dataset_ref, enrichment_id, 'Partially Enriched')
 
 
-def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample):
+
+def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample, progress_callback):
 
     """
     Compute a calculated variable for the provided bounds and save into local netcdf file.
@@ -145,6 +142,7 @@ def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample):
         geo_buff (int): Geographic buffer for which to download data around occurrence point (kilometers).
         time_buff (float list): Time bounds for which to download data around occurrence day (days). For instance, time_buff = [-7, 0] will download data from 7 days before the occurrence to the occurrence date.
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
 
     Returns:
         pandas.DataFrame: DataFrame with indices of relevant data in the netCDF file.
@@ -216,6 +214,10 @@ def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample):
     if not(len(geodf2)):
         print('No data in input dataframe.')
         return(pd.DataFrame())
+    
+    if progress_callback:
+        progress_callback.pandas()
+
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, 'surface', downsample))
     res = geodf2.progress_apply(row_compute, axis=1, args = (local_ds, bool_ds, base_datasets,
@@ -241,7 +243,7 @@ def enrich_compute(geodf, var_id, geo_buff, time_buff, downsample):
 
 
 
-def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_request, downsample, maxpoints, force_download):
+def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_request, downsample, maxpoints, force_download, progress_callback):
     
     """
     Download data for the requested occurrences and buffer into local netcdf file.
@@ -251,14 +253,14 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
         geodf (geopandas.GeoDataFrame): Data to be enriched.
         varname(str): Variable name in the dataset.
         var_id (str): ID of the variable to download.
-        url (str): Dataset url (including credentials if needed).
+        url (str): Dataset url.
         geo_buff (int): Geographic buffer for which to download data around occurrence point (kilometers).
         time_buff (float list): Time bounds for which to download data around occurrence day (days). For instance, time_buff = [-7, 0] will download data from 7 days before the occurrence to the occurrence date.
         depth_request (str): For 4D data: 'all' -> data for all depths. 'nearest' -> closest available depth. 'nearest_lower' -> closest lower available depth. Anything else downloads surface data.
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
-
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
     Returns:
         pandas.DataFrame: DataFrame with indices of relevant data in the netCDF file.
 
@@ -315,6 +317,9 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
         print('No data in input dataframe.')
         return(pd.DataFrame())
 
+    if progress_callback:
+        progress_callback.pandas()
+
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, depth_request, downsample))
 
     if maxpoints is not None and (s:= checksize(geodf2['ind'])) > maxpoints:
@@ -353,7 +358,7 @@ def enrich_download(geodf, varname, var_id, url, geo_buff, time_buff, depth_requ
     return(res)
 
 
-def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, depth_request, downsample, maxpoints, force_download):
+def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, depth_request, downsample, maxpoints, force_download, progress_callback):
     
     """
     Download Copernicus data for the requested occurrences and buffer into local netcdf file.
@@ -370,6 +375,7 @@ def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, d
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
         maxpoints(int): Maximum number of points to download.
         force_download(bool): If True, download data regardless of cache status.
+        progress_callback (class): If provided, this class is used to create a custom tqdm progress bar, for instance in a web application. It should be a subclass of tqdm with the same signature.
 
     Returns:
         pandas.DataFrame: DataFrame with indices of relevant data in the netCDF file.
@@ -426,6 +432,9 @@ def enrich_copernicus(geodf, varname, var_id, dataset_id, geo_buff, time_buff, d
     if not(len(geodf2)):
         print('No data in input dataframe.')
         return(pd.DataFrame())
+    
+    if progress_callback:
+        progress_callback.pandas()
 
     geodf2['ind'] = geodf2.apply(calculate_indices, axis = 1, args = (dimdict, var, depth_request, downsample))
 
@@ -545,7 +554,6 @@ def add_bounds(geodf1, geo_buff, time_buff):
 
 ############################# Element-wise enrichment #################################
 
-
 def row_enrich(row, remote_ds, local_ds, bool_ds, dimdict, var, depth_request, downsample, force_download):
 
     """
@@ -561,7 +569,7 @@ def row_enrich(row, remote_ds, local_ds, bool_ds, dimdict, var, depth_request, d
         var (dict): Variable dictionary as returned by :func:`geoenrich.satellite.get_metadata`.
         depth_request (str): For 4D data: 'all' -> data for all depths. 'nearest' -> closest available depth. 'nearest_lower' -> closest lower available depth. Anything else downloads surface data.
         downsample (dict): Number of points to skip between each downloaded point, for each dimension, using its standard name as a key.
-        force_download(bool): If True, download data regardless of cache status.    
+        force_download(bool): If True, download data regardless of cache status.
     Returns:
         pandas.Series: Coordinates of the data of interest in the netCDF file.
 
@@ -571,7 +579,6 @@ def row_enrich(row, remote_ds, local_ds, bool_ds, dimdict, var, depth_request, d
 
     ind = row['ind']
     params = [dimdict[n]['standard_name'] for n in var['params']]
-    ordered_indices = [ind[p] for p in params]
     
     download_data(remote_ds, local_ds, bool_ds, var, dimdict, ind, force_download)
 
@@ -986,7 +993,6 @@ def reset_enrichment_file(dataset_ref, var_ids_to_remove):
     df, enrichment_metadata = load_enrichment_file(dataset_ref)
 
     enrichments = enrichment_metadata['enrichments']
-    input_type = enrichment_metadata['input_type']
 
     remaining_enrichments = []
     to_drop = []
@@ -1033,7 +1039,6 @@ def enrichment_status(dataset_ref):
     df, enrichment_metadata = load_enrichment_file(dataset_ref)
 
     enrichments = enrichment_metadata['enrichments']
-    input_type = enrichment_metadata['input_type']
 
     col_indices = parse_columns(df)
 
@@ -1124,7 +1129,7 @@ def get_enrichment_id(enrichments, var_id, geo_buff, time_buff, depth_request, d
     return(result_id)
 
 
-def save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample):
+def save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_buff, depth_request, downsample, status = 'None'):
 
     """
     Save enrichment metadata in the json config file.
@@ -1144,15 +1149,17 @@ def save_enrichment_config(dataset_ref, enrichment_id, var_id, geo_buff, time_bu
     with Path(biodiv_path, dataset_ref + '-config.json').open() as f:
         enrichment_metadata = json.load(f)
 
-    new_enrichment = {'id': enrichment_id,
-                      'parameters':
+    new_enrichment =    {  
+                        'id': enrichment_id,
+                        'parameters':
                            {'var_id':           var_id,
                             'geo_buff':         geo_buff,
                             'time_buff':        time_buff,
                             'depth_request':    depth_request,
-                            'downsample':       downsample
-                            }
-                     }
+                            'downsample':       downsample,
+                            },
+                        'status':           status
+                        }
 
     enrichment_metadata['enrichments'].append(new_enrichment)
 
@@ -1176,3 +1183,31 @@ def read_ids(dataset_ref):
     df = pd.read_csv(str(filepath), index_col = 'id')
 
     return(list(df.index))
+
+
+def update_enrichment_status(ds_ref, enrichment_id, status):
+
+    """
+    Update enrichment status in the config file.
+    
+    Args:
+        ds_ref (str): The enrichment file name (e.g. gbif_taxonKey).
+        enrichment_id (int): Enrichment ID.
+        status (str): Enrichment status. Can be 'None', 'Enriched', 'Partially Enriched', etc.
+    Returns:
+        None
+    """
+
+    filepath_json = biodiv_path / (ds_ref + '-config.json')
+    with filepath_json.open('r') as f:
+        enrichment_metadata = json.load(f)
+
+    new_enrichments = []
+    for enrichment in enrichment_metadata['enrichments']:
+        if enrichment['id'] == int(enrichment_id):
+            enrichment['status'] = status
+        new_enrichments.append(enrichment)
+    enrichment_metadata['enrichments'] = new_enrichments
+
+    with filepath_json.open('w') as f:
+        json.dump(enrichment_metadata, f, ensure_ascii=False, indent=4)

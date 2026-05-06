@@ -25,7 +25,7 @@ copyright = '2025, Gaétan Morand (UMR Marbec). Project under GNU GPL v3 license
 author = 'Gaétan Morand (UMR Marbec)'
 
 # The full version, including alpha/beta/rc tags
-release = '0.6.8'
+release = '1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -34,7 +34,7 @@ release = '0.6.8'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'sphinx_rtd_theme',
-				'nbsphinx', 'sphinx_copybutton']
+				'nbsphinx', 'sphinx_copybutton', 'sphinx_mdinclude']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
