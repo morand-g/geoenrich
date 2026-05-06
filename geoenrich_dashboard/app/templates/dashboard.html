@@ -95,18 +95,20 @@
                 <div class="export-actions">
 
                     <p>Option 1: export variable summaries as CSV.</p>
-                    <div class="sidebysidecontainer">
-                        <button class="inputfillbutton" type="button" id="exportCsvBtn">
-                            <div class="fill" style="width:0%"></div>
-                            <span class="label">Export CSV</span>
-                        </button>
-                    </div>
+                    <form id="exportCsvForm" method="GET" action="/prepare_csv_export" enctype='application/x-www-form-urlencoded'>
+                        <div class="sidebysidecontainer">
+                            <button class="inputfillbutton" type="submit" id="exportCsvBtn">
+                                <div class="fill"></div>
+                                <span class="label">Export CSV</span>
+                            </button>
+                        </div>
+                    </form>
 
                     <form id="collateForm" method="POST" action="/collateData" enctype='application/x-www-form-urlencoded'>
                         <p>Option 2a: collate numpy files with all variables (e.g. for deep learning training).</p>
                         <div class="sidebysidecontainer">
                             <input type="number" id="resInput" name="resInput" placeholder="Target resolution (e.g., 32)"/>
-                            <button class="inputfillbutton" type = 'submit' id="collateBtn" disabled>
+                            <button class="inputfillbutton" type ="submit" id="collateBtn" disabled>
                                 <div class="fill"></div>
                                 <span class="label">Collate</span>
                             </button>

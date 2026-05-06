@@ -374,11 +374,16 @@ def verifyfilenumber(ds_ref):
     out_path.mkdir(exist_ok=True, parents=True)
 
     filelist = list((out_path / (ds_ref + '-npy')).glob('*.npy'))
-    csv, _  = load_enrichment_file(ds_ref)
+    csv, metadata  = load_enrichment_file(ds_ref)
 
-    if len(filelist) == len(csv):
+    with open(out_path / (ds_ref + '_metadata.npy'), 'r') as fp:
+        linecount = sum(1 for line in fp)
+
+    if linecount == len(metadata['enrichments']) and len(filelist) == len(csv):
         socketio.emit('collation_status', {'enrichment_id':  'collation', 'status': "COMPLETED", 'progress': 100})
 
+    else:
+        socketio.emit('collation_status', {'enrichment_id':  'collation', 'status': "RESET"})   
     return '', 200
 
 
@@ -417,7 +422,7 @@ def export_variable(ds_ref, enrichment):
     dimdict, var = get_metadata(ds, var_source['varname'])
 
     print('Computing stats for ' + var_id + '...')
-    res = df.progress_apply(compute_stats, axis=1, args = (enrichment['parameters'], input_type, var_ind, ds, dimdict, var),
+    res = df.apply(compute_stats, axis=1, args = (enrichment['parameters'], input_type, var_ind, ds, dimdict, var),
                                     result_type = 'expand')
     ds.close()
 

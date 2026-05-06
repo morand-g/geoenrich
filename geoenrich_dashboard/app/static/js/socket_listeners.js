@@ -27,6 +27,8 @@ document.head.appendChild(style);
 
 socket.on("enrichment_status", (data) => {
 
+  console.log("Enrichment Status:", data);
+
   if (data.status === "PENDING") {
 
     document.getElementById("section3").classList.remove("locked");
@@ -135,6 +137,8 @@ socket.on("enrichment_status", (data) => {
 
 socket.on("collation_status", (data) => {
 
+  console.log("Collation Status:", data);
+
   document.getElementById("section2").classList.add("locked");
 
   const collateBtn = document.getElementById("collateBtn");
@@ -152,18 +156,25 @@ socket.on("collation_status", (data) => {
   else if (data.status === "COMPLETED") {
 
     fill.style.width = "100%";
-    label.textContent = "Collation complete. Restart?";
+    label.textContent = "Collation complete. Collate again?";
     collateBtn.disabled = false;
     normalizeBtn.disabled = false;
 
     document.getElementById("section2").classList.remove("locked");
     document.getElementById("section3").classList.remove("locked");
     }
-
+  else if (data.status === "RESET") {
+    fill.style.width = "0%";
+    label.textContent = "Collate";
+    collateBtn.disabled = false;
+    normalizeBtn.disabled = true;
+  }
 });
 
 
 socket.on("normalization_status", (data) => {
+
+  console.log("Normalization Status:", data);
 
   const normalizeBtn = document.getElementById("normalizeBtn");
   const collateBtn = document.getElementById("collateBtn");
@@ -191,7 +202,7 @@ socket.on("normalization_status", (data) => {
 
   else if (data.status === "COMPLETED") {
     fill.style.width = "100%";
-    label.textContent = "Normalization complete. Restart?";
+    label.textContent = "Normalization complete. Normalize again?";
     collateBtn.disabled = false;
     normalizeBtn.disabled = false;
     }
@@ -201,6 +212,8 @@ socket.on("normalization_status", (data) => {
 
 
 socket.on("csvexport_status", (data) => {
+
+  console.log("CSV Export Status:", data);
 
   const exportCsvBtn = document.getElementById("exportCsvBtn");
   const fill = exportCsvBtn.querySelector(".fill");
@@ -216,7 +229,7 @@ socket.on("csvexport_status", (data) => {
 
   else if (data.status === "COMPLETED") {
     fill.style.width = "100%";
-    label.textContent = "CSV export complete. Restart?";
+    label.textContent = "CSV export complete. Export again?";
     exportCsvBtn.disabled = false;
     
     fetch("/get_csv_export_preview/<task_id>".replace("<task_id>", csvexportTaskId))

@@ -292,17 +292,29 @@ function unlockSection4IfReady() {
 
   if (allFinished) {
       document.getElementById("section4").classList.remove("locked");
+      document.getElementById("exportCsvBtn").disabled = false;
       document.getElementById("collateBtn").disabled = false;
       document.getElementById("section4").querySelector('.muted').style.display = "none";
       fetch("/checkExported");
   }
   else {
       document.getElementById("section4").classList.add("locked");
+      document.getElementById("exportCsvBtn").disabled = true;
       document.getElementById("collateBtn").disabled = true;
       document.getElementById("section4").querySelector('.muted').style.display = "block";
   }
   updateCollateButton();
 }
+
+document.getElementById("exportCsvForm").addEventListener('submit', async (e) => {
+    e.preventDefault();
+    fetch("/prepare_csv_export")
+        .then(response => response.json())
+        .then(data => {
+            csvexportTaskId = data.task_id;
+        });
+});
+
 
 document.getElementById('collateForm').addEventListener('submit', async (e) => {
         e.preventDefault(); // Prevent page reload
@@ -312,6 +324,30 @@ document.getElementById('collateForm').addEventListener('submit', async (e) => {
         });
         collateBtn.disabled = true;
     });
+
+
+
+
+document.getElementById('normform').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent page reload
+        const response = await fetch('/normalizeData', {
+            method: 'POST',
+            body: new FormData(e.target)
+        });
+        normalizeBtn.disabled = true;
+    });
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -343,30 +379,16 @@ function handleFile2(file) {
   normalizeBtn.disabled = false;
 }
 
-document.getElementById('normform').addEventListener('submit', async (e) => {
-        e.preventDefault(); // Prevent page reload
-        const response = await fetch('/normalizeData', {
-            method: 'POST',
-            body: new FormData(e.target)
-        });
-        normalizeBtn.disabled = true;
-    });
+
 
 //modal Js
-const exportBtn = document.getElementById("exportCsvBtn");
 const modal = document.getElementById("csvModal");
 const closeModalBtn = document.getElementById("closeModalBtn");
 const downloadBtn = document.getElementById("downloadCsvBtn");
 const previewTable = document.getElementById("csvPreviewTable");
 let csvexportTaskId = null;
 
-exportBtn.addEventListener("click", () => {
-    fetch("/prepare_csv_export")
-        .then(response => response.json())
-        .then(data => {
-            csvexportTaskId = data.task_id;
-        });
-});
+
 
 closeModalBtn.addEventListener("click", () => {
     modal.style.display = "none";
