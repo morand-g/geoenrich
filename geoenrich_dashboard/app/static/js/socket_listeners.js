@@ -168,6 +168,9 @@ socket.on("collation_status", (data) => {
     label.textContent = "Collate";
     collateBtn.disabled = false;
     normalizeBtn.disabled = true;
+
+    document.getElementById("section2").classList.remove("locked");
+    document.getElementById("section3").classList.remove("locked");
   }
 });
 
