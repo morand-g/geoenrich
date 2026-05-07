@@ -1,4 +1,4 @@
-# **geoenrich 1.0**
+# **geoenrich 1.0.1**
 
 [![Read the Docs](https://img.shields.io/readthedocs/geoenrich)](https://geoenrich.readthedocs.io/en/latest/)
 [![License](https://img.shields.io/github/license/morand-g/geoenrich?color=green)](https://github.com/morand-g/geoenrich/blob/main/LICENSE)
@@ -46,7 +46,7 @@ A graphic interface is available through a Docker web app. See instructions [her
 
 As this package is distributed under a GPLv3 license, you have no obligation to cite the authors when you use it. If you want to cite the package to ensure reproducibility, please consider doing it the following way:
 
-> Morand, G., Nabil, T., Poulain, S., Barde, J. & Mouillot, D. (2026). GeoEnrich v1.0: a new tool for scientists to painlessly enrich species occurrence data with environmental variables (v1.0). Zenodo. http://doi.org/10.5281/zenodo.6458090
+> Morand, G., Nabil, T., Poulain, S., Barde, J. & Mouillot, D. (2026). GeoEnrich v1.0.1: a new tool for scientists to painlessly enrich species occurrence data with environmental variables (v1.0.1). Zenodo. http://doi.org/10.5281/zenodo.6458090
 
 You can find the specific DOI for the version you are using on the [package's Zenodo page](http://doi.org/10.5281/zenodo.6458090).
 
