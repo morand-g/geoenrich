@@ -60,10 +60,10 @@ def load_paths():
     sat_path = cache_path / 'sat'
 
     if not biodiv_path.exists():
-        biodiv_path.mkdir()
+        biodiv_path.mkdir(parents=True)
 
     if not sat_path.exists():
-        sat_path.mkdir()
+        sat_path.mkdir(parents=True)
 
     return(biodiv_path, sat_path)
 
