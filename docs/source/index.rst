@@ -1,4 +1,4 @@
-geoenrich 1.0 documentation
+geoenrich 1.0.1 documentation
 ==============================
 
 |Read the Docs| |License| |PyPI| |Python versions| |Last commit| |DOI|
@@ -44,7 +44,7 @@ As this package is distributed under a GPLv3 license, you have no obligation to 
 
 .. epigraph::
 
-   Morand, G., Nabil, T., Poulain, S., Barde, J. & Mouillot, D. (2026). GeoEnrich v1.0: a new tool for scientists to painlessly enrich species occurrence data with environmental variables (v1.0). Zenodo. http://doi.org/10.5281/zenodo.6458090
+   Morand, G., Nabil, T., Poulain, S., Barde, J. & Mouillot, D. (2026). GeoEnrich v1.0.1: a new tool for scientists to painlessly enrich species occurrence data with environmental variables (v1.0.1). Zenodo. http://doi.org/10.5281/zenodo.6458090
 
 You can find the specific DOI for the version you are using on the `package's Zenodo page <http://doi.org/10.5281/zenodo.6458090>`_.
 

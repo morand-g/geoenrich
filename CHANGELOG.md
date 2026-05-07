@@ -1,3 +1,9 @@
+## v1.0.1
+
+#### Bug fixes:
+- Fixed a bug preventing cache folder creation
+
+
 ## v1.0
 
 #### New functions:
