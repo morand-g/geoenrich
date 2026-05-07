@@ -20,7 +20,7 @@ The following columns are mandatory: a unique ID, an occurrence date, its latitu
 
 .. csv-table:: Turtle occurrences
    :file: ../../geoenrich/data/webapp_turtles.csv
-   :widths: 20 20 20 20 20
+   :widths: 15 15 15 15 15 25
    :header-rows: 1
 
 Download sample csv file `webapp_turtles.csv <https://raw.githubusercontent.com/morand-g/geoenrich/main/geoenrich/data/webapp_turtles.csv>`_ (right click -> Save As).
